@@ -1,0 +1,24 @@
+version: "4.0"
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: admin_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: protu-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - protu_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  protu_network:
+    driver: bridge
