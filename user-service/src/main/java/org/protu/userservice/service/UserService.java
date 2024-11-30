@@ -1,67 +1,17 @@
 package org.protu.userservice.service;
 
-import org.protu.userservice.dto.RegisterRequestDTO;
-import org.protu.userservice.dto.UserUpdateDto;
-import org.protu.userservice.exceptions.ResourceNotFoundException;
-import org.protu.userservice.model.User;
-import org.protu.userservice.repository.UserRepository;
-import org.springframework.stereotype.Service;
+import org.protu.userservice.dto.*;
 
-@Service
-public class UserService implements IUserService{
+import java.nio.file.AccessDeniedException;
 
-    private final UserRepository userRepository;
+public interface UserService {
+  TokensResponseDto registerUser(RegisterRequestDto registerRequest);
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+  TokensResponseDto loginUser(LoginRequestDto loginRequestDto);
 
-    @Override
-    public User registerUser(RegisterRequestDTO registerRequest) {
-        if (userRepository.existsByUsername(registerRequest.getUsername())) {
-            throw new IllegalArgumentException("Username is already taken");
-        }
+  UserResponseDto getUserById(Long userId, String authHeader) throws AccessDeniedException;
 
-        if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new IllegalArgumentException("Email is already registered");
-        }
+  UserResponseDto updateUser(Long userId, UpdateRequestDto userUpdateDto, String authHeader) throws AccessDeniedException;
 
-        User user = new User();
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-//        user.setPasswordHash(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setPasswordHash(registerRequest.getPassword());
-        user.setPhoneNumber(registerRequest.getPhoneNumber());
-        user.setAuthorities("ROLE_USER");
-
-        return userRepository.save(user);
-    }
-
-    @Override
-    public void deactivateUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-        user.setIsActive(false);
-        userRepository.save(user);
-    }
-
-    @Override
-    public User updateUser(Long userId, UserUpdateDto userUpdateDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-
-        user.setFirstName(userUpdateDto.getFirstName());
-        user.setLastName(userUpdateDto.getLastName());
-        user.setPhoneNumber(userUpdateDto.getPhoneNumber());
-        userRepository.save(user);
-        return user;
-    }
-
-    @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
-    }
+  void deactivateUser(Long userId, String authHeader) throws AccessDeniedException;
 }
