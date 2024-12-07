@@ -12,4 +12,7 @@ public class TokensResponseDto {
   Long userId;
   String accessToken;
   String refreshToken;
+  String accessTokenExpiresIn;
+  String refreshTokenExpiresIn;
+  String tokenType;
 }

@@ -2,11 +2,19 @@ package org.protu.userservice.service;
 
 public interface JWTService {
 
-  public String generateRefreshToken(String username);
+  String generateRefreshToken(Long userId);
 
-  public String generateAccessToken(String username);
+  String generateAccessToken(Long userId);
 
-  public boolean validateToken(String token, String username);
+  boolean isValidToken(String token, Long userId);
 
-  public String getUsernameFromToken(String token);
+  String getAccessTokenDuration();
+
+  String getRefreshTokenDuration();
+
+  boolean isTokenExpired(String token);
+
+  Long getUserIdFromToken(String token);
+
+  String getTokenFromHeader(String authHeader);
 }

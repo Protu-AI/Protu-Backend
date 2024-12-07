@@ -8,11 +8,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponseDto {
-  Long id;
-  String username;
-  String firstName;
-  String lastName;
-  String email;
-  String phoneNumber;
+public class RefreshResponseDto {
+  String accessToken;
+  String expiresIn;
 }

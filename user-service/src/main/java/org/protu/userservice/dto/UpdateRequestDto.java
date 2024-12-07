@@ -30,11 +30,11 @@ public class UpdateRequestDto {
   @Size(max = 100, message = "Email must not exceed 100 characters")
   String email;
 
-  @NotBlank(message = "Password is required")
-  @Size(min = 8, message = "Password must be at least 8 characters long")
-  String password;
-
   @NotBlank(message = "Phone number is required")
   @Size(max = 20, message = "Phone number must not exceed 20 characters")
   String phoneNumber;
+
+  @NotBlank(message = "Password is required")
+  @Size(min = 8, message = "Password must be at least 8 characters long")
+  String password;
 }

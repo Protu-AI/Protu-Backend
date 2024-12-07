@@ -20,23 +20,19 @@ public class JWTServiceImpl implements JWTService {
   private String jwtSecret;
 
   @Value("${jwt.access-token-expiration-time}")
-  private long accessTokenExpiryTime;
+  private String accessTokenExpiryTime;
 
   @Value("${jwt.refresh-token-expiration-time}")
-  private long refreshTokenExpiryTime;
+  private String refreshTokenExpiryTime;
 
-  private String generateToken(String username, long expiryTime) {
+  private String generateToken(Long userId, long expiryTime) {
     Instant now = Instant.now();
     return Jwts.builder()
-        .subject(username)
+        .subject(String.valueOf(userId))
         .issuedAt(Date.from(now))
         .expiration(Date.from(now.plus(expiryTime, ChronoUnit.MILLIS)))
         .signWith(getSigningKey())
         .compact();
-  }
-
-  private boolean isTokenExpired(String token) {
-    return extractExpiration(token).before(Date.from(Instant.now()));
   }
 
   private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -61,23 +57,42 @@ public class JWTServiceImpl implements JWTService {
   }
 
   @Override
-  public String getUsernameFromToken(String token) {
-    return extractClaim(token, Claims::getSubject);
+  public String getTokenFromHeader(String authHeader) {
+    return authHeader.split(" ")[1];
   }
 
   @Override
-  public String generateAccessToken(String username) {
-    return generateToken(username, accessTokenExpiryTime);
+  public String getAccessTokenDuration() {
+    return Long.parseLong(accessTokenExpiryTime) / (1000 * 60) + " minutes";
   }
 
   @Override
-  public String generateRefreshToken(String username) {
-    return generateToken(username, refreshTokenExpiryTime);
+  public String getRefreshTokenDuration() {
+    return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60) + " minutes";
   }
 
   @Override
-  public boolean validateToken(String token, String username) {
-    final String usernameFromToken = getUsernameFromToken(token);
-    return (usernameFromToken.equals(username) && !isTokenExpired(token));
+  public boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(Date.from(Instant.now()));
+  }
+
+  @Override
+  public Long getUserIdFromToken(String token) {
+    return Long.parseLong(extractClaim(token, Claims::getSubject));
+  }
+
+  @Override
+  public String generateAccessToken(Long userId) {
+    return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
+  }
+
+  @Override
+  public String generateRefreshToken(Long userId) {
+    return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
+  }
+
+  @Override
+  public boolean isValidToken(String token, Long userId) {
+    return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId);
   }
 }

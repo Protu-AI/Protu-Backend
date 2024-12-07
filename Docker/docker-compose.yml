@@ -4,16 +4,14 @@ services:
     build:
       context: ../user-service
       dockerfile: Dockerfile
-    #  TODO: Upload image to DockerHub repo   image: protu-ai/user-service:v1.0.0
+    image: protu-ai/user-service:v1.0.0
     ports:
       - "8085:8085"
+    env_file:
+      - ../user-service/.env
     depends_on:
       postgres:
         condition: service_healthy
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/protu-db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
     volumes:
       - maven-repo:/root/.m2
     networks:
@@ -23,8 +21,8 @@ services:
     image: postgres:latest
     container_name: postgres-db-container
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: protu-db
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]

@@ -9,9 +9,9 @@ public interface UserService {
 
   TokensResponseDto loginUser(LoginRequestDto loginRequestDto);
 
-  UserResponseDto getUserById(Long userId, String authHeader) throws AccessDeniedException;
+  UserResponseDto getUserById(Long userId, Long authUserId) throws AccessDeniedException;
 
-  UserResponseDto updateUser(Long userId, UpdateRequestDto userUpdateDto, String authHeader) throws AccessDeniedException;
+  UserResponseDto updateUser(Long userId, Long authUserId, UpdateRequestDto userUpdateDto) throws AccessDeniedException;
 
-  void deactivateUser(Long userId, String authHeader) throws AccessDeniedException;
+  void deactivateUser(Long userId, Long authUserId) throws AccessDeniedException;
 }

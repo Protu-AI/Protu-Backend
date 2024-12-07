@@ -1,5 +1,7 @@
-package org.protu.userservice.security;
+package org.protu.userservice.service;
 
+import lombok.RequiredArgsConstructor;
+import org.protu.userservice.exceptions.custom.UserNotFoundException;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,17 +10,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
   private final UserRepository userRepository;
 
-  public CustomUserDetailsService(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
-
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = userRepository.findByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found!!"));
+  public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+    Long userId2 = Long.parseLong(userId);
+    User user = userRepository.findById(userId2)
+        .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
     return org.springframework.security.core.userdetails.User
         .builder()
