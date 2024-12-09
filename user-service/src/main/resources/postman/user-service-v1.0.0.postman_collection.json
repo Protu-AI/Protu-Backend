@@ -1,0 +1,202 @@
+{
+	"info": {
+		"_postman_id": "b73ec814-f367-4640-ae0f-34d5dcf37159",
+		"name": "user-service:v1.0.0",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "31660608"
+	},
+	"item": [
+		{
+			"name": "register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const userId = jsonData.userId;\r",
+							"const refreshToken = jsonData.refreshToken;\r",
+							"const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"if(pm.response.code == 201) {\r",
+							"    pm.environment.set(\"USER_ID\", userId);\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ali\",\r\n    \"username\": \"hosam\",\r\n    \"email\": \"ahmed_hosam@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8085/api/v1/users/register"
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const userId = jsonData.userId;\r",
+							"const refreshToken = jsonData.refreshToken;\r",
+							"const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"if(pm.response.code == 200) {\r",
+							"    pm.environment.set(\"USER_ID\", userId);\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"hosam\",\r\n    \"password\": \"passwordTest123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8085/api/v1/users/login"
+			},
+			"response": []
+		},
+		{
+			"name": "refreshToken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"if(pm.response.code == 200) {\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"}\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{REFRESH_TOKEN}}"
+					}
+				},
+				"method": "POST",
+				"header": [],
+				"url": "http://localhost:8085/api/v1/users/refresh"
+			},
+			"response": []
+		},
+		{
+			"name": "getUser",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{ACCESS_TOKEN}}"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "updateUser",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{ACCESS_TOKEN}}"
+					}
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"ahmed_aldddi14126\",\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ali\",\r\n    \"email\": \"dsaffa@example.com\",\r\n    \"phoneNumber\": \"555-987-6543\",\r\n    \"password\": \"19238455555\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}"
+			},
+			"response": []
+		},
+		{
+			"name": "deactivateUser",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "{{ACCESS_TOKEN}}"
+					}
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}/deactivate"
+			},
+			"response": []
+		}
+	]
+}
