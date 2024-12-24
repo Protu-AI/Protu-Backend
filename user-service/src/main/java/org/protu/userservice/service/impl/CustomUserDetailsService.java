@@ -1,4 +1,4 @@
-package org.protu.userservice.service;
+package org.protu.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;

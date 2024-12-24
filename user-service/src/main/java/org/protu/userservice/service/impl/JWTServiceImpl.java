@@ -1,8 +1,9 @@
-package org.protu.userservice.service;
+package org.protu.userservice.service.impl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.protu.userservice.service.JWTService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
