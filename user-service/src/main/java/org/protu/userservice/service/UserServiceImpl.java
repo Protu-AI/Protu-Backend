@@ -5,6 +5,7 @@ import org.protu.userservice.dto.*;
 import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
 import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
+import org.protu.userservice.mapper.UserMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,11 +18,23 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final JWTServiceImpl jwtService;
+  private final UserMapper userMapper;
 
   private void verifyAuthority(Long userId, Long authUserId) {
     if (!userId.equals(authUserId)) {
       throw new UnauthorizedAccessException("You do not have permission to access this resource.");
     }
+  }
+
+  private TokensResponseDto buildTokenResponseDto(User user) {
+    return TokensResponseDto.builder()
+        .userId(user.getId())
+        .accessToken(jwtService.generateAccessToken(user.getId()))
+        .refreshToken(jwtService.generateRefreshToken(user.getId()))
+        .refreshTokenExpiresIn(jwtService.getRefreshTokenDuration())
+        .accessTokenExpiresIn(jwtService.getAccessTokenDuration())
+        .tokenType("Bearer")
+        .build();
   }
 
   @Override
@@ -34,26 +47,12 @@ public class UserServiceImpl implements UserService {
       throw new UserAlreadyExistsException("User with email: " + registerRequestDto.getEmail() + " already exists");
     }
 
-    User user = User.builder()
-        .username(registerRequestDto.getUsername())
-        .firstName(registerRequestDto.getFirstName())
-        .lastName(registerRequestDto.getLastName())
-        .email(registerRequestDto.getEmail())
-        .passwordHash(passwordEncoder.encode(registerRequestDto.getPassword()))
-        .phoneNumber(registerRequestDto.getPhoneNumber())
-        .authorities("ROLE_USER")
-        .isActive(true)
-        .build();
-
+    User user = userMapper.registerRequestDtoToUser(registerRequestDto);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setAuthorities("ROLE_USER");
+    user.setIsActive(true);
     userRepository.save(user);
-    return TokensResponseDto.builder()
-        .userId(user.getUserId())
-        .accessToken(jwtService.generateAccessToken(user.getUserId()))
-        .refreshToken(jwtService.generateRefreshToken(user.getUserId()))
-        .refreshTokenExpiresIn(jwtService.getRefreshTokenDuration())
-        .accessTokenExpiresIn(jwtService.getAccessTokenDuration())
-        .tokenType("Bearer")
-        .build();
+    return buildTokenResponseDto(user);
   }
 
   @Override
@@ -61,18 +60,10 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findByUsername(loginRequestDto.getUsername())
         .orElseThrow(() -> new UserNotFoundException("User with username: " + loginRequestDto.getUsername() + " not found"));
 
-    if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPasswordHash())) {
+    if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
       throw new BadCredentialsException("Invalid username or password");
     }
-
-    return TokensResponseDto.builder()
-        .userId(user.getUserId())
-        .accessToken(jwtService.generateAccessToken(user.getUserId()))
-        .refreshToken(jwtService.generateRefreshToken(user.getUserId()))
-        .refreshTokenExpiresIn(jwtService.getRefreshTokenDuration())
-        .accessTokenExpiresIn(jwtService.getAccessTokenDuration())
-        .tokenType("Bearer")
-        .build();
+    return buildTokenResponseDto(user);
   }
 
   @Override
@@ -81,14 +72,7 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
 
     verifyAuthority(userId, authUserId);
-    return UserResponseDto.builder()
-        .id(user.getUserId())
-        .username(user.getUsername())
-        .firstName(user.getFirstName())
-        .lastName(user.getLastName())
-        .email(user.getEmail())
-        .phoneNumber(user.getPhoneNumber())
-        .build();
+    return userMapper.userToUserResponseDto(user);
   }
 
   @Override
@@ -102,17 +86,10 @@ public class UserServiceImpl implements UserService {
     user.setLastName(updateRequestDto.getLastName());
     user.setEmail(updateRequestDto.getEmail());
     user.setPhoneNumber(updateRequestDto.getPhoneNumber());
-    user.setPasswordHash(passwordEncoder.encode(updateRequestDto.getPassword()));
+    user.setPassword(passwordEncoder.encode(updateRequestDto.getPassword()));
 
     userRepository.save(user);
-    return UserResponseDto.builder()
-        .id(user.getUserId())
-        .username(user.getUsername())
-        .firstName(user.getFirstName())
-        .lastName(user.getLastName())
-        .email(user.getEmail())
-        .phoneNumber(user.getPhoneNumber())
-        .build();
+    return userMapper.userToUserResponseDto(user);
   }
 
   @Override

@@ -24,8 +24,8 @@ public class User {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "user_id")
-  Long userId;
+  @Column(name = "id")
+  Long id;
 
   @Column(name = "first_name", length = 50, nullable = false)
   String firstName;
@@ -39,8 +39,8 @@ public class User {
   @Column(name = "email", length = 100, unique = true, nullable = false)
   String email;
 
-  @Column(name = "password_hash", length = 100, nullable = false)
-  String passwordHash;
+  @Column(name = "password", length = 100, nullable = false)
+  String password;
 
   @Column(name = "phone_number", length = 20, nullable = false)
   String phoneNumber;
