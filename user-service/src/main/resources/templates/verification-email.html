@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Verification Code</title>
+  <style>
+      body {
+          font-family: 'Segoe UI', Arial, sans-serif;
+          line-height: 1.6;
+          color: #333333;
+          margin: 0;
+          padding: 0;
+          background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+      }
+
+      .container {
+          max-width: 600px;
+          margin: 40px auto;
+          padding: 40px;
+          background-color: #ffffff;
+          border-radius: 16px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      }
+
+      .header {
+          text-align: center;
+          margin-bottom: 40px;
+          position: relative;
+      }
+
+      .logo-container {
+          position: relative;
+          margin-bottom: 30px;
+      }
+
+      .logo {
+          width: 100px;
+          height: 100px;
+          background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+          border-radius: 50%;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: 40px;
+          position: relative;
+          box-shadow: 0 8px 16px rgba(79, 70, 229, 0.2);
+          animation: pulse 2s infinite;
+      }
+
+      .logo::after {
+          content: '';
+          position: absolute;
+          width: 110px;
+          height: 110px;
+          border: 2px solid #4F46E5;
+          border-radius: 50%;
+          opacity: 0.5;
+      }
+
+      @keyframes pulse {
+          0% {
+              transform: scale(1);
+          }
+          50% {
+              transform: scale(1.05);
+          }
+          100% {
+              transform: scale(1);
+          }
+      }
+
+      h2 {
+          color: #1a1a1a;
+          font-size: 28px;
+          margin: 0;
+          padding: 0;
+          font-weight: 600;
+          background: linear-gradient(135deg, #1a1a1a 0%, #4F46E5 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+      }
+
+      .code-box {
+          background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+          border-radius: 16px;
+          padding: 40px;
+          text-align: center;
+          margin: 30px 0;
+          box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+          position: relative;
+          overflow: hidden;
+      }
+
+      .code-box::before {
+          content: '';
+          position: absolute;
+          top: -50%;
+          left: -50%;
+          width: 200%;
+          height: 200%;
+          background: linear-gradient(
+                  45deg,
+                  transparent 0%,
+                  rgba(255, 255, 255, 0.1) 50%,
+                  transparent 100%
+          );
+          animation: shine 3s infinite;
+      }
+
+      @keyframes shine {
+          0% {
+              transform: translateX(-100%) translateY(-100%) rotate(45deg);
+          }
+          100% {
+              transform: translateX(100%) translateY(100%) rotate(45deg);
+          }
+      }
+
+      .verification-code {
+          font-size: 42px;
+          font-weight: bold;
+          letter-spacing: 8px;
+          color: #ffffff;
+          font-family: 'Courier New', monospace;
+          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          position: relative;
+          padding: 10px 0;
+      }
+
+      .verification-code::before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 25%;
+          width: 50%;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.5);
+      }
+
+      .message {
+          color: #4b5563;
+          font-size: 16px;
+          line-height: 1.8;
+          margin: 20px 0;
+          padding: 0 20px;
+      }
+
+      .time-notice {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin: 30px 0;
+          color: #6366F1;
+          font-weight: 500;
+      }
+
+      .time-notice::before,
+      .time-notice::after {
+          content: '';
+          height: 1px;
+          width: 50px;
+          background: linear-gradient(90deg, transparent, #6366F1, transparent);
+      }
+
+      .warning {
+          background: linear-gradient(to right, #fff5f5, #fef2f2);
+          border-left: 4px solid #ef4444;
+          padding: 20px;
+          margin: 25px 0;
+          color: #991b1b;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
+      }
+
+      .warning-icon {
+          display: inline-block;
+          width: 20px;
+          height: 20px;
+          margin-right: 10px;
+          vertical-align: middle;
+          background: #ef4444;
+          border-radius: 50%;
+          position: relative;
+      }
+
+      .warning-icon::after {
+          content: '!';
+          color: white;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-weight: bold;
+          font-size: 14px;
+      }
+
+      .footer {
+          font-size: 13px;
+          color: #6b7280;
+          text-align: center;
+          margin-top: 40px;
+          padding-top: 30px;
+          border-top: 1px solid #e5e7eb;
+          background: linear-gradient(to bottom, transparent, rgba(247, 249, 252, 0.5));
+      }
+
+      .social-links {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+          margin: 20px 0;
+      }
+
+      .social-link {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: #f3f4f6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #4F46E5;
+          text-decoration: none;
+          transition: all 0.3s ease;
+      }
+
+      .social-link:hover {
+          background: #4F46E5;
+          color: white;
+          transform: translateY(-2px);
+      }
+
+      @media only screen and (max-width: 600px) {
+          .container {
+              margin: 0;
+              padding: 20px;
+              border-radius: 0;
+          }
+
+          .verification-code {
+              font-size: 32px;
+              letter-spacing: 6px;
+          }
+
+          .logo {
+              width: 80px;
+              height: 80px;
+              font-size: 32px;
+          }
+
+          .logo::after {
+              width: 88px;
+              height: 88px;
+          }
+      }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="logo-container">
+      <div class="logo">Pro</div>
+    </div>
+    <h2>Security Verification</h2>
+  </div>
+
+  <div class="message">
+    Hello! To ensure the security of your account, please use the verification code below:
+  </div>
+
+  <div class="code-box">
+    <div class="verification-code">[[${verificationCode}]]</div>
+  </div>
+
+  <div class="time-notice">
+    Valid for 10 minutes only
+  </div>
+
+  <div class="message">
+    Enter this code on the verification page to complete your authentication process. For your security, this code
+    will expire in 10 minutes.
+  </div>
+
+  <div class="warning">
+    <span class="warning-icon"></span>
+    If you didn't request this verification code, please ignore this email and contact our support team immediately
+    if you notice any suspicious activity.
+  </div>
+
+  <div class="social-links">
+    <a class="social-link" href="#">T</a>
+    <a class="social-link" href="#">F</a>
+    <a class="social-link" href="#">L</a>
+  </div>
+
+  <div class="footer">
+    <p>This is an automated message. Please do not reply to this email.</p>
+    <p>© 2024 Your Company Name. All rights reserved.</p>
+    <p>Privacy Policy • Terms of Service • Contact Support</p>
+  </div>
+</div>
+</body>
+</html>

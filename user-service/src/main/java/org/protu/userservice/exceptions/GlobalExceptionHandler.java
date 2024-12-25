@@ -2,12 +2,11 @@ package org.protu.userservice.exceptions;
 
 
 import io.jsonwebtoken.ExpiredJwtException;
-import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
-import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
-import org.protu.userservice.exceptions.custom.UserNotFoundException;
+import org.protu.userservice.exceptions.custom.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailSendException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindingResult;
@@ -114,13 +113,72 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
   }
 
-
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ErrorDetails> handleDataIntegrityViolation(DataIntegrityViolationException e) {
     ErrorDetails errorDetails = ErrorDetails.builder()
         .code(HttpStatus.CONFLICT.value())
         .message("Data integrity violation")
         .details(e.getMostSpecificCause().getMessage())
+        .timestamp(Timestamp.from(Instant.now()))
+        .build();
+
+    return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(InvalidVerificationCodeException.class)
+  public ResponseEntity<ErrorDetails> handleInvalidVerificationTokenException(InvalidVerificationCodeException e) {
+    ErrorDetails errorDetails = ErrorDetails.builder()
+        .code(HttpStatus.BAD_REQUEST.value())
+        .message("Invalid verification code")
+        .details(e.getMessage())
+        .timestamp(Timestamp.from(Instant.now()))
+        .build();
+
+    return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ErrorDetails> handleIllegalStateException(IllegalStateException e) {
+    ErrorDetails errorDetails = ErrorDetails.builder()
+        .code(HttpStatus.CONFLICT.value())
+        .message("Illegal State")
+        .details(e.getMessage())
+        .timestamp(Timestamp.from(Instant.now()))
+        .build();
+
+    return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(UserEmailAlreadyVerifiedException.class)
+  public ResponseEntity<ErrorDetails> handleUserEmailAlreadyVerified(UserEmailAlreadyVerifiedException e) {
+    ErrorDetails errorDetails = ErrorDetails.builder()
+        .code(HttpStatus.CONFLICT.value())
+        .message("Email already verified")
+        .details(e.getMessage())
+        .timestamp(Timestamp.from(Instant.now()))
+        .build();
+
+    return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(UserEmailNotVerifiedException.class)
+  public ResponseEntity<ErrorDetails> handleUserEmailNotVerified(UserEmailNotVerifiedException e) {
+    ErrorDetails errorDetails = ErrorDetails.builder()
+        .code(HttpStatus.CONFLICT.value())
+        .message("Email not verified")
+        .details(e.getMessage())
+        .timestamp(Timestamp.from(Instant.now()))
+        .build();
+
+    return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+  }
+
+  @ExceptionHandler(MailSendException.class)
+  public ResponseEntity<ErrorDetails> handleMailSendException(MailSendException e) {
+    ErrorDetails errorDetails = ErrorDetails.builder()
+        .code(HttpStatus.CONFLICT.value())
+        .message("Verification email error.")
+        .details(e.getMessage())
         .timestamp(Timestamp.from(Instant.now()))
         .build();
 

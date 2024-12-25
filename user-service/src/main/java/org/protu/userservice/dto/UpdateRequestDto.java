@@ -1,6 +1,5 @@
 package org.protu.userservice.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
@@ -24,11 +23,6 @@ public class UpdateRequestDto {
   @NotBlank(message = "Username is required")
   @Size(max = 50, message = "Username must not exceed 50 characters")
   String username;
-
-  @NotBlank(message = "Email is required")
-  @Email(message = "Invalid email format")
-  @Size(max = 100, message = "Email must not exceed 100 characters")
-  String email;
 
   @NotBlank(message = "Phone number is required")
   @Size(max = 20, message = "Phone number must not exceed 20 characters")

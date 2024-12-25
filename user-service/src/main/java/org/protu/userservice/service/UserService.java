@@ -5,9 +5,11 @@ import org.protu.userservice.dto.*;
 import java.nio.file.AccessDeniedException;
 
 public interface UserService {
-  TokensResponseDto registerUser(RegisterRequestDto registerRequest);
+  SignupResponseDto registerUser(RegisterRequestDto registerRequest);
 
   TokensResponseDto loginUser(LoginRequestDto loginRequestDto);
+
+  void verifyUserAuthority(Long userId, Long authUserId);
 
   UserResponseDto getUserById(Long userId, Long authUserId) throws AccessDeniedException;
 

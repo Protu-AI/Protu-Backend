@@ -1,12 +1,10 @@
 package org.protu.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.LoginRequestDto;
-import org.protu.userservice.dto.RefreshResponseDto;
-import org.protu.userservice.dto.RegisterRequestDto;
-import org.protu.userservice.dto.TokensResponseDto;
+import org.protu.userservice.dto.*;
 import org.protu.userservice.service.impl.JWTServiceImpl;
 import org.protu.userservice.service.impl.UserServiceImpl;
+import org.protu.userservice.service.impl.VerificationCodeServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,11 +17,18 @@ public class AccessController {
 
   private final UserServiceImpl userServiceImpl;
   private final JWTServiceImpl jwtServiceImpl;
+  private final VerificationCodeServiceImpl verificationCodeServiceImpl;
 
   @PostMapping("/register")
-  public ResponseEntity<TokensResponseDto> registerUser(@Validated @RequestBody RegisterRequestDto registerRequest) {
-    TokensResponseDto tokensResponseDto = userServiceImpl.registerUser(registerRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(tokensResponseDto);
+  public ResponseEntity<SignupResponseDto> registerUser(@Validated @RequestBody RegisterRequestDto registerRequest) {
+    SignupResponseDto signupResponseDto = userServiceImpl.registerUser(registerRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(signupResponseDto);
+  }
+
+  @PostMapping("/confirm")
+  public ResponseEntity<TokensResponseDto> verifyUserEmail(@Validated @RequestBody VerificationRequestDTO requestDto) {
+    TokensResponseDto responseDTO = verificationCodeServiceImpl.verifyUserEmailAndCode(requestDto);
+    return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
   }
 
   @PostMapping("/login")
@@ -45,3 +50,5 @@ public class AccessController {
     return ResponseEntity.status(HttpStatus.OK).body(refreshResponseDto);
   }
 }
+
+

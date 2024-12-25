@@ -51,6 +51,15 @@ public class User {
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
   Boolean isActive = true;
 
+  @Column(name = "is_email_verified", nullable = false)
+  Boolean isEmailVerified;
+
+  @Column(name = "verification_code", nullable = false)
+  String verificationCode;
+
+  @Column(name = "code_expiry_date", nullable = false)
+  Timestamp codeExpiryDate;
+
   @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
   Timestamp createdAt;
 
