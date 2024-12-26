@@ -1,9 +1,7 @@
 package org.protu.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.request.LoginReqDto;
-import org.protu.userservice.dto.request.RegisterReqDto;
-import org.protu.userservice.dto.request.UpdateReqDto;
+import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.RegisterResDto;
 import org.protu.userservice.dto.response.TokensResDto;
@@ -20,6 +18,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
         throw new UserAlreadyExistsException("User with email: " + registerReqDto.getEmail() + " already exists");
       }
 
-      verificationCodeService.sendVerificationCode(userOpt.get());
+      verificationCodeService.sendVerificationCode(userOpt.get(), "Verify your email");
       throw new UserEmailNotVerifiedException("This email is already registered but not verified. A new verification email has been sent to your inbox.");
     }
 
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     user.setAuthorities("ROLE_USER");
     user.setIsActive(true);
     user.setIsEmailVerified(false);
-    verificationCodeService.sendVerificationCode(user);
+    verificationCodeService.sendVerificationCode(user, "Verify your email");
     userRepository.save(user);
 
     return RegisterResDto.builder()
@@ -68,7 +68,6 @@ public class UserServiceImpl implements UserService {
         .emailSent(true)
         .build();
   }
-
 
   @Override
   public TokensResDto loginUser(LoginReqDto loginReqDto) {
@@ -80,7 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     if (!user.getIsEmailVerified()) {
-      verificationCodeService.sendVerificationCode(user);
+      verificationCodeService.sendVerificationCode(user, "Verify your email");
       throw new UserEmailNotVerifiedException("Your email is not verified. Please check your email to verify your account.");
     }
 
@@ -130,4 +129,27 @@ public class UserServiceImpl implements UserService {
     return userMapper.UserToDeactivateResDto(user);
   }
 
+  @Override
+  public void forgotPassword(ForgotPasswordReqDto requestDto) {
+    Optional<User> userOpt = userRepository.findByEmail(requestDto.getEmail());
+    if (userOpt.isEmpty()) {
+      throw new UserNotFoundException("User with email: " + requestDto.getEmail() + " is not found");
+    }
+
+    verificationCodeService.sendVerificationCode(userOpt.get(), "Reset your password");
+  }
+
+  @Override
+  public void resetPassword(ResetPasswordReqDto requestDto) {
+    Optional<User> userOpt = userRepository.findByEmail(requestDto.getEmail());
+    if (userOpt.isEmpty()) {
+      throw new UserNotFoundException("User with email: " + requestDto.getEmail() + " is not found");
+    }
+
+    verificationCodeService.validateCode(userOpt.get(), requestDto.getVerificationCode());
+    User user = userOpt.get();
+    user.setCodeExpiryDate(Timestamp.from(Instant.now()));
+    user.setPassword(requestDto.getPassword());
+    userRepository.save(user);
+  }
 }

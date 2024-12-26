@@ -2,7 +2,7 @@ package org.protu.userservice.service.impl;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.request.VerifyReqDto;
+import org.protu.userservice.dto.request.VerifyEmailReqDto;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.InvalidVerificationCodeException;
 import org.protu.userservice.exceptions.custom.UserEmailAlreadyVerifiedException;
@@ -33,8 +33,10 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
   @Value("${verification-code-expiration-time}")
   private String codeExpiryTime;
 
-  private void validateCode(String storedCode, Timestamp codeExpiryTime, String code) {
-    storedCode = storedCode.trim();
+  @Override
+  public void validateCode(User user, String code) {
+    String storedCode = user.getVerificationCode().trim();
+    Timestamp codeExpiryTime = user.getCodeExpiryDate();
     code = code.trim();
 
     if (!storedCode.equals(code)) {
@@ -47,14 +49,14 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
   }
 
   @Override
-  public TokensResDto verifyUserEmailAndCode(VerifyReqDto requestDTO) {
+  public TokensResDto verifyUserEmailAndCode(VerifyEmailReqDto requestDTO) {
     Optional<User> userOpt = userRepository.findByEmail(requestDTO.getEmail());
     if (userOpt.isEmpty()) {
       throw new UserNotFoundException("User with email:" + requestDTO.getEmail() + " not found.");
     }
 
     User user = userOpt.get();
-    validateCode(user.getVerificationCode(), user.getCodeExpiryDate(), requestDTO.getVerificationCode());
+    validateCode(user, requestDTO.getVerificationCode());
     return verifyUserEmail(user);
   }
 
@@ -72,7 +74,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
   }
 
   @Override
-  public void sendVerificationCode(User user) {
+  public void sendVerificationCode(User user, String subject) {
     String generatedCode = generateVerificationCode(5);
     user.setVerificationCode(generatedCode);
     user.setCodeExpiryDate(Timestamp.valueOf(LocalDateTime.now().plusMinutes(Long.parseLong(codeExpiryTime))));
@@ -84,7 +86,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     try {
       emailService.sendEmail(
           user.getEmail(),
-          "Verify your email",
+          subject,
           htmlContent
       );
     } catch (MessagingException e) {

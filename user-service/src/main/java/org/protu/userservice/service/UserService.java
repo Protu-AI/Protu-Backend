@@ -1,8 +1,6 @@
 package org.protu.userservice.service;
 
-import org.protu.userservice.dto.request.LoginReqDto;
-import org.protu.userservice.dto.request.RegisterReqDto;
-import org.protu.userservice.dto.request.UpdateReqDto;
+import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.RegisterResDto;
 import org.protu.userservice.dto.response.TokensResDto;
@@ -22,4 +20,8 @@ public interface UserService {
   UserResDto updateUser(Long userId, Long authUserId, UpdateReqDto userUpdateDto) throws AccessDeniedException;
 
   DeactivateResDto deactivateUser(Long userId, Long authUserId) throws AccessDeniedException;
+
+  void forgotPassword(ForgotPasswordReqDto requestDto);
+
+  void resetPassword(ResetPasswordReqDto requestDto);
 }
