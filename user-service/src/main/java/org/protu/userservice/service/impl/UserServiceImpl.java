@@ -1,7 +1,13 @@
 package org.protu.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.*;
+import org.protu.userservice.dto.request.LoginReqDto;
+import org.protu.userservice.dto.request.RegisterReqDto;
+import org.protu.userservice.dto.request.UpdateReqDto;
+import org.protu.userservice.dto.response.DeactivateResDto;
+import org.protu.userservice.dto.response.RegisterResDto;
+import org.protu.userservice.dto.response.TokensResDto;
+import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
 import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
 import org.protu.userservice.exceptions.custom.UserEmailNotVerifiedException;
@@ -33,23 +39,23 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public SignupResponseDto registerUser(RegisterRequestDto registerRequestDto) {
-    Optional<User> userOpt = userRepository.findByUsername(registerRequestDto.getUsername());
+  public RegisterResDto registerUser(RegisterReqDto registerReqDto) {
+    Optional<User> userOpt = userRepository.findByUsername(registerReqDto.getUsername());
     if (userOpt.isPresent()) {
-      throw new UserAlreadyExistsException("User with username: " + registerRequestDto.getUsername() + " already exists");
+      throw new UserAlreadyExistsException("User with username: " + registerReqDto.getUsername() + " already exists");
     }
 
-    userOpt = userRepository.findByEmail(registerRequestDto.getEmail());
+    userOpt = userRepository.findByEmail(registerReqDto.getEmail());
     if (userOpt.isPresent()) {
       if (userOpt.get().getIsEmailVerified()) {
-        throw new UserAlreadyExistsException("User with email: " + registerRequestDto.getEmail() + " already exists");
+        throw new UserAlreadyExistsException("User with email: " + registerReqDto.getEmail() + " already exists");
       }
 
       verificationCodeService.sendVerificationCode(userOpt.get());
       throw new UserEmailNotVerifiedException("This email is already registered but not verified. A new verification email has been sent to your inbox.");
     }
 
-    User user = userMapper.registerRequestDtoToUser(registerRequestDto);
+    User user = userMapper.registerReqDtoToUser(registerReqDto);
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     user.setAuthorities("ROLE_USER");
     user.setIsActive(true);
@@ -57,8 +63,7 @@ public class UserServiceImpl implements UserService {
     verificationCodeService.sendVerificationCode(user);
     userRepository.save(user);
 
-    return SignupResponseDto.builder()
-        .message("Signup successful. Please check your email to verify your account.")
+    return RegisterResDto.builder()
         .email(user.getEmail())
         .emailSent(true)
         .build();
@@ -66,11 +71,11 @@ public class UserServiceImpl implements UserService {
 
 
   @Override
-  public TokensResponseDto loginUser(LoginRequestDto loginRequestDto) {
-    User user = userRepository.findByUsername(loginRequestDto.getUsername())
-        .orElseThrow(() -> new UserNotFoundException("User with username: " + loginRequestDto.getUsername() + " not found"));
+  public TokensResDto loginUser(LoginReqDto loginReqDto) {
+    User user = userRepository.findByUsername(loginReqDto.getUsername())
+        .orElseThrow(() -> new UserNotFoundException("User with username: " + loginReqDto.getUsername() + " is not found"));
 
-    if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+    if (!passwordEncoder.matches(loginReqDto.getPassword(), user.getPassword())) {
       throw new BadCredentialsException("Invalid username or password");
     }
 
@@ -79,7 +84,7 @@ public class UserServiceImpl implements UserService {
       throw new UserEmailNotVerifiedException("Your email is not verified. Please check your email to verify your account.");
     }
 
-    return TokensResponseDto.builder()
+    return TokensResDto.builder()
         .userId(user.getId())
         .accessToken(jwtService.generateAccessToken(user.getId()))
         .refreshToken(jwtService.generateRefreshToken(user.getId()))
@@ -90,38 +95,39 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public UserResponseDto getUserById(Long userId, Long authUserId) {
+  public UserResDto getUserById(Long userId, Long authUserId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " is not found"));
 
     verifyUserAuthority(userId, authUserId);
-    return userMapper.userToUserResponseDto(user);
+    return userMapper.userToUserResDto(user);
   }
 
   @Override
-  public UserResponseDto updateUser(Long userId, Long authUserId, UpdateRequestDto updateRequestDto) {
+  public UserResDto updateUser(Long userId, Long authUserId, UpdateReqDto updateReqDto) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " is not found"));
 
     verifyUserAuthority(userId, authUserId);
-    user.setUsername(updateRequestDto.getUsername());
-    user.setFirstName(updateRequestDto.getFirstName());
-    user.setLastName(updateRequestDto.getLastName());
-    user.setPhoneNumber(updateRequestDto.getPhoneNumber());
-    user.setPassword(passwordEncoder.encode(updateRequestDto.getPassword()));
+    user.setUsername(updateReqDto.getUsername());
+    user.setFirstName(updateReqDto.getFirstName());
+    user.setLastName(updateReqDto.getLastName());
+    user.setPhoneNumber(updateReqDto.getPhoneNumber());
+    user.setPassword(passwordEncoder.encode(updateReqDto.getPassword()));
 
     userRepository.save(user);
-    return userMapper.userToUserResponseDto(user);
+    return userMapper.userToUserResDto(user);
   }
 
   @Override
-  public void deactivateUser(Long userId, Long authUserId) {
+  public DeactivateResDto deactivateUser(Long userId, Long authUserId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " not found"));
+        .orElseThrow(() -> new UserNotFoundException("User with id: " + userId + " is not found"));
 
     verifyUserAuthority(userId, authUserId);
     user.setIsActive(false);
     userRepository.save(user);
+    return userMapper.UserToDeactivateResDto(user);
   }
 
 }

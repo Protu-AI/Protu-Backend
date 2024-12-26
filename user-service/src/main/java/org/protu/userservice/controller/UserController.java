@@ -1,16 +1,19 @@
 package org.protu.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.UpdateRequestDto;
-import org.protu.userservice.dto.UserResponseDto;
+import org.protu.userservice.dto.ApiResponse;
+import org.protu.userservice.dto.request.UpdateReqDto;
+import org.protu.userservice.dto.response.DeactivateResDto;
+import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.service.impl.JWTServiceImpl;
 import org.protu.userservice.service.impl.UserServiceImpl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/${api.version}/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -18,37 +21,40 @@ public class UserController {
   private final JWTServiceImpl jwtServiceImpl;
 
   @GetMapping("/{id}")
-  public ResponseEntity<UserResponseDto> getUserById(
+  public ResponseEntity<ApiResponse<UserResDto>> getUserById(
       @PathVariable("id") Long userId,
       @RequestHeader("Authorization") String authHeader) {
 
     String token = jwtServiceImpl.getTokenFromHeader(authHeader);
     Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
-    UserResponseDto userResponseDto = userService.getUserById(userId, authUserId);
-    return ResponseEntity.ok(userResponseDto);
+    UserResDto userResDto = userService.getUserById(userId, authUserId);
+    String message = "User details retrieved successfully";
+    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userResDto, message));
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<UserResponseDto> updateUser(
+  public ResponseEntity<ApiResponse<UserResDto>> updateUser(
       @PathVariable("id") Long userId,
-      @Validated @RequestBody UpdateRequestDto userUpdateDto,
+      @Validated @RequestBody UpdateReqDto userUpdateDto,
       @RequestHeader("Authorization") String authHeader) {
 
     String token = jwtServiceImpl.getTokenFromHeader(authHeader);
     Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
-    UserResponseDto updatedUser = userService.updateUser(userId, authUserId, userUpdateDto);
-    return ResponseEntity.ok(updatedUser);
+    UserResDto userResDto = userService.updateUser(userId, authUserId, userUpdateDto);
+    String message = "User profile has been updated successfully";
+    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userResDto, message));
   }
 
 
   @PatchMapping("/{id}/deactivate")
-  public ResponseEntity<String> deactivateUser(
+  public ResponseEntity<ApiResponse<DeactivateResDto>> deactivateUser(
       @PathVariable("id") Long userId,
       @RequestHeader("Authorization") String authHeader) {
 
     String token = jwtServiceImpl.getTokenFromHeader(authHeader);
     Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
-    userService.deactivateUser(userId, authUserId);
-    return ResponseEntity.ok("User deactivated successfully");
+    DeactivateResDto deactivateResDto = userService.deactivateUser(userId, authUserId);
+    String message = "User account has been deactivated successfully";
+    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(deactivateResDto, message));
   }
 }

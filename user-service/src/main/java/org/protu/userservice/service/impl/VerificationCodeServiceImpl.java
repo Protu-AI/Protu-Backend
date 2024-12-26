@@ -2,8 +2,8 @@ package org.protu.userservice.service.impl;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.dto.TokensResponseDto;
-import org.protu.userservice.dto.VerificationRequestDTO;
+import org.protu.userservice.dto.request.VerifyReqDto;
+import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.InvalidVerificationCodeException;
 import org.protu.userservice.exceptions.custom.UserEmailAlreadyVerifiedException;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
@@ -47,7 +47,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
   }
 
   @Override
-  public TokensResponseDto verifyUserEmailAndCode(VerificationRequestDTO requestDTO) {
+  public TokensResDto verifyUserEmailAndCode(VerifyReqDto requestDTO) {
     Optional<User> userOpt = userRepository.findByEmail(requestDTO.getEmail());
     if (userOpt.isEmpty()) {
       throw new UserNotFoundException("User with email:" + requestDTO.getEmail() + " not found.");
@@ -92,7 +92,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
   }
 
-  public TokensResponseDto verifyUserEmail(User user) {
+  public TokensResDto verifyUserEmail(User user) {
     if (user.getIsEmailVerified()) {
       throw new UserEmailAlreadyVerifiedException("The email for this user is already verified.");
     }
@@ -100,7 +100,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     user.setIsEmailVerified(true);
     userRepository.save(user);
 
-    return TokensResponseDto.builder()
+    return TokensResDto.builder()
         .userId(user.getId())
         .accessToken(jwtService.generateAccessToken(user.getId()))
         .refreshToken(jwtService.generateRefreshToken(user.getId()))
