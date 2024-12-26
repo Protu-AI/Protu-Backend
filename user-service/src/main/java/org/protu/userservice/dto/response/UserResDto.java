@@ -1,4 +1,4 @@
-package org.protu.userservice.dto;
+package org.protu.userservice.dto.response;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,8 +8,11 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SignupResponseDto {
-  String message;
+public class UserResDto {
+  Long id;
+  String username;
+  String firstName;
+  String lastName;
   String email;
-  Boolean emailSent;
+  String phoneNumber;
 }

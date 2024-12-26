@@ -1,5 +1,7 @@
 server.port: 8085
-logging.level.org.springframework.security: DEBUG
+api:
+  version: v1
+#logging.level.org.springframework.security: DEBUG
 
 spring:
   application.name: user-service
@@ -28,9 +30,10 @@ jwt:
 verification-code-expiration-time: ${VERIFICATION_CODE_EXPIRATION_TIME:2} # Minutes
 
 spring.mail:
-  host: sandbox.smtp.mailtrap.io
-  port: 2525
-  username: f7942f3fc06991
-  password: 2b25b85dbbadc1
-  properties.mail.smtp.ssl.enable: false
-  properties.mail.smtp.starttls.enable: true
+  host: ${MAIL_HOST}
+  port: ${MAIL_PORT}
+  username: ${MAIL_USERNAME}
+  password: ${MAIL_PASSWORD}
+  properties.mail.smtp:
+    ssl.enable: ${MAIL_SMTP_SSL_ENABLE:false}
+    starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:true}
