@@ -7,6 +7,7 @@ import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.InvalidVerificationCodeException;
 import org.protu.userservice.exceptions.custom.UserEmailAlreadyVerifiedException;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
+import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
 import org.protu.userservice.service.VerificationCodeService;
@@ -29,6 +30,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
   private final UserRepository userRepository;
   private final JWTServiceImpl jwtService;
   private final TemplateEngine templateEngine;
+  private final TokenMapper tokenMapper;
 
   @Value("${verification-code-expiration-time}")
   private String codeExpiryTime;
@@ -98,17 +100,10 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     if (user.getIsEmailVerified()) {
       throw new UserEmailAlreadyVerifiedException("The email for this user is already verified.");
     }
+    
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));
     user.setIsEmailVerified(true);
     userRepository.save(user);
-
-    return TokensResDto.builder()
-        .userId(user.getId())
-        .accessToken(jwtService.generateAccessToken(user.getId()))
-        .refreshToken(jwtService.generateRefreshToken(user.getId()))
-        .refreshTokenExpiresIn(jwtService.getRefreshTokenDuration())
-        .accessTokenExpiresIn(jwtService.getAccessTokenDuration())
-        .tokenType("Bearer")
-        .build();
+    return tokenMapper.userToTokensResDto(user, jwtService);
   }
 }

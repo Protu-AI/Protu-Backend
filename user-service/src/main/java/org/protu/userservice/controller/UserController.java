@@ -17,16 +17,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
+  private final JWTServiceImpl jwtService;
   private final UserServiceImpl userService;
-  private final JWTServiceImpl jwtServiceImpl;
 
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<UserResDto>> getUserById(
       @PathVariable("id") Long userId,
       @RequestHeader("Authorization") String authHeader) {
 
-    String token = jwtServiceImpl.getTokenFromHeader(authHeader);
-    Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
+    String token = jwtService.getTokenFromHeader(authHeader);
+    Long authUserId = jwtService.getUserIdFromToken(token);
     UserResDto userResDto = userService.getUserById(userId, authUserId);
     String message = "User details retrieved successfully";
     return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userResDto, message));
@@ -38,8 +38,8 @@ public class UserController {
       @Validated @RequestBody UpdateReqDto userUpdateDto,
       @RequestHeader("Authorization") String authHeader) {
 
-    String token = jwtServiceImpl.getTokenFromHeader(authHeader);
-    Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
+    String token = jwtService.getTokenFromHeader(authHeader);
+    Long authUserId = jwtService.getUserIdFromToken(token);
     UserResDto userResDto = userService.updateUser(userId, authUserId, userUpdateDto);
     String message = "User profile has been updated successfully";
     return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(userResDto, message));
@@ -51,8 +51,8 @@ public class UserController {
       @PathVariable("id") Long userId,
       @RequestHeader("Authorization") String authHeader) {
 
-    String token = jwtServiceImpl.getTokenFromHeader(authHeader);
-    Long authUserId = jwtServiceImpl.getUserIdFromToken(token);
+    String token = jwtService.getTokenFromHeader(authHeader);
+    Long authUserId = jwtService.getUserIdFromToken(token);
     DeactivateResDto deactivateResDto = userService.deactivateUser(userId, authUserId);
     String message = "User account has been deactivated successfully";
     return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(deactivateResDto, message));
