@@ -5,8 +5,8 @@ import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.UpdateReqDto;
 import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.UserResDto;
-import org.protu.userservice.service.impl.JWTServiceImpl;
-import org.protu.userservice.service.impl.UserServiceImpl;
+import org.protu.userservice.service.JWTService;
+import org.protu.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final JWTServiceImpl jwtService;
-  private final UserServiceImpl userService;
+  private final JWTService jwtService;
+  private final UserService userService;
 
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<UserResDto>> getUserById(

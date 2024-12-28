@@ -6,9 +6,9 @@ import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.RefreshResDto;
 import org.protu.userservice.dto.response.RegisterResDto;
 import org.protu.userservice.dto.response.TokensResDto;
-import org.protu.userservice.service.impl.AuthServiceImpl;
-import org.protu.userservice.service.impl.JWTServiceImpl;
-import org.protu.userservice.service.impl.VerificationCodeServiceImpl;
+import org.protu.userservice.service.AuthService;
+import org.protu.userservice.service.JWTService;
+import org.protu.userservice.service.VerificationCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final JWTServiceImpl jwtService;
-  private final AuthServiceImpl authService;
-  private final VerificationCodeServiceImpl verificationCodeService;
+  private final JWTService jwtService;
+  private final AuthService authService;
+  private final VerificationCodeService verificationCodeService;
 
   @PostMapping("/register")
   public ResponseEntity<ApiResponse<RegisterResDto>> registerUser(@Validated @RequestBody RegisterReqDto registerRequest) {

@@ -1,4 +1,4 @@
-package org.protu.userservice.service.impl;
+package org.protu.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
@@ -20,8 +20,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     User user = userRepository.findById(userId2)
         .orElseThrow(() -> new UserNotFoundException("User not found!"));
 
-    return org.springframework.security.core.userdetails.User
-        .builder()
+    return org.springframework.security.core.userdetails.User.builder()
         .username(user.getUsername())
         .password(user.getPassword())
         .authorities(user.getAuthorities().split(","))

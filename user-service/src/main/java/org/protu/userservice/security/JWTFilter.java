@@ -6,7 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.service.impl.JWTServiceImpl;
+import org.protu.userservice.service.JWTService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,7 +23,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
 
-  private final JWTServiceImpl jwtService;
+  private final JWTService jwtService;
   private final UserDetailsService userDetailsService;
   private final HandlerExceptionResolver handlerExceptionResolver;
 
