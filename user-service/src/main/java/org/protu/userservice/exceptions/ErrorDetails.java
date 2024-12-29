@@ -1,12 +1,12 @@
 package org.protu.userservice.exceptions;
 
 import lombok.AccessLevel;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Builder
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ErrorDetails {
   int code;

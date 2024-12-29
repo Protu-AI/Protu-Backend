@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LoginReqDto {
+public class SignInReqDto {
   @NotBlank(message = "userIdentifier is required")
   @Size(max = 100, message = "userIdentifier must be at least 8 characters long")
   String userIdentifier;

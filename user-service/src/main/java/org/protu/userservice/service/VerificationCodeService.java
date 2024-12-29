@@ -2,11 +2,12 @@ package org.protu.userservice.service;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.request.VerifyEmailReqDto;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.InvalidVerificationCodeException;
 import org.protu.userservice.exceptions.custom.UserEmailAlreadyVerifiedException;
-import org.protu.userservice.exceptions.custom.UserNotFoundException;
+import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
@@ -20,7 +21,6 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class VerificationCodeService {
   private final JWTService jwtService;
   private final TemplateEngine templateEngine;
   private final TokenMapper tokenMapper;
+  private final UserHelper userHelper;
 
   @Value("${verification-code-expiration-time}")
   private String codeExpiryTime;
@@ -40,21 +41,16 @@ public class VerificationCodeService {
     code = code.trim();
 
     if (!storedCode.equals(code)) {
-      throw new InvalidVerificationCodeException("The verification code entered is incorrect. Please check the code and ensure it's entered correctly.");
+      throw new InvalidVerificationCodeException(FailureMessages.INVALID_VERIFICATION_CODE.getMessage(code));
     }
 
     if (codeExpiryTime.before(Timestamp.from(Instant.now()))) {
-      throw new InvalidVerificationCodeException("The verification code entered has expired. Please request a new verification code.");
+      throw new InvalidVerificationCodeException(FailureMessages.EXPIRED_VERIFICATION_CODE.getMessage(code));
     }
   }
 
   public TokensResDto verifyUserEmailAndCode(VerifyEmailReqDto requestDTO) {
-    Optional<User> userOpt = userRepository.findByEmail(requestDTO.getEmail());
-    if (userOpt.isEmpty()) {
-      throw new UserNotFoundException("User with email:" + requestDTO.getEmail() + " not found.");
-    }
-
-    User user = userOpt.get();
+    User user = userHelper.fetchUserOrThrow(requestDTO.getEmail(), "email");
     validateCode(user, requestDTO.getVerificationCode());
     return verifyUserEmail(user);
   }
@@ -87,13 +83,13 @@ public class VerificationCodeService {
           htmlContent
       );
     } catch (MessagingException e) {
-      throw new MailSendException("Failed to send verification email.");
+      throw new MailSendException(FailureMessages.MAIL_SENDING_FAILED.getMessage(), e);
     }
   }
 
   public TokensResDto verifyUserEmail(User user) {
     if (user.getIsEmailVerified()) {
-      throw new UserEmailAlreadyVerifiedException("The email for this user is already verified.");
+      throw new UserEmailAlreadyVerifiedException(FailureMessages.EMAIL_ALREADY_VERIFIED.getMessage());
     }
     
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));

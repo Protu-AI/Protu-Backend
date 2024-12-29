@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class RegisterResDto {
+public class signUpResDto {
   String email;
   Boolean emailSent;
 }
