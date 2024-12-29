@@ -10,7 +10,8 @@ public enum SuccessMessages {
   RESET_PASSWORD_MSG("Password reset successfully."),
   GET_USER_MSG("User details retrieved successfully."),
   UPDATE_USER_MSG("User profile has been updated successfully."),
-  DEACTIVATE_USER_MSG("User account has been deactivated successfully.");
+  DEACTIVATE_USER_MSG("User account has been deactivated successfully."),
+  NEW_CODE_MSG("If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed.");
 
   public final String message;
 

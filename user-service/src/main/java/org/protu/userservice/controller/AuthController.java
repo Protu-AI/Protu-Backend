@@ -64,7 +64,7 @@ public class AuthController {
 
   @PostMapping("/forgot-password")
   public ResponseEntity<ApiResponse<Void>> forgotPassword(
-      @Validated @RequestBody ForgotPasswordReqDto requestDto, HttpServletRequest request) {
+      @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
     authService.forgotPassword(requestDto);
     return buildResponse(request, HttpStatus.OK, null, SuccessMessages.FORGOT_PASSWORD_MSG.message);
   }
@@ -74,6 +74,13 @@ public class AuthController {
       @Validated @RequestBody ResetPasswordReqDto requestDto, HttpServletRequest request) {
     authService.resetPassword(requestDto);
     return buildResponse(request, HttpStatus.OK, null, SuccessMessages.RESET_PASSWORD_MSG.message);
+  }
+
+  @PostMapping("/send-verification-code")
+  public ResponseEntity<ApiResponse<Void>> sendVerificationCode(
+      @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
+    authService.sendNewCode(requestDto, "Verify your email");
+    return buildResponse(request,HttpStatus.OK,null,SuccessMessages.NEW_CODE_MSG.message);
   }
 }
 

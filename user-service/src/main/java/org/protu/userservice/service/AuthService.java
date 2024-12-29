@@ -2,8 +2,8 @@ package org.protu.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.constants.FailureMessages;
-import org.protu.userservice.dto.request.ForgotPasswordReqDto;
 import org.protu.userservice.dto.request.ResetPasswordReqDto;
+import org.protu.userservice.dto.request.SendCodeDto;
 import org.protu.userservice.dto.request.SignInReqDto;
 import org.protu.userservice.dto.request.SignUpReqDto;
 import org.protu.userservice.dto.response.RefreshResDto;
@@ -69,9 +69,8 @@ public class AuthService {
     return tokenMapper.authUserIdsToRefreshResDto(authUserId, jwtService);
   }
 
-  public void forgotPassword(ForgotPasswordReqDto requestDto) {
-    User user = userHelper.fetchUserOrThrow(requestDto.getEmail(), "email");
-    verificationCodeService.sendVerificationCode(user, "Reset your password");
+  public void forgotPassword(SendCodeDto requestDto) {
+    sendNewCode(requestDto, "Reset your password");
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {
@@ -80,5 +79,10 @@ public class AuthService {
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));
     user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
     userRepo.save(user);
+  }
+
+  public void sendNewCode(SendCodeDto requestDto, String subject) {
+    User user = userHelper.fetchUserOrThrow(requestDto.getEmail(), "email");
+    verificationCodeService.sendVerificationCode(user, subject);
   }
 }
