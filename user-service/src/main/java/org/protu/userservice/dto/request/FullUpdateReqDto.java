@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateReqDto {
+public class FullUpdateReqDto {
 
   @NotBlank(message = "First name is required")
   @Size(max = 50, message = "First name must not exceed 50 characters")
