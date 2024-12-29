@@ -15,16 +15,17 @@ CREATE TABLE "users" (
     "is_email_verified" BOOLEAN NOT NULL,
     "verification_code" VARCHAR NOT NULL,
     "code_expiry_date" TIMESTAMPTZ NOT NULL,
-    "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- CreateTable
 CREATE TABLE "chats" (
     "id" SERIAL PRIMARY KEY,
     "userId" INTEGER NOT NULL,
-    "createdAt" TIMESTAMPTZ(6),
-    "lastUpdated" TIMESTAMPTZ(6),
+    "name" VARCHAR(50) NOT NULL,
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "chats_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -34,7 +35,7 @@ CREATE TABLE "messages" (
     "chatId" INTEGER NOT NULL,
     "senderRole" "enum_messages_senderRole" NOT NULL,
     "content" TEXT NOT NULL,
-    "createdAt" TIMESTAMPTZ(6),
+    "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "messages_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "chats"("id") ON DELETE CASCADE ON UPDATE NO ACTION
 );
 
@@ -44,7 +45,7 @@ CREATE TABLE "attachments" (
     "messageId" INTEGER NOT NULL,
     "filePath" VARCHAR(255) NOT NULL,
     "fileType" VARCHAR(255) NOT NULL,
-    "uploadedAt" TIMESTAMPTZ(6),
+    "uploadedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "attachments_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES "messages"("id") ON DELETE CASCADE ON UPDATE NO ACTION
 );
 

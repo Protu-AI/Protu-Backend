@@ -1,13 +1,13 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const createChat = async userId => {
+const createChat = async (userId, name) => {
   const chat = await prisma.chats.create({
-    data: {
-      userId
-    }
+    data: { userId, name }
   });
-  return chat;
+  return {
+    data: chat
+  };
 };
 
 const getUserChats = async userId => {

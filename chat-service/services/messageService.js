@@ -1,21 +1,44 @@
-const { PrismaClient } = require("@prisma/client");
+const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const createMessage = async (chatId, senderRole, content) => {
+const createMessage = async (chatId, senderRole, content, attachmentPath) => {
   const message = await prisma.messages.create({
-    data: { chatId, senderRole, content },
+    data: {
+      chatId,
+      senderRole,
+      content,
+      attachments: attachmentPath
+        ? {
+            create: [
+              {
+                filePath: attachmentPath,
+                fileType: attachmentPath.split('.').pop()
+              }
+            ]
+          }
+        : undefined
+    },
+    include: {
+      attachments: true
+    }
   });
   return message;
 };
 
-const getMessagesForChat = async (chatId) => {
+const getMessagesForChat = async chatId => {
   const messages = await prisma.messages.findMany({
     where: { chatId },
+    include: {
+      attachments: true
+    },
+    orderBy: {
+      createdAt: 'asc'
+    }
   });
   return messages;
 };
 
 module.exports = {
   createMessage,
-  getMessagesForChat,
+  getMessagesForChat
 };

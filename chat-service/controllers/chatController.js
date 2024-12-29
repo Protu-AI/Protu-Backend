@@ -3,7 +3,8 @@ const asyncWrapper = require('../utils/asyncWrapper');
 
 const createChat = asyncWrapper(async (req, res) => {
   const { userId } = req.params;
-  const chat = await chatService.createChat(parseInt(userId));
+  const { name } = req.body;
+  const chat = await chatService.createChat(parseInt(userId), name);
   res.status(201).json(chat);
 });
 
