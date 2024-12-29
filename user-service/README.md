@@ -1,41 +1,41 @@
 # User Service
 
-## Table of Contents
+## 📑 Table of Contents
 - [Key Features](#key-features)
 - [API Reference](#api-reference)
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
 
-## Key Features
+## ⭐ Key Features
 
-- **User Authentication**
+- 🔑 **User Authentication**
   - JWT-based authentication system
   - Secure login and registration flows
   - Token refresh mechanism
-    
-- **Account Management**
+
+- 👤 **Account Management**
   - Email verification system
   - Password recovery workflow
   - Profile management
   - Account deactivation capabilities
 
-- **Security**
+- 🛡️ **Security**
   - JWT token-based security
   - Email verification
   - Secure password reset flow
     
-## Technology Stack
+## 🛠️ Technology Stack
 
-- **Backend Framework**: Spring Boot 3.4.0
-- **Language**: Java 17
-- **Database**: PostgreSQL
-- **Containerization**: Docker & Docker Compose
-- **Build Tool**: Maven
-- **API Documentation**: OpenAPI (SpringDoc)
+- **Backend Framework**: Spring Boot 3.4.0 🍃
+- **Language**: Java 17 ☕
+- **Database**: PostgreSQL 🐘
+- **Containerization**: Docker & Docker Compose 🐳
+- **Build Tool**: Maven 📦
+- **API Documentation**: OpenAPI (SpringDoc) 📚
 
-## API Reference
+## 🔌API Reference
 
-### Authentication Endpoints
+### 🔒 Authentication Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -47,7 +47,7 @@
 | POST | `/api/v1/auth/reset-password` | Reset password |
 | POST | `/api/v1/auth/refresh` | Refresh access token |
 
-### User Management Endpoints
+### 👥 User Management Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -57,12 +57,12 @@
 | PATCH | `/api/v1/users/{id}/deactivate` | Deactivate account |
 | POST | `/api/v1/auth/send-verification-code` | Resend verification |
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
 - Docker and Docker Compose
 
-### Environment Setup
+### ⚙️ Environment Setup
 
 1. Create a `.env` file in the project root with the following variables:
 ```env
@@ -84,7 +84,7 @@
 ```
 6. Service will be available at `http://localhost:8085`
 
-## Documentation
+## 📚 Documentation
 
 - **API Documentation**: Available at `http://localhost:8085/swagger-ui/index.html` when the service is running
 - **Postman Collection**: Available in the `src/main/resources/postman` directory
