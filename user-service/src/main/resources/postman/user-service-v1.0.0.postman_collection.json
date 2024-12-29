@@ -2,138 +2,25 @@
 	"info": {
 		"_postman_id": "b73ec814-f367-4640-ae0f-34d5dcf37159",
 		"name": "user-service:v1.0.0",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "31660608"
 	},
 	"item": [
 		{
-			"name": "register",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const jsonData = pm.response.json();\r",
-							"const userId = jsonData.userId;\r",
-							"const refreshToken = jsonData.refreshToken;\r",
-							"const accessToken = jsonData.accessToken;\r",
-							"\r",
-							"if(pm.response.code == 201) {\r",
-							"    pm.environment.set(\"USER_ID\", userId);\r",
-							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
-							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
-							"}\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ali\",\r\n    \"username\": \"hosam\",\r\n    \"email\": \"ahmed_hosam@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://localhost:8085/api/v1/users/register"
-			},
-			"response": []
-		},
-		{
-			"name": "login",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const jsonData = pm.response.json();\r",
-							"const userId = jsonData.userId;\r",
-							"const refreshToken = jsonData.refreshToken;\r",
-							"const accessToken = jsonData.accessToken;\r",
-							"\r",
-							"if(pm.response.code == 200) {\r",
-							"    pm.environment.set(\"USER_ID\", userId);\r",
-							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
-							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
-							"}\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"hosam\",\r\n    \"password\": \"passwordTest123\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "http://localhost:8085/api/v1/users/login"
-			},
-			"response": []
-		},
-		{
-			"name": "refreshToken",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"const jsonData = pm.response.json();\r",
-							"const accessToken = jsonData.accessToken;\r",
-							"\r",
-							"if(pm.response.code == 200) {\r",
-							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
-							"}\r",
-							"\r",
-							"\r",
-							""
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": {
-						"token": "{{REFRESH_TOKEN}}"
-					}
-				},
-				"method": "POST",
-				"header": [],
-				"url": "http://localhost:8085/api/v1/users/refresh"
-			},
-			"response": []
-		},
-		{
-			"name": "getUser",
+			"name": "Swagger file",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": {
-						"token": "{{ACCESS_TOKEN}}"
-					}
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
 				},
 				"method": "GET",
 				"header": [],
@@ -146,42 +33,2420 @@
 						}
 					}
 				},
-				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}"
+				"url": {
+					"raw": "http://localhost:8085/swagger-ui/index.html",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"swagger-ui",
+						"index.html"
+					]
+				}
 			},
 			"response": []
 		},
 		{
-			"name": "updateUser",
+			"name": "Open API Specs",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": {
-						"token": "{{ACCESS_TOKEN}}"
-					}
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
 				},
-				"method": "PUT",
+				"method": "GET",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"ahmed_aldddi14126\",\r\n    \"firstName\": \"Ahmed\",\r\n    \"lastName\": \"Ali\",\r\n    \"email\": \"dsaffa@example.com\",\r\n    \"phoneNumber\": \"555-987-6543\",\r\n    \"password\": \"19238455555\"\r\n}",
+					"raw": "",
 					"options": {
 						"raw": {
 							"language": "json"
 						}
 					}
 				},
-				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}"
+				"url": {
+					"raw": "http://localhost:8085/v3/api-docs",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8085",
+					"path": [
+						"v3",
+						"api-docs"
+					]
+				}
 			},
 			"response": []
 		},
 		{
-			"name": "deactivateUser",
+			"name": "sign-up",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// const jsonData = pm.response.json();\r",
+							"// const userId = jsonData.userId;\r",
+							"// const refreshToken = jsonData.refreshToken;\r",
+							"// const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"// if(pm.response.code == 201) {\r",
+							"//     pm.environment.set(\"USER_ID\", userId);\r",
+							"//     pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"//     pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"// }\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"username\": \"hmagdy8855\",\r\n    \"email\": \"hazem.magdy8855@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/sign-up",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"sign-up"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "email already exists",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"username\": \"hmagdy8811\",\r\n    \"email\": \"hazem.magdy8811@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/sign-up",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"sign-up"
+							]
+						}
+					},
+					"status": "Conflict",
+					"code": 409,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:47:47 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User already exists\",\n    \"timestamp\": \"2024-12-28T23:47:47.269+00:00\",\n    \"data\": {\n        \"code\": 409,\n        \"details\": \"The user with email: hazem.magdy8811@example.com already exists.\"\n    },\n    \"requestUri\": \"/api/v1/auth/sign-up\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "username already exists",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"username\": \"hmagdy8811\",\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/sign-up",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"sign-up"
+							]
+						}
+					},
+					"status": "Conflict",
+					"code": 409,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:48:30 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User already exists\",\n    \"timestamp\": \"2024-12-28T23:48:30.856+00:00\",\n    \"data\": {\n        \"code\": 409,\n        \"details\": \"The user with username: hmagdy8811 already exists.\"\n    },\n    \"requestUri\": \"/api/v1/auth/sign-up\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"username\": \"hmagdy8822\",\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"password\": \"passwordTest123\",\r\n    \"phoneNumber\": \"555-987-6543\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/sign-up",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"sign-up"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:48:49 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User registration successful. If the verification email doesn't appear in your inbox, please check your spam folder or try again later.\",\n    \"timestamp\": \"2024-12-28T23:48:49.779+00:00\",\n    \"data\": {\n        \"email\": \"hazem.magdy8822@example.com\",\n        \"emailSent\": true\n    },\n    \"requestUri\": \"/api/v1/auth/sign-up\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "verify-email",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const userId = jsonData.data.userId;\r",
+							"const refreshToken = jsonData.data.refreshToken;\r",
+							"const accessToken = jsonData.data.accessToken;\r",
+							"\r",
+							"if (pm.response.code == 200) {\r",
+							"    pm.environment.set(\"USER_ID\", userId);\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"hazem.magdy8844@example.com\",\r\n    \"verificationCode\":\"97311\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/verify-email",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"verify-email"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "invalid code",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"verificationCode\":\"03329\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/verify-email",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:50:09 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Invalid verification code\",\n    \"timestamp\": \"2024-12-28T23:50:09.257+00:00\",\n    \"data\": {\n        \"code\": 400,\n        \"details\": \"The verification code entered: 03329 is invalid. Please check and try again.\"\n    },\n    \"requestUri\": \"/api/v1/auth/verify-email\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "already verified",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"verificationCode\":\"14361\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/verify-email",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"status": "Conflict",
+					"code": 409,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:58:36 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Email already verified\",\n    \"timestamp\": \"2024-12-28T23:58:36.995+00:00\",\n    \"data\": {\n        \"code\": 409,\n        \"details\": \"Your email is already verified.\"\n    },\n    \"requestUri\": \"/api/v1/auth/verify-email\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"verificationCode\":\"43655\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/verify-email",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"verify-email"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:50:21 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Email verified successfully. Your account is now active.\",\n    \"timestamp\": \"2024-12-28T23:50:21.509+00:00\",\n    \"data\": {\n        \"userId\": 146,\n        \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNDYiLCJpYXQiOjE3MzU0Mjk4MjEsImV4cCI6MTczNTQyOTk0MX0.q_BTlqCkXkaidoifBjHNgrSZi1TsNF8ixHblCIlKLEBsV6pwWgO3W4AuvmInnAnaIpz5GDF-UtZ37e4ylUrlpw\",\n        \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNDYiLCJpYXQiOjE3MzU0Mjk4MjEsImV4cCI6MTczNTQzMDA2MX0.dvrdK_LYbN2jcPWcts8KSr_DpqYktG-YYN5DrOlH7ea3s-GyJh6y-SOOq7vYtU5vCxBqMbUF568DynsciymK7A\",\n        \"accessTokenExpiresIn\": \"2 minutes\",\n        \"refreshTokenExpiresIn\": \"4 minutes\",\n        \"tokenType\": \"Bearer\"\n    },\n    \"requestUri\": \"/api/v1/auth/verify-email\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "send-verification-code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// const jsonData = pm.response.json();\r",
+							"// const userId = jsonData.userId;\r",
+							"// const refreshToken = jsonData.refreshToken;\r",
+							"// const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"// if(pm.response.code == 201) {\r",
+							"//     pm.environment.set(\"USER_ID\", userId);\r",
+							"//     pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"//     pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"// }\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"hazem.magdy8833@example.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/send-verification-code",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"send-verification-code"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8833@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/send-verification-code",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"send-verification-code"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 29 Dec 2024 01:14:49 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed.\",\n    \"timestamp\": \"2024-12-29T01:14:49.385+00:00\",\n    \"data\": null,\n    \"requestUri\": \"/api/v1/auth/send-verification-code\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "forgot-password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// const jsonData = pm.response.json();\r",
+							"// const userId = jsonData.userId;\r",
+							"// const refreshToken = jsonData.refreshToken;\r",
+							"// const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"// if(pm.response.code == 201) {\r",
+							"//     pm.environment.set(\"USER_ID\", userId);\r",
+							"//     pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"//     pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"// }\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"hazem.magdy8833@example.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/forgot-password",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"forgot-password"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/forgot-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:55:28 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"If the provided email exists, a password reset verification code will be sent to your inbox. Please check your email to proceed.\",\n    \"timestamp\": \"2024-12-28T23:55:28.083+00:00\",\n    \"data\": null,\n    \"requestUri\": \"/api/v1/auth/forgot-password\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "reset-password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// const jsonData = pm.response.json();\r",
+							"// const userId = jsonData.userId;\r",
+							"// const refreshToken = jsonData.refreshToken;\r",
+							"// const accessToken = jsonData.accessToken;\r",
+							"\r",
+							"// if(pm.response.code == 201) {\r",
+							"//     pm.environment.set(\"USER_ID\", userId);\r",
+							"//     pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"//     pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"// }\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"password\": \"12345678\",\r\n    \"verificationCode\":\"54199\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/reset-password",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"reset-password"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "reset-password",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"password\": \"12345678\",\r\n    \"verificationCode\":\"54199\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/reset-password",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:56:51 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "close"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Invalid verification code\",\n    \"timestamp\": \"2024-12-28T23:56:51.626+00:00\",\n    \"data\": {\n        \"code\": 400,\n        \"details\": \"The verification code entered: 54199 has expired. Please request a new verification code.\"\n    },\n    \"requestUri\": \"/api/v1/auth/reset-password\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"hazem.magdy8822@example.com\",\r\n    \"password\": \"12345678\",\r\n    \"verificationCode\":\"54199\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/reset-password",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:56:39 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Password reset successfully.\",\n    \"timestamp\": \"2024-12-28T23:56:39.689+00:00\",\n    \"data\": null,\n    \"requestUri\": \"/api/v1/auth/reset-password\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "validate-identifier",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/validate-identifier?userIdentifier=hmagdy8822",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"validate-identifier"
+					],
+					"query": [
+						{
+							"key": "userIdentifier",
+							"value": "hmagdy8822"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "not verified",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/validate-identifier?userIdentifier=hmagdy8822",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"validate-identifier"
+							],
+							"query": [
+								{
+									"key": "userIdentifier",
+									"value": "hmagdy8822"
+								}
+							]
+						}
+					},
+					"status": "Conflict",
+					"code": 409,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:49:12 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Email verification pending\",\n    \"timestamp\": \"2024-12-28T23:49:12.014+00:00\",\n    \"data\": {\n        \"code\": 409,\n        \"details\": \"Your email is registered but not verified. A new verification email has been sent to your inbox.\"\n    },\n    \"requestUri\": \"/api/v1/auth/validate-identifier\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/validate-identifier?userIdentifier=hmagdy8822",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"validate-identifier"
+							],
+							"query": [
+								{
+									"key": "userIdentifier",
+									"value": "hmagdy8822"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:50:38 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"The username or email you provided is valid. Please proceed to the next step.\",\n    \"timestamp\": \"2024-12-28T23:50:38.855+00:00\",\n    \"data\": null,\n    \"requestUri\": \"/api/v1/auth/validate-identifier\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "signIn",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const userId = jsonData.data.userId;\r",
+							"const refreshToken = jsonData.data.refreshToken;\r",
+							"const accessToken = jsonData.data.accessToken;\r",
+							"\r",
+							"if(pm.response.code == 200) {\r",
+							"    pm.environment.set(\"USER_ID\", userId);\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"    pm.environment.set(\"REFRESH_TOKEN\", refreshToken);\r",
+							"}\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userIdentifier\": \"hmagdy8844\",\r\n    \"password\": \"passwordTest123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/sign-in",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"sign-in"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userIdentifier\": \"hmagdy8822\",\r\n    \"password\": \"passwordTest123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/sign-in",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"sign-in"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:50:57 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Welcome back! You have successfully logged in.\",\n    \"timestamp\": \"2024-12-28T23:50:57.360+00:00\",\n    \"data\": {\n        \"userId\": 146,\n        \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNDYiLCJpYXQiOjE3MzU0Mjk4NTcsImV4cCI6MTczNTQyOTk3N30.FS9HyNHdZJteGR1cHBqc3sAnA7SHNkbBJwCi-HuAx0RmTNG4-PJlySRKje3H2aumwGWlL0czS4yUG6S98883DA\",\n        \"refreshToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNDYiLCJpYXQiOjE3MzU0Mjk4NTcsImV4cCI6MTczNTQzMDA5N30.qA-l2dUfDTzJxvi5Hw4k7l7NUwgDqZUm7u-14sUyG7orNb4MZxiSfNnmmwYv2H36TYRCggRwd6NK3hULmKn3KA\",\n        \"accessTokenExpiresIn\": \"2 minutes\",\n        \"refreshTokenExpiresIn\": \"4 minutes\",\n        \"tokenType\": \"Bearer\"\n    },\n    \"requestUri\": \"/api/v1/auth/sign-in\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "user not found",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userIdentifier\": \"hmagdy88212\",\r\n    \"password\": \"passwordTest123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/sign-in",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"sign-in"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:51:09 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User not found\",\n    \"timestamp\": \"2024-12-28T23:51:09.367+00:00\",\n    \"data\": {\n        \"code\": 404,\n        \"details\": \"The user with username/email: hmagdy88212 does not exist.\"\n    },\n    \"requestUri\": \"/api/v1/auth/sign-in\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "incorrect password",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"userIdentifier\": \"hmagdy8822\",\r\n    \"password\": \"passwordTest123111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/sign-in",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"sign-in"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:51:32 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Authentication failed\",\n    \"timestamp\": \"2024-12-28T23:51:32.239+00:00\",\n    \"data\": {\n        \"code\": 401,\n        \"details\": \"Incorrect password. Please check and try again.\"\n    },\n    \"requestUri\": \"/api/v1/auth/sign-in\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"const accessToken = jsonData.data.accessToken;\r",
+							"\r",
+							"if (pm.response.code == 200) {\r",
+							"    pm.environment.set(\"ACCESS_TOKEN\", accessToken);\r",
+							"}\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
 			"request": {
 				"auth": {
 					"type": "bearer",
-					"bearer": {
-						"token": "{{ACCESS_TOKEN}}"
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{REFRESH_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/v1/auth/refresh",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"auth",
+						"refresh"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8085/api//v1/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:54:13 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Access token has been refreshed successfully.\",\n    \"timestamp\": \"2024-12-28T23:54:13.636+00:00\",\n    \"data\": {\n        \"accessToken\": \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxNDYiLCJpYXQiOjE3MzU0MzAwNTMsImV4cCI6MTczNTQzMDE3M30.f52XKOdq5PESPZMjIsqENj7OIT0SZLi-kBAvq8mzV9kQxaqAFFd5NHY0LdJefFmrNYLdL8geBtPncbSj99NOmQ\",\n        \"expiresIn\": \"2 minutes\"\n    },\n    \"requestUri\": \"/api/v1/auth/refresh\",\n    \"requestMethod\": \"POST\"\n}"
+				},
+				{
+					"name": "expired JWT",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/v1/auth/refresh",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 29 Dec 2024 00:41:39 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Session expired\",\n    \"timestamp\": \"2024-12-29T00:41:39.741+00:00\",\n    \"data\": {\n        \"code\": 401,\n        \"details\": \"JWT expired 1004740 milliseconds ago at 2024-12-29T00:24:55\"\n    },\n    \"requestUri\": \"/api/v1/auth/refresh\",\n    \"requestMethod\": \"POST\"\n}"
+				}
+			]
+		},
+		{
+			"name": "get-user",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
 					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"users",
+								""
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:51:39 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User details retrieved successfully.\",\n    \"timestamp\": \"2024-12-28T23:51:39.775+00:00\",\n    \"data\": {\n        \"id\": 146,\n        \"username\": \"hmagdy8822\",\n        \"firstName\": \"hazem\",\n        \"lastName\": \"magdy\",\n        \"email\": \"hazem.magdy8822@example.com\",\n        \"phoneNumber\": \"555-987-6543\"\n    },\n    \"requestUri\": \"/api/v1/users/146\",\n    \"requestMethod\": \"GET\"\n}"
+				},
+				{
+					"name": "user not found",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/users/55",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"55"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:51:54 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User not found\",\n    \"timestamp\": \"2024-12-28T23:51:54.642+00:00\",\n    \"data\": {\n        \"code\": 404,\n        \"details\": \"The user with id: 55 does not exist.\"\n    },\n    \"requestUri\": \"/api/v1/users/55\",\n    \"requestMethod\": \"GET\"\n}"
+				},
+				{
+					"name": "access denied",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/users/5",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"5"
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:52:12 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Unauthorized access\",\n    \"timestamp\": \"2024-12-28T23:52:12.221+00:00\",\n    \"data\": {\n        \"code\": 401,\n        \"details\": \"You do not have permission to access this resource.\"\n    },\n    \"requestUri\": \"/api/v1/users/5\",\n    \"requestMethod\": \"GET\"\n}"
+				}
+			]
+		},
+		{
+			"name": "update-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"hazemmmm\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "update-user",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"hazemmmm\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"{{USER_ID}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sun, 29 Dec 2024 00:58:18 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User profile has been updated successfully.\",\n    \"timestamp\": \"2024-12-29T00:58:18.345+00:00\",\n    \"data\": {\n        \"id\": 180,\n        \"username\": \"hmagdy8844\",\n        \"firstName\": \"hazemmmm\",\n        \"lastName\": \"magdy\",\n        \"email\": \"hazem.magdy8844@example.com\",\n        \"phoneNumber\": \"555-987-6543\"\n    },\n    \"requestUri\": \"/api/v1/users/180\",\n    \"requestMethod\": \"PATCH\"\n}"
+				}
+			]
+		},
+		{
+			"name": "update-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"hmagdy8822\",\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"password\": \"passwordTest12312\",\r\n    \"phoneNumber\": \"555-987-654311111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "expired JWT",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"hmagdy8822\",\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"password\": \"passwordTest12312\",\r\n    \"phoneNumber\": \"555-987-654311111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/users/",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"users",
+								""
+							]
+						}
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:53:45 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"FAILURE\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"Session expired\",\n    \"timestamp\": \"2024-12-28T23:53:45.490+00:00\",\n    \"data\": {\n        \"code\": 401,\n        \"details\": \"JWT expired 48488 milliseconds ago at 2024-12-28T23:52:57.000Z. Current time: 2024-12-28T23:53:45.488Z. Allowed clock skew: 0 milliseconds.\"\n    },\n    \"requestUri\": \"/api/v1/users/146\",\n    \"requestMethod\": \"PUT\"\n}"
+				},
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"hmagdy8822\",\r\n    \"firstName\": \"hazem\",\r\n    \"lastName\": \"magdy\",\r\n    \"password\": \"passwordTest12312\",\r\n    \"phoneNumber\": \"555-987-654311111\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}",
+							"host": [
+								"{{BASE_URL}}"
+							],
+							"path": [
+								"v1",
+								"users",
+								"{{USER_ID}}"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:54:22 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User profile has been updated successfully.\",\n    \"timestamp\": \"2024-12-28T23:54:22.316+00:00\",\n    \"data\": {\n        \"id\": 146,\n        \"username\": \"hmagdy8822\",\n        \"firstName\": \"hazem\",\n        \"lastName\": \"magdy\",\n        \"email\": \"hazem.magdy8822@example.com\",\n        \"phoneNumber\": \"555-987-654311111\"\n    },\n    \"requestUri\": \"/api/v1/users/146\",\n    \"requestMethod\": \"PUT\"\n}"
+				}
+			]
+		},
+		{
+			"name": "deactivate-user",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
 				},
 				"method": "PATCH",
 				"header": [],
@@ -194,9 +2459,110 @@
 						}
 					}
 				},
-				"url": "http://localhost:8085/api/v1/users/{{USER_ID}}/deactivate"
+				"url": {
+					"raw": "{{BASE_URL}}/v1/users/{{USER_ID}}/deactivate",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}",
+						"deactivate"
+					]
+				}
 			},
-			"response": []
+			"response": [
+				{
+					"name": "success",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8085/api//v1/users//deactivate",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8085",
+							"path": [
+								"api",
+								"",
+								"v1",
+								"users",
+								"",
+								"deactivate"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Cache-Control",
+							"value": "no-cache, no-store, max-age=0, must-revalidate"
+						},
+						{
+							"key": "Pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "Expires",
+							"value": "0"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "DENY"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Date",
+							"value": "Sat, 28 Dec 2024 23:54:40 GMT"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=60"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"SUCCESS\",\n    \"apiVersion\": \"v1.0.0\",\n    \"message\": \"User account has been deactivated successfully.\",\n    \"timestamp\": \"2024-12-28T23:54:40.804+00:00\",\n    \"data\": {\n        \"userId\": 146,\n        \"email\": \"hazem.magdy8822@example.com\",\n        \"deactivatedBy\": \"SELF\",\n        \"deactivateReason\": \"User requested account closure\",\n        \"reactivationAllowed\": true\n    },\n    \"requestUri\": \"/api/v1/users/146/deactivate\",\n    \"requestMethod\": \"PATCH\"\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:8085/api/"
 		}
 	]
 }

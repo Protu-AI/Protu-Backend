@@ -1,9 +1,10 @@
 package org.protu.userservice.mapper;
 
 import org.mapstruct.*;
+import org.protu.userservice.dto.response.RefreshResDto;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.model.User;
-import org.protu.userservice.service.impl.JWTServiceImpl;
+import org.protu.userservice.service.JWTService;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TokenMapper {
@@ -16,5 +17,11 @@ public interface TokenMapper {
       @Mapping(target = "refreshTokenExpiresIn", expression = "java(jwtService.getRefreshTokenDuration())"),
       @Mapping(target = "tokenType", constant = "Bearer")
   })
-  TokensResDto userToTokensResDto(User user, @Context JWTServiceImpl jwtService);
+  TokensResDto userToTokensResDto(User user, @Context JWTService jwtService);
+
+  @Mappings({
+      @Mapping(target = "accessToken", expression = "java(jwtService.generateAccessToken(authUserId))"),
+      @Mapping(target = "expiresIn", expression = "java(jwtService.getAccessTokenDuration())"),
+  })
+  RefreshResDto authUserIdsToRefreshResDto(Long authUserId, @Context JWTService jwtService);
 }

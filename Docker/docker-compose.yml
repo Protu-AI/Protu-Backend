@@ -41,7 +41,7 @@ services:
     image: postgres:latest
     container_name: postgres-db-container
     env_file:
-      - ../user-service/.env
+      - ./.env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

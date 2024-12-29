@@ -1,82 +1,86 @@
 package org.protu.userservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.constants.SuccessMessages;
 import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.RefreshResDto;
-import org.protu.userservice.dto.response.RegisterResDto;
 import org.protu.userservice.dto.response.TokensResDto;
-import org.protu.userservice.service.impl.AuthServiceImpl;
-import org.protu.userservice.service.impl.JWTServiceImpl;
-import org.protu.userservice.service.impl.VerificationCodeServiceImpl;
+import org.protu.userservice.dto.response.signUpResDto;
+import org.protu.userservice.service.AuthService;
+import org.protu.userservice.service.JWTService;
+import org.protu.userservice.service.VerificationCodeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static org.protu.userservice.helper.SuccessResponseHelper.buildResponse;
+
 @RestController
 @RequestMapping("/api/${api.version}/auth")
 @RequiredArgsConstructor
 public class AuthController {
+  private final JWTService jwtService;
+  private final AuthService authService;
+  private final VerificationCodeService verificationCodeService;
 
-  private final JWTServiceImpl jwtService;
-  private final AuthServiceImpl authService;
-  private final VerificationCodeServiceImpl verificationCodeService;
-
-  @PostMapping("/register")
-  public ResponseEntity<ApiResponse<RegisterResDto>> registerUser(@Validated @RequestBody RegisterReqDto registerRequest) {
-    RegisterResDto registerResDto = authService.registerUser(registerRequest);
-    String message = "User registration successful. If the verification email doesn't appear in your inbox, please check your spam folder or try again later.";
-    return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(registerResDto, message));
+  @PostMapping("/sign-up")
+  public ResponseEntity<ApiResponse<signUpResDto>> signUpUser(
+      @Validated @RequestBody SignUpReqDto signUpReqDto, HttpServletRequest request) {
+    signUpResDto signUpResDto = authService.signUpUser(signUpReqDto);
+    return buildResponse(request, HttpStatus.CREATED, signUpResDto, SuccessMessages.SIGN_UP_MSG.message);
   }
 
-  @PostMapping("/confirm")
-  public ResponseEntity<ApiResponse<TokensResDto>> verifyUserEmail(@Validated @RequestBody VerifyEmailReqDto requestDto) {
+  @PostMapping("/verify-email")
+  public ResponseEntity<ApiResponse<TokensResDto>> verifyUserEmail(
+      @Validated @RequestBody VerifyEmailReqDto requestDto, HttpServletRequest request) {
     TokensResDto responseDTO = verificationCodeService.verifyUserEmailAndCode(requestDto);
-    String message = "Email verified successfully. Your account is now active";
-    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(responseDTO, message));
+    return buildResponse(request, HttpStatus.OK, responseDTO, SuccessMessages.VERIFY_MSG.message);
   }
 
-  @PostMapping("/validate-user")
-  public ResponseEntity<ApiResponse<Void>> validateUserIdentifier(@RequestParam String userIdentifier) {
+  @PostMapping("/validate-identifier")
+  public ResponseEntity<ApiResponse<Void>> validateUserIdentifier(
+      @RequestParam String userIdentifier, HttpServletRequest request) {
     authService.validateUserIdentifier(userIdentifier);
-    String message = "The username or email you provided is valid. Please proceed to the next step.";
-    return ResponseEntity.ok(new ApiResponse<>(null, message));
+    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.VALIDATE_MSG.message);
   }
 
-  @PostMapping("/authenticate")
-  public ResponseEntity<ApiResponse<TokensResDto>> authenticate(@Validated @RequestBody LoginReqDto loginRequest) {
-    TokensResDto responseDTO = authService.authenticate(loginRequest);
-    String message = "Welcome back! You have successfully logged in.";
-    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(responseDTO, message));
+  @PostMapping("/sign-in")
+  public ResponseEntity<ApiResponse<TokensResDto>> signIn(
+      @Validated @RequestBody SignInReqDto signInReqDto, HttpServletRequest request) {
+    TokensResDto responseDTO = authService.signIn(signInReqDto);
+    return buildResponse(request, HttpStatus.OK, responseDTO, SuccessMessages.SIGN_IN_MSG.message);
   }
 
   @PostMapping("/refresh")
-  public ResponseEntity<ApiResponse<RefreshResDto>> refreshAccessToken(@RequestHeader("Authorization") String authHeader) {
+  public ResponseEntity<ApiResponse<RefreshResDto>> refreshAccessToken(
+      @RequestHeader("Authorization") String authHeader, HttpServletRequest request) {
     String refreshToken = jwtService.getTokenFromHeader(authHeader);
-    Long authUserId = jwtService.getUserIdFromToken(refreshToken);
-
-    String message = "Access token has been refreshed successfully";
-    RefreshResDto refreshResDto = RefreshResDto.builder()
-        .accessToken(jwtService.generateAccessToken(authUserId))
-        .expiresIn(jwtService.getAccessTokenDuration())
-        .build();
-
-    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(refreshResDto, message));
+    RefreshResDto refreshResDto = authService.refreshAccessToken(refreshToken);
+    return buildResponse(request, HttpStatus.OK, refreshResDto, SuccessMessages.REFRESH_MSG.message);
   }
 
-  @GetMapping("/forgot-password")
-  public ResponseEntity<ApiResponse<Void>> forgotPassword(@Validated @RequestBody ForgotPasswordReqDto requestDto) {
+  @PostMapping("/forgot-password")
+  public ResponseEntity<ApiResponse<Void>> forgotPassword(
+      @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
     authService.forgotPassword(requestDto);
-    String message = "If the provided email exists, a password reset verification code will be sent to your inbox. Please check your email to proceed.";
-    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null, message));
+    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.FORGOT_PASSWORD_MSG.message);
   }
 
   @PostMapping("/reset-password")
-  public ResponseEntity<ApiResponse<Void>> resetPassword(@Validated @RequestBody ResetPasswordReqDto requestDto) {
+  public ResponseEntity<ApiResponse<Void>> resetPassword(
+      @Validated @RequestBody ResetPasswordReqDto requestDto, HttpServletRequest request) {
     authService.resetPassword(requestDto);
-    String message = "Password reset successfully";
-    return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(null, message));
+    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.RESET_PASSWORD_MSG.message);
+  }
+
+  @PostMapping("/send-verification-code")
+  public ResponseEntity<ApiResponse<Void>> sendVerificationCode(
+      @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
+    authService.sendNewCode(requestDto, "Verify your email");
+    return buildResponse(request,HttpStatus.OK,null,SuccessMessages.NEW_CODE_MSG.message);
   }
 }
 

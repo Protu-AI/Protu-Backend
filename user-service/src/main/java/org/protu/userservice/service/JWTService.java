@@ -1,20 +1,90 @@
 package org.protu.userservice.service;
 
-public interface JWTService {
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-  String generateRefreshToken(Long userId);
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+import java.util.function.Function;
 
-  String generateAccessToken(Long userId);
+@Service
+public class JWTService {
 
-  boolean isValidToken(String token, Long userId);
+  @Value("${jwt.secret}")
+  private String jwtSecret;
 
-  String getAccessTokenDuration();
+  @Value("${jwt.access-token-expiration-time}")
+  private String accessTokenExpiryTime;
 
-  String getRefreshTokenDuration();
+  @Value("${jwt.refresh-token-expiration-time}")
+  private String refreshTokenExpiryTime;
 
-  boolean isTokenExpired(String token);
+  private String generateToken(Long userId, long expiryTime) {
+    Instant now = Instant.now();
+    return Jwts.builder()
+        .subject(String.valueOf(userId))
+        .issuedAt(Date.from(now))
+        .expiration(Date.from(now.plus(expiryTime, ChronoUnit.MILLIS)))
+        .signWith(getSigningKey())
+        .compact();
+  }
 
-  Long getUserIdFromToken(String token);
+  private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    final Claims claims = extractAllClaims(token);
+    return claimsResolver.apply(claims);
+  }
 
-  String getTokenFromHeader(String authHeader);
+  private Date extractExpiration(String token) {
+    return extractClaim(token, Claims::getExpiration);
+  }
+
+  private SecretKey getSigningKey() {
+    return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private Claims extractAllClaims(String token) {
+    return Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+  }
+
+  public String getTokenFromHeader(String authHeader) {
+    return authHeader.split(" ")[1];
+  }
+
+  public String getAccessTokenDuration() {
+    return Long.parseLong(accessTokenExpiryTime) / (1000 * 60) + " minutes";
+  }
+
+  public String getRefreshTokenDuration() {
+    return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60) + " minutes";
+  }
+
+  public boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(Date.from(Instant.now()));
+  }
+
+  public Long getUserIdFromToken(String token) {
+    return Long.parseLong(extractClaim(token, Claims::getSubject));
+  }
+
+  public String generateAccessToken(Long userId) {
+    return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
+  }
+
+  public String generateRefreshToken(Long userId) {
+    return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
+  }
+
+  public boolean isValidToken(String token, Long userId) {
+    return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId);
+  }
 }

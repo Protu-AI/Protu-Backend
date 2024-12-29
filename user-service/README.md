@@ -1,71 +1,90 @@
-# 👤 User Service
+# User Service
 
-## 🌟 Overview
+## 📑 Table of Contents
+- [Key Features](#key-features)
+- [API Reference](#api-reference)
+- [Getting Started](#getting-started)
+- [Documentation](#documentation)
 
-- The **User Service** is a RESTful API that handles user management, including registration, authentication, profile
-  updates, and deactivation.
-- The service uses JWT-based authentication to secure endpoints.
+## ⭐ Key Features
 
-## ✨ Features
+- 🔑 **User Authentication**
+  - JWT-based authentication system
+  - Secure login and registration flows
+  - Token refresh mechanism
 
-- **User Registration**: Create a new account.
-- **Login**: Authenticate and retrieve tokens.
-- **Token Refresh**: Renew expired access tokens.
-- **User Profile Management**: View and update user details.
-- **Account Deactivation**: Disable user accounts.
+- 👤 **Account Management**
+  - Email verification system
+  - Password recovery workflow
+  - Profile management
+  - Account deactivation capabilities
 
-## 💻 Technology Stack
+- 🛡️ **Security**
+  - JWT token-based security
+  - Email verification
+  - Secure password reset flow
+    
+## 🛠️ Technology Stack
 
-- Java 22 ☕
-- Spring Boot 🍃
-- Docker & Docker Compose 🐳
-- PostgreSQL 🐘.
-- Maven 📦
+- **Backend Framework**: Spring Boot 3.4.0 🍃
+- **Language**: Java 17 ☕
+- **Database**: PostgreSQL 🐘
+- **Containerization**: Docker & Docker Compose 🐳
+- **Build Tool**: Maven 📦
+- **API Documentation**: OpenAPI (SpringDoc) 📚
 
-## 🔗 Endpoints Overview
+## 🔌API Reference
 
-### Authentication and Token Management
+### 🔒 Authentication Endpoints
 
-- **Register**: `POST /api/v1/users/register`
-- **Login**: `POST /api/v1/users/login`
-- **Refresh Token**: `POST /api/v1/users/refresh`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/sign-up` | Register new user |
+| POST | `/api/v1/auth/verify-email` | Verify email address |
+| POST | `/api/v1/auth/sign-in` | Authenticate user |
+| POST | `/api/v1/auth/validate-identifier` | Validate email/username |
+| POST | `/api/v1/auth/forgot-password` | Request password reset |
+| POST | `/api/v1/auth/reset-password` | Reset password |
+| POST | `/api/v1/auth/refresh` | Refresh access token |
 
-### User Management
+### 👥 User Management Endpoints
 
-- **Get User**: `GET /api/v1/users/{id}`
-- **Update User**: `PUT /api/v1/users/{id}`
-- **Deactivate User**: `PATCH /api/v1/users/{id}/deactivate`
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/users/{id}` | Get user details |
+| PUT | `/api/v1/users/{id}` | Update full profile |
+| PATCH | `/api/v1/users/{id}` | Update partial profile |
+| PATCH | `/api/v1/users/{id}/deactivate` | Deactivate account |
+| POST | `/api/v1/auth/send-verification-code` | Resend verification |
 
-## ⚙️ Running the Service
+## 🚀 Getting Started
 
-### Prerequisites
+### 📋 Prerequisites
+- Docker and Docker Compose
 
-- Docker and Docker Compose installed.
+### ⚙️ Environment Setup
 
-### Steps
+1. Create a `.env` file in the project root with the following variables:
+```env
+  SPRING_DATASOURCE_URL=your_jdbc_url
+  SPRING_DATASOURCE_USERNAME=your_postgres_username
+  SPRING_DATASOURCE_PASSWORD=your_postgres_password
+  POSTGRES_USER=your_postgres_username
+  POSTGRES_PASSWORD=your_postgres_password
+  POSTGRES_DB=protu-db
+  JWT_SECRET=your_jwt_secret
+  JWT_ACCESS_TOKEN_EXPIRATION_TIME=access_token_expiry_time
+  JWT_REFRESH_TOKEN_EXPIRATION_TIME=refresh_token_expiry_time
+```
 
-1. Create an `.env` file in user-service directory and add your credentials:
-   ```env
-    SPRING_DATASOURCE_URL=your_jdbc_url
-    SPRING_DATASOURCE_USERNAME=your_postgres_username
-    SPRING_DATASOURCE_PASSWORD=your_postgres_password
-    POSTGRES_USER=your_postgres_username
-    POSTGRES_PASSWORD=your_postgres_password
-    POSTGRES_DB=protu-db
-    JWT_SECRET=your_jwt_secret
-    JWT_ACCESS_TOKEN_EXPIRATION_TIME=access_token_expriy_time
-    JWT_REFRESH_TOKEN_EXPIRATION_TIME=refresh_token_expriy_time
-   ```
-2. Build and run the service:
-   ```bash
-    docker-compose up --build
-   ```
+3. Navigate to the project directory
+4. Run the following command:
+```bash
+   docker-compose up --build
+```
+6. Service will be available at `http://localhost:8085`
 
-## 📖 API Documentation
+## 📚 Documentation
 
-### Postman Collection
-
-- Download and import the Postman collection to interact with the API:
-  [User Service Postman Collection](src/main/resources/postman/user-service-v1.0.0.postman_collection.json)
-
-
+- **API Documentation**: Available at `http://localhost:8085/swagger-ui/index.html` when the service is running
+- **Postman Collection**: Available in the `src/main/resources/postman` directory
