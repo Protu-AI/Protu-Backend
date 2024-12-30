@@ -12,7 +12,7 @@ model attachments {
   messageId  Int       @db.Integer
   filePath   String    @db.VarChar(255)
   fileType   String    @db.VarChar(255)
-  uploadedAt DateTime? @db.Timestamptz @default(now()) 
+  uploadedAt DateTime? @db.Timestamptz @default(now())
   messages   messages  @relation(fields: [messageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([messageId], map: "idx_attachments_messageId")
@@ -21,8 +21,8 @@ model attachments {
 model chats {
   id          Int       @id @default(autoincrement()) @db.Integer
   userId      Int       @db.Integer
-  name        String     @db.VarChar(50)
-  createdAt   DateTime? @db.Timestamptz @default(now()) 
+  name        String    @db.VarChar(100)
+  createdAt   DateTime? @db.Timestamptz @default(now())
   updatedAt   DateTime? @db.Timestamptz @default(now()) @updatedAt
   user        users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   messages    messages[]
@@ -35,9 +35,9 @@ model messages {
   id          Int       @id @default(autoincrement()) @db.Integer
   chatId      Int       @db.Integer
   senderRole  enum_messages_senderRole
-  content     String
-  attachmentName  String
-  createdAt   DateTime? @db.Timestamptz @default(now()) 
+  content     String    @db.Text
+  attachmentName String @db.VarChar(255)
+  createdAt   DateTime? @db.Timestamptz @default(now())
   attachments attachments[]
   chat        chats      @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -47,21 +47,21 @@ model messages {
 
 model users {
   id               Int        @id @default(autoincrement()) @db.Integer
-  firstName        String     @db.VarChar(50)
-  lastName         String     @db.VarChar(50)
+  firstName        String     @db.VarChar(100)
+  lastName         String     @db.VarChar(100)
   username         String     @unique @db.VarChar(50)
-  email            String     @unique @db.VarChar(100)
+  email            String     @unique @db.VarChar(150)
   chats            chats[]
   password         String     @db.VarChar(100)
   phoneNumber      String     @db.VarChar(20)
   authorities      String     @db.Text
   isActive         Boolean    @default(true)
   isEmailVerified  Boolean
-  verificationCode String
+  verificationCode String     @db.VarChar(20)
   codeExpiryDate   DateTime
-  createdAt        DateTime? @db.Timestamptz @default(now()) 
+  createdAt        DateTime? @db.Timestamptz @default(now())
   updatedAt        DateTime? @db.Timestamptz @default(now()) @updatedAt
-  
+
   @@index([username], name: "idx_users_username")
   @@index([email], name: "idx_users_email")
 }
