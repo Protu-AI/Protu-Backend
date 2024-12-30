@@ -6,7 +6,10 @@ const getAttachmentsForMessage = asyncWrapper(async (req, res) => {
   const attachments = await attachmentService.getAttachmentsForMessage(
     parseInt(messageId)
   );
-  res.status(200).json(attachments);
+  res.status(200).json({
+    status: 'success',
+    data: attachments
+  });
 });
 
 module.exports = {

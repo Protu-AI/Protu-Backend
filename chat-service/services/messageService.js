@@ -1,12 +1,19 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const createMessage = async (chatId, senderRole, content, attachmentPath) => {
+const createMessage = async (
+  chatId,
+  senderRole,
+  content,
+  attachmentPath,
+  attachmentName
+) => {
   const message = await prisma.messages.create({
     data: {
       chatId,
       senderRole,
       content,
+      attachmentName: attachmentName || '',
       attachments: attachmentPath
         ? {
             create: [

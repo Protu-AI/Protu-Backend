@@ -45,7 +45,8 @@ const socketHandler = io => {
           parseInt(chatId),
           'user',
           content,
-          attachmentPath
+          attachmentPath,
+          file?.name || null
         );
 
         const aiResponse = await getAIResponse(content);
@@ -56,6 +57,10 @@ const socketHandler = io => {
           aiResponse
         );
 
+        socket.emit('receive_message', {
+          status: 'success',
+          data: aiMessage
+        });
         socket.emit('receive_message', aiMessage);
       } catch (error) {
         console.error('Error in send_message handler:', error);
