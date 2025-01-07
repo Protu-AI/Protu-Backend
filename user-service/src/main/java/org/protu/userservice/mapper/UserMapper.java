@@ -15,7 +15,7 @@ public interface UserMapper {
       @Mapping(target = "authorities", constant = "ROLE_USER"),
       @Mapping(target = "isActive", constant = "true"),
       @Mapping(target = "isEmailVerified", constant = "false"),
-      @Mapping(target = "password", expression = "java(passwordEncoder.encode(signUpReqDto.getPassword()))")
+      @Mapping(target = "password", expression = "java(passwordEncoder.encode(signUpReqDto.password()))")
   })
   User signUpReqDtoToUser(SignUpReqDto signUpReqDto, @Context PasswordEncoder passwordEncoder);
 

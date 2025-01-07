@@ -50,8 +50,8 @@ public class VerificationCodeService {
   }
 
   public TokensResDto verifyUserEmailAndCode(VerifyEmailReqDto requestDTO) {
-    User user = userHelper.fetchUserOrThrow(requestDTO.getEmail(), "email");
-    validateCode(user, requestDTO.getVerificationCode());
+    User user = userHelper.fetchUserOrThrow(requestDTO.email(), "email");
+    validateCode(user, requestDTO.verificationCode());
     return verifyUserEmail(user);
   }
 

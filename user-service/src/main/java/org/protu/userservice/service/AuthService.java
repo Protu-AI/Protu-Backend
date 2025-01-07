@@ -34,8 +34,8 @@ public class AuthService {
   private final VerificationCodeService verificationCodeService;
 
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
-    userHelper.checkIfUserExists(signUpReqDto.getEmail(), "email");
-    userHelper.checkIfUserExists(signUpReqDto.getUsername(), "username");
+    userHelper.checkIfUserExists(signUpReqDto.email(), "email");
+    userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.signUpReqDtoToUser(signUpReqDto, passwordEncoder);
     verificationCodeService.sendVerificationCode(user, "Verify your email");
     userRepo.save(user);
@@ -51,14 +51,14 @@ public class AuthService {
   }
 
   public TokensResDto signIn(SignInReqDto signInReqDto) {
-    User user = userHelper.fetchUserOrThrow(signInReqDto.getUserIdentifier(), "username/email");
+    User user = userHelper.fetchUserOrThrow(signInReqDto.userIdentifier(), "username/email");
     if (!user.getIsEmailVerified()) {
       verificationCodeService.sendVerificationCode(user, "Verify your email");
-      throw new UserEmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.getUserIdentifier()));
+      throw new UserEmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
 
-    if (!passwordEncoder.matches(signInReqDto.getPassword(), user.getPassword())) {
-      throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password", signInReqDto.getPassword()));
+    if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
+      throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password", signInReqDto.password()));
     }
 
     return tokenMapper.userToTokensResDto(user, jwtService);
@@ -74,15 +74,15 @@ public class AuthService {
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {
-    User user = userHelper.fetchUserOrThrow(requestDto.getEmail(), "email");
-    verificationCodeService.validateCode(user, requestDto.getVerificationCode());
+    User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
+    verificationCodeService.validateCode(user, requestDto.verificationCode());
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));
-    user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+    user.setPassword(passwordEncoder.encode(requestDto.password()));
     userRepo.save(user);
   }
 
   public void sendNewCode(SendCodeDto requestDto, String subject) {
-    User user = userHelper.fetchUserOrThrow(requestDto.getEmail(), "email");
+    User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
     verificationCodeService.sendVerificationCode(user, subject);
   }
 }

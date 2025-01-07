@@ -1,45 +1,25 @@
 package org.protu.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonPropertyOrder({
-    "status",
-    "apiVersion",
-    "message",
-    "timestamp",
-    "data"
-})
-@AllArgsConstructor
-public class ApiResponse<T> {
-  String status = "SUCCESS";
-  String apiVersion = "v1.0.0";
-  String message;
-  Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-  T data;
-  String requestUri;
-  String requestMethod;
+@JsonPropertyOrder({"status", "apiVersion", "message", "timestamp", "data"})
+public record ApiResponse<T>(String status, String apiVersion, String message, Timestamp timestamp, T data, String requestUri, String requestMethod) {
+  public ApiResponse {
+    if (status == null)
+      status = "SUCCESS";
+    if (apiVersion == null)
+      apiVersion = "v1.0.0";
+    if (timestamp == null)
+      timestamp = new Timestamp(System.currentTimeMillis());
+  }
 
   public ApiResponse(String message, T data, String requestUri, String requestMethod) {
-    this.message = message;
-    this.data = data;
-    this.requestUri = requestUri;
-    this.requestMethod = requestMethod;
+    this("SUCCESS", "v1.0.0", message, new Timestamp(System.currentTimeMillis()), data, requestUri, requestMethod);
   }
 
-  public ApiResponse(String status,String message, T data, String requestUri, String requestMethod) {
-    this.status = status;
-    this.message = message;
-    this.data = data;
-    this.requestUri = requestUri;
-    this.requestMethod = requestMethod;
+  public ApiResponse(String status, String message, T data, String requestUri, String requestMethod) {
+    this(status, "v1.0.0", message, new Timestamp(System.currentTimeMillis()), data, requestUri, requestMethod);
   }
-
 }

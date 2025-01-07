@@ -37,11 +37,11 @@ public class UserService {
   public UserResDto fullUpdateUser(Long userId, Long authUserId, FullUpdateReqDto fullUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
-    user.setUsername(fullUpdateReqDto.getUsername());
-    user.setFirstName(fullUpdateReqDto.getFirstName());
-    user.setLastName(fullUpdateReqDto.getLastName());
-    user.setPhoneNumber(fullUpdateReqDto.getPhoneNumber());
-    user.setPassword(passwordEncoder.encode(fullUpdateReqDto.getPassword()));
+    user.setUsername(fullUpdateReqDto.username());
+    user.setFirstName(fullUpdateReqDto.firstName());
+    user.setLastName(fullUpdateReqDto.lastName());
+    user.setPhoneNumber(fullUpdateReqDto.phoneNumber());
+    user.setPassword(passwordEncoder.encode(fullUpdateReqDto.password()));
 
     userRepo.save(user);
     return userMapper.userToUserResDto(user);
@@ -50,17 +50,17 @@ public class UserService {
   public UserResDto partialUpdateUser(Long userId, Long authUserId, PartialUpdateReqDto partialUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
-    if (partialUpdateReqDto.getUsername() != null) {
-      user.setUsername(partialUpdateReqDto.getUsername());
+    if (partialUpdateReqDto.username() != null) {
+      user.setUsername(partialUpdateReqDto.username());
     }
-    if (partialUpdateReqDto.getFirstName() != null) {
-      user.setFirstName(partialUpdateReqDto.getFirstName());
+    if (partialUpdateReqDto.firstName() != null) {
+      user.setFirstName(partialUpdateReqDto.firstName());
     }
-    if (partialUpdateReqDto.getLastName() != null) {
-      user.setLastName(partialUpdateReqDto.getLastName());
+    if (partialUpdateReqDto.lastName() != null) {
+      user.setLastName(partialUpdateReqDto.lastName());
     }
-    if (partialUpdateReqDto.getPhoneNumber() != null) {
-      user.setPhoneNumber(partialUpdateReqDto.getPhoneNumber());
+    if (partialUpdateReqDto.phoneNumber() != null) {
+      user.setPhoneNumber(partialUpdateReqDto.phoneNumber());
     }
     userRepo.save(user);
     return userMapper.userToUserResDto(user);
