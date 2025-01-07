@@ -8,7 +8,6 @@ import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.exceptions.custom.*;
 import org.protu.userservice.helper.FailureResponseHelper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -66,11 +65,6 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ExpiredJwtException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleExpiredJwtException(ExpiredJwtException e, HttpServletRequest request) {
     return FailureResponseHelper.buildResponse(apiVersion, request,HttpStatus.UNAUTHORIZED,e.getMessage().split("\\.")[0],"Session expired");
-  }
-
-  @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ApiResponse<ErrorDetails>> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiVersion, request,HttpStatus.CONFLICT,e.getMostSpecificCause().getMessage(),"Data integrity issue");
   }
 
   @ExceptionHandler(InvalidVerificationCodeException.class)

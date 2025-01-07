@@ -37,6 +37,7 @@ public class UserService {
   public UserResDto fullUpdateUser(Long userId, Long authUserId, FullUpdateReqDto fullUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
+    userHelper.checkIfUserExists(fullUpdateReqDto.username(),"username");
     user.setUsername(fullUpdateReqDto.username());
     user.setFirstName(fullUpdateReqDto.firstName());
     user.setLastName(fullUpdateReqDto.lastName());
@@ -51,6 +52,7 @@ public class UserService {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
     if (partialUpdateReqDto.username() != null) {
+      userHelper.checkIfUserExists(partialUpdateReqDto.username(),"username");
       user.setUsername(partialUpdateReqDto.username());
     }
     if (partialUpdateReqDto.firstName() != null) {
