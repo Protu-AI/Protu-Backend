@@ -10,6 +10,7 @@ import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.service.JWTService;
 import org.protu.userservice.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -23,6 +24,8 @@ import static org.protu.userservice.helper.SuccessResponseHelper.buildResponse;
 public class UserController {
   private final JWTService jwtService;
   private final UserService userService;
+  @Value("${api.version}")
+  private String apiVersion;
 
   private Long getIdFromAuthHeader(String authHeader) {
     String token = jwtService.getTokenFromHeader(authHeader);
@@ -36,7 +39,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.getUserById(userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(request, HttpStatus.OK, userResDto, SuccessMessages.GET_USER_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, userResDto, SuccessMessages.GET_USER_MSG.message);
   }
 
   @PutMapping("/{id}")
@@ -47,7 +50,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.fullUpdateUser(userId, getIdFromAuthHeader(authHeader), userUpdateDto);
-    return buildResponse(request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
   }
 
   @PatchMapping("/{id}")
@@ -58,7 +61,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.partialUpdateUser(userId, getIdFromAuthHeader(authHeader), userUpdateDto);
-    return buildResponse(request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);  }
+    return buildResponse(apiVersion, request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);  }
 
 
   @PatchMapping("/{id}/deactivate")
@@ -68,6 +71,6 @@ public class UserController {
       HttpServletRequest request) {
 
     DeactivateResDto deactivateResDto = userService.deactivateUser(userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(request, HttpStatus.OK, deactivateResDto, SuccessMessages.DEACTIVATE_USER_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, deactivateResDto, SuccessMessages.DEACTIVATE_USER_MSG.message);
   }
 }

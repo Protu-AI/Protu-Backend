@@ -36,7 +36,7 @@ public class AuthService {
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
     userHelper.checkIfUserExists(signUpReqDto.email(), "email");
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
-    User user = userMapper.signUpReqDtoToUser(signUpReqDto, passwordEncoder);
+    User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
     verificationCodeService.sendVerificationCode(user, "Verify your email");
     userRepo.save(user);
     return new signUpResDto(user.getEmail(), true);
@@ -61,12 +61,12 @@ public class AuthService {
       throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password", signInReqDto.password()));
     }
 
-    return tokenMapper.userToTokensResDto(user, jwtService);
+    return tokenMapper.toTokensDto(user, jwtService);
   }
 
   public RefreshResDto refreshAccessToken(String refreshToken) {
     Long authUserId = jwtService.getUserIdFromToken(refreshToken);
-    return tokenMapper.authUserIdsToRefreshResDto(authUserId, jwtService);
+    return tokenMapper.toTokensDto(authUserId, jwtService);
   }
 
   public void forgotPassword(SendCodeDto requestDto) {

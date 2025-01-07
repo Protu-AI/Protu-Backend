@@ -31,7 +31,7 @@ public class UserService {
   public UserResDto getUserById(Long userId, Long authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
-    return userMapper.userToUserResDto(user);
+    return userMapper.toUserDto(user);
   }
 
   public UserResDto fullUpdateUser(Long userId, Long authUserId, FullUpdateReqDto fullUpdateReqDto) {
@@ -44,7 +44,7 @@ public class UserService {
     user.setPassword(passwordEncoder.encode(fullUpdateReqDto.password()));
 
     userRepo.save(user);
-    return userMapper.userToUserResDto(user);
+    return userMapper.toUserDto(user);
   }
 
   public UserResDto partialUpdateUser(Long userId, Long authUserId, PartialUpdateReqDto partialUpdateReqDto) {
@@ -63,7 +63,7 @@ public class UserService {
       user.setPhoneNumber(partialUpdateReqDto.phoneNumber());
     }
     userRepo.save(user);
-    return userMapper.userToUserResDto(user);
+    return userMapper.toUserDto(user);
   }
 
   public DeactivateResDto deactivateUser(Long userId, Long authUserId) {
@@ -71,7 +71,7 @@ public class UserService {
     verifyUserAuthority(userId, authUserId);
     user.setIsActive(false);
     userRepo.save(user);
-    return userMapper.UserToDeactivateResDto(user);
+    return userMapper.toDeactivateDto(user);
   }
 
 }

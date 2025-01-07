@@ -95,6 +95,6 @@ public class VerificationCodeService {
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));
     user.setIsEmailVerified(true);
     userRepository.save(user);
-    return tokenMapper.userToTokensResDto(user, jwtService);
+    return tokenMapper.toTokensDto(user, jwtService);
   }
 }

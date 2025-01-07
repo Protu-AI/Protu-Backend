@@ -11,6 +11,7 @@ import org.protu.userservice.dto.response.signUpResDto;
 import org.protu.userservice.service.AuthService;
 import org.protu.userservice.service.JWTService;
 import org.protu.userservice.service.VerificationCodeService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,33 +26,35 @@ public class AuthController {
   private final JWTService jwtService;
   private final AuthService authService;
   private final VerificationCodeService verificationCodeService;
+  @Value("${api.version}")
+  private String apiVersion;
 
   @PostMapping("/sign-up")
   public ResponseEntity<ApiResponse<signUpResDto>> signUpUser(
       @Validated @RequestBody SignUpReqDto signUpReqDto, HttpServletRequest request) {
     signUpResDto signUpResDto = authService.signUpUser(signUpReqDto);
-    return buildResponse(request, HttpStatus.CREATED, signUpResDto, SuccessMessages.SIGN_UP_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.CREATED, signUpResDto, SuccessMessages.SIGN_UP_MSG.message);
   }
 
   @PostMapping("/verify-email")
   public ResponseEntity<ApiResponse<TokensResDto>> verifyUserEmail(
       @Validated @RequestBody VerifyEmailReqDto requestDto, HttpServletRequest request) {
     TokensResDto responseDTO = verificationCodeService.verifyUserEmailAndCode(requestDto);
-    return buildResponse(request, HttpStatus.OK, responseDTO, SuccessMessages.VERIFY_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, responseDTO, SuccessMessages.VERIFY_MSG.message);
   }
 
   @PostMapping("/validate-identifier")
   public ResponseEntity<ApiResponse<Void>> validateUserIdentifier(
       @RequestParam String userIdentifier, HttpServletRequest request) {
     authService.validateUserIdentifier(userIdentifier);
-    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.VALIDATE_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, null, SuccessMessages.VALIDATE_MSG.message);
   }
 
   @PostMapping("/sign-in")
   public ResponseEntity<ApiResponse<TokensResDto>> signIn(
       @Validated @RequestBody SignInReqDto signInReqDto, HttpServletRequest request) {
     TokensResDto responseDTO = authService.signIn(signInReqDto);
-    return buildResponse(request, HttpStatus.OK, responseDTO, SuccessMessages.SIGN_IN_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, responseDTO, SuccessMessages.SIGN_IN_MSG.message);
   }
 
   @PostMapping("/refresh")
@@ -59,28 +62,28 @@ public class AuthController {
       @RequestHeader("Authorization") String authHeader, HttpServletRequest request) {
     String refreshToken = jwtService.getTokenFromHeader(authHeader);
     RefreshResDto refreshResDto = authService.refreshAccessToken(refreshToken);
-    return buildResponse(request, HttpStatus.OK, refreshResDto, SuccessMessages.REFRESH_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, refreshResDto, SuccessMessages.REFRESH_MSG.message);
   }
 
   @PostMapping("/forgot-password")
   public ResponseEntity<ApiResponse<Void>> forgotPassword(
       @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
     authService.forgotPassword(requestDto);
-    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.FORGOT_PASSWORD_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, null, SuccessMessages.FORGOT_PASSWORD_MSG.message);
   }
 
   @PostMapping("/reset-password")
   public ResponseEntity<ApiResponse<Void>> resetPassword(
       @Validated @RequestBody ResetPasswordReqDto requestDto, HttpServletRequest request) {
     authService.resetPassword(requestDto);
-    return buildResponse(request, HttpStatus.OK, null, SuccessMessages.RESET_PASSWORD_MSG.message);
+    return buildResponse(apiVersion, request, HttpStatus.OK, null, SuccessMessages.RESET_PASSWORD_MSG.message);
   }
 
   @PostMapping("/send-verification-code")
   public ResponseEntity<ApiResponse<Void>> sendVerificationCode(
       @Validated @RequestBody SendCodeDto requestDto, HttpServletRequest request) {
     authService.sendNewCode(requestDto, "Verify your email");
-    return buildResponse(request,HttpStatus.OK,null,SuccessMessages.NEW_CODE_MSG.message);
+    return buildResponse(apiVersion, request,HttpStatus.OK,null,SuccessMessages.NEW_CODE_MSG.message);
   }
 }
 
