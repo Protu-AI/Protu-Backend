@@ -1,3 +1,5 @@
+name: protu-ai
+
 services:
   user-service:
     container_name: user-service-container
