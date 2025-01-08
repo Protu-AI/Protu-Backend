@@ -3,18 +3,24 @@ package org.protu.userservice.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JWTService {
+
+  private final RedisTemplate<Object, Object> redisTemplate;
 
   @Value("${jwt.secret}")
   private String jwtSecret;
@@ -35,29 +41,12 @@ public class JWTService {
         .compact();
   }
 
-  private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-    final Claims claims = extractAllClaims(token);
-    return claimsResolver.apply(claims);
+  public String generateAccessToken(Long userId) {
+    return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
   }
 
-  private Date extractExpiration(String token) {
-    return extractClaim(token, Claims::getExpiration);
-  }
-
-  private SecretKey getSigningKey() {
-    return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
-  }
-
-  private Claims extractAllClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(getSigningKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
-  }
-
-  public String getTokenFromHeader(String authHeader) {
-    return authHeader.split(" ")[1];
+  public String generateRefreshToken(Long userId) {
+    return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
   }
 
   public String getAccessTokenDuration() {
@@ -68,23 +57,56 @@ public class JWTService {
     return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60) + " minutes";
   }
 
-  public boolean isTokenExpired(String token) {
-    return extractExpiration(token).before(Date.from(Instant.now()));
+  private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    final Claims claims = extractAllClaims(token);
+    return claimsResolver.apply(claims);
+  }
+
+  private Claims extractAllClaims(String token) {
+    return Jwts.parser()
+        .verifyWith(getSigningKey())
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+  }
+
+  private Date extractExpiration(String token) {
+    return extractClaim(token, Claims::getExpiration);
+  }
+
+  private SecretKey getSigningKey() {
+    return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+  }
+
+  public String getTokenFromHeader(String authHeader) {
+    return authHeader.split(" ")[1];
+  }
+
+  public Long getRefreshTokenDurationInMinutes() {
+    return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60);
   }
 
   public Long getUserIdFromToken(String token) {
     return Long.parseLong(extractClaim(token, Claims::getSubject));
   }
 
-  public String generateAccessToken(Long userId) {
-    return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
+  private boolean isTokenExpired(String token) {
+    return extractExpiration(token).before(Date.from(Instant.now()));
   }
 
-  public String generateRefreshToken(Long userId) {
-    return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
+  private boolean isNotBlackListedToken(String token) {
+    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get(getUserIdFromToken(token));
+    Date issuedDate = extractClaim(token, Claims::getIssuedAt);
+    return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
   }
 
   public boolean isValidToken(String token, Long userId) {
-    return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId);
+    return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId) && isNotBlackListedToken(token);
+  }
+
+  public void invalidateUserTokens(Long id){
+    Date currentDate = Date.from(Instant.now());
+    Duration durationInSeconds =  Duration.ofMinutes(getRefreshTokenDurationInMinutes());
+    redisTemplate.opsForValue().set(id, currentDate, durationInSeconds);
   }
 }

@@ -1,6 +1,7 @@
-package org.protu.userservice.security;
+package org.protu.userservice.config;
 
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.filter.JWTFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

@@ -1,4 +1,4 @@
-package org.protu.userservice.security;
+package org.protu.userservice.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -22,7 +22,6 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
-
   private final JWTService jwtService;
   private final UserDetailsService userDetailsService;
   private final HandlerExceptionResolver handlerExceptionResolver;

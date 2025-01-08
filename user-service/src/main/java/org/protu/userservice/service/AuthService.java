@@ -15,6 +15,7 @@ import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.mapper.UserMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,10 +28,11 @@ import java.time.Instant;
 public class AuthService {
   private final UserRepository userRepo;
   private final PasswordEncoder passwordEncoder;
-  private final JWTService jwtService;
   private final TokenMapper tokenMapper;
   private final UserMapper userMapper;
+  private final JWTService jwtService;
   private final UserHelper userHelper;
+  private final RedisTemplate<Object, Object> redisTemplate;
   private final VerificationCodeService verificationCodeService;
 
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
@@ -79,6 +81,7 @@ public class AuthService {
     user.setCodeExpiryDate(Timestamp.from(Instant.now()));
     user.setPassword(passwordEncoder.encode(requestDto.password()));
     userRepo.save(user);
+    jwtService.invalidateUserTokens(user.getId());
   }
 
   public void sendNewCode(SendCodeDto requestDto, String subject) {
