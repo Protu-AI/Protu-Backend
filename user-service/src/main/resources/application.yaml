@@ -1,38 +1,19 @@
 server.port: 8085
 api:
   version: v1
-#logging.level.org.springframework.security: DEBUG
+
+logging.level:
+  org.springframework.security: INFO
+  io.lettuce.core: INFO
+  com.zaxxer.hikari: INFO
 
 spring:
+  profiles:
+    active: local
   application.name: user-service
   main.banner-mode: off
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/protu-db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:password}
-    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate.ddl-auto: update
     show-sql: false
     properties.hibernate.format_sql: false
     open-in-view: false
-  data:
-    redis:
-      port: 6379
-      host: redis
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties.mail.smtp:
-      ssl.enable: ${MAIL_SMTP_SSL_ENABLE:false}
-      starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE:true}
-
-jwt:
-  secret: ${JWT_SECRET:verySecureJwtSecretKeyThatIsAtLeast32BytesLong12345678901234567890}
-  refresh-token-expiration-time: ${JWT_REFRESH_TOKEN_EXPIRATION_TIME:240000}
-  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:120000}
-
-verification-code-expiration-time: ${VERIFICATION_CODE_EXPIRATION_TIME:2} # Minutes
-

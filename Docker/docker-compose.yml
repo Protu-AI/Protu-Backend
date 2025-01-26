@@ -6,9 +6,11 @@ services:
     build:
       context: ../user-service
       dockerfile: Dockerfile
-#    image: protu-ai/user-service:v1.0.0
+    image: protu-ai/user-service:v1.0.0
     ports:
       - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
     env_file:
       - ../user-service/.env
     depends_on:
@@ -18,8 +20,6 @@ services:
         condition: service_healthy
     volumes:
       - maven-repo:/root/.m2
-    networks:
-      - protu_network
 
   chat-service:
     container_name: chat-service-container
@@ -39,8 +39,6 @@ services:
     volumes:
       - node_modules:/app/node_modules
       - attachments:/app/uploads
-    networks:
-      - protu_network
 
   postgres:
     image: postgres:latest
@@ -61,8 +59,6 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./db-init:/docker-entrypoint-initdb.d
-    networks:
-      - protu_network
 
   redis:
     image: redis:alpine3.21
@@ -77,18 +73,10 @@ services:
     command: ["redis-server"]
     volumes:
       - redis-data:/data
-    networks:
-      - protu_network
 
 volumes:
   node_modules:
   attachments:
   maven-repo:
   postgres-data:
-    driver: local
   redis-data:
-    driver: local
-
-networks:
-  protu_network:
-    driver: bridge
