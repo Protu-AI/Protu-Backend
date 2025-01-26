@@ -34,16 +34,25 @@
 
 ### ⚙️ Environment Setup
 
-1. Copy the `.env.sample` file in the root directory of the user-service to create your `.env` file: 
+#### 💻 Local Run
+
+1. Create `application-local.yaml` file in the following path:`src/main/resources`
+2. Copy the properties in template file in the same path `application-local-template.yaml` into the new file
+3. Replace all placeholders with your actual credentials
+
+#### 🐋 Docker Run
+
+1. Copy the `.env.sample` file in the root directory of the user-service to create your `.env` file:
    ```bash
       cp .env.sample .env
    ```
 2. Open the .env file and replace the placeholder values with your actual configuration values.
-3. Navigate to the `Docker` directory and run the following command: 
+3. Navigate to the `Docker` directory and run the following command:
    ```bash 
       docker compose up --build -d
    ```
 4. Service will be available at `http://localhost:8085`
+
 
 ## 📚 Documentation
 
