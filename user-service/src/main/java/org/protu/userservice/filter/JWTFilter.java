@@ -48,9 +48,9 @@ public class JWTFilter extends OncePerRequestFilter {
     return authToken;
   }
 
-  private void authenticateUserIfNecessary(HttpServletRequest request, Long userId, String jwt) {
+  private void authenticateUserIfNecessary(HttpServletRequest request, String userId, String jwt) {
     if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(userId));
+      UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
       if (jwtService.isValidToken(jwt, userId)) {
         UsernamePasswordAuthenticationToken authToken = createAuthenticationToken(request, userDetails);
         SecurityContextHolder.getContext().setAuthentication(authToken);
@@ -65,7 +65,7 @@ public class JWTFilter extends OncePerRequestFilter {
       @NonNull FilterChain filterChain) throws ServletException, IOException {
     try {
       String jwt;
-      Long userId;
+      String userId;
       String authHeader = request.getHeader("Authorization");
 
       if (isInvalidBearerToken(authHeader)) {

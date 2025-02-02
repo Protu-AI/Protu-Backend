@@ -22,19 +22,19 @@ public class UserService {
   private final UserMapper userMapper;
   private final UserHelper userHelper;
 
-  public void verifyUserAuthority(Long userId, Long authUserId) {
+  public void verifyUserAuthority(String userId, String authUserId) {
     if (!userId.equals(authUserId)) {
       throw new UnauthorizedAccessException(FailureMessages.UNAUTHORIZED_ACCESS.getMessage());
     }
   }
 
-  public UserResDto getUserById(Long userId, Long authUserId) {
+  public UserResDto getUserById(String userId, String authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
     return userMapper.toUserDto(user);
   }
 
-  public UserResDto fullUpdateUser(Long userId, Long authUserId, FullUpdateReqDto fullUpdateReqDto) {
+  public UserResDto fullUpdateUser(String userId, String authUserId, FullUpdateReqDto fullUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
     userHelper.checkIfUserExists(fullUpdateReqDto.username(),"username");
@@ -48,7 +48,7 @@ public class UserService {
     return userMapper.toUserDto(user);
   }
 
-  public UserResDto partialUpdateUser(Long userId, Long authUserId, PartialUpdateReqDto partialUpdateReqDto) {
+  public UserResDto partialUpdateUser(String userId, String authUserId, PartialUpdateReqDto partialUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
     if (partialUpdateReqDto.username() != null) {
@@ -68,7 +68,7 @@ public class UserService {
     return userMapper.toUserDto(user);
   }
 
-  public DeactivateResDto deactivateUser(Long userId, Long authUserId) {
+  public DeactivateResDto deactivateUser(String userId, String authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
     user.setIsActive(false);

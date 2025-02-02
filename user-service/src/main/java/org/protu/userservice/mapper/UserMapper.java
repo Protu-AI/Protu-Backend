@@ -1,5 +1,6 @@
 package org.protu.userservice.mapper;
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,8 +19,12 @@ public interface UserMapper {
   @Mapping(target = "isActive", constant = "true")
   @Mapping(target = "isEmailVerified", constant = "false")
   @Mapping(target = "password", expression = "java(passwordEncoder.encode(signUpReqDto.password()))")
+  @Mapping(target = "publicId", expression = "java(generateUlid())")
   User toUserEntity(SignUpReqDto signUpReqDto, @Context PasswordEncoder passwordEncoder);
 
-  @Mapping(source = "id", target = "userId")
   DeactivateResDto toDeactivateDto(User user);
+
+  default String generateUlid(){
+    return UlidCreator.getUlid().toString();
+  }
 }

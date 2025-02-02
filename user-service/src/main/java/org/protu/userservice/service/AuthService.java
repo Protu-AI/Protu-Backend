@@ -67,7 +67,7 @@ public class AuthService {
   }
 
   public RefreshResDto refreshAccessToken(String refreshToken) {
-    Long authUserId = jwtService.getUserIdFromToken(refreshToken);
+    String authUserId = jwtService.getUserIdFromToken(refreshToken);
     return tokenMapper.toTokensDto(authUserId, jwtService);
   }
 

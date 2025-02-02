@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
     name = "users",
     indexes = {
         @Index(name = "idx_users_username", columnList = "username"),
-        @Index(name = "idx_users_email", columnList = "email")
+        @Index(name = "idx_users_email", columnList = "email"),
+        @Index(name = "idx_users_public_id", columnList = "public_id")
     }
 )
 @Data
@@ -27,6 +28,9 @@ public class User {
   @SequenceGenerator(name = "users_id_gen", sequenceName = "users_user_id_seq", allocationSize = 1)
   @Column(name = "id")
   Long id;
+
+  @Column(name = "public_id", nullable = false, unique = true)
+  private String publicId;
 
   @Column(name = "first_name", length = 50, nullable = false)
   String firstName;

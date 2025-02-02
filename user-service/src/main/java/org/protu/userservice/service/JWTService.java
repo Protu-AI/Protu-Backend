@@ -31,21 +31,21 @@ public class JWTService {
   @Value("${jwt.refresh-token-expiration-time}")
   private String refreshTokenExpiryTime;
 
-  private String generateToken(Long userId, long expiryTime) {
+  private String generateToken(String userId, long expiryTime) {
     Instant now = Instant.now();
     return Jwts.builder()
-        .subject(String.valueOf(userId))
+        .subject(userId)
         .issuedAt(Date.from(now))
         .expiration(Date.from(now.plus(expiryTime, ChronoUnit.MILLIS)))
         .signWith(getSigningKey())
         .compact();
   }
 
-  public String generateAccessToken(Long userId) {
+  public String generateAccessToken(String userId) {
     return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
   }
 
-  public String generateRefreshToken(Long userId) {
+  public String generateRefreshToken(String userId) {
     return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
   }
 
@@ -86,8 +86,8 @@ public class JWTService {
     return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60);
   }
 
-  public Long getUserIdFromToken(String token) {
-    return Long.parseLong(extractClaim(token, Claims::getSubject));
+  public String getUserIdFromToken(String token) {
+    return extractClaim(token, Claims::getSubject);
   }
 
   private boolean isTokenExpired(String token) {
@@ -100,7 +100,7 @@ public class JWTService {
     return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
   }
 
-  public boolean isValidToken(String token, Long userId) {
+  public boolean isValidToken(String token, String userId) {
     return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId) && isNotBlackListedToken(token);
   }
 

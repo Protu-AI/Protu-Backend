@@ -32,8 +32,8 @@ public class UserHelper {
         .orElseThrow(() -> new UserNotFoundException(FailureMessages.USER_NOT_FOUND.getMessage(type, identifier)));
   }
 
-  public User fetchUserByIdOrThrow(Long userId){
-    return userRepo.findById(userId)
+  public User fetchUserByIdOrThrow(String userId){
+    return userRepo.findByPublicId(userId)
         .orElseThrow(() -> new UserNotFoundException(FailureMessages.USER_NOT_FOUND.getMessage("id", userId)));
   }
 }

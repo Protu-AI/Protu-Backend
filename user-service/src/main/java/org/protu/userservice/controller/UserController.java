@@ -27,14 +27,14 @@ public class UserController {
   @Value("${api.version}")
   private String apiVersion;
 
-  private Long getIdFromAuthHeader(String authHeader) {
+  private String getIdFromAuthHeader(String authHeader) {
     String token = jwtService.getTokenFromHeader(authHeader);
     return jwtService.getUserIdFromToken(token);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<UserResDto>> getUserById(
-      @PathVariable("id") Long userId,
+      @PathVariable("id") String userId,
       @RequestHeader("Authorization") String authHeader,
       HttpServletRequest request) {
 
@@ -44,7 +44,7 @@ public class UserController {
 
   @PutMapping("/{id}")
   public ResponseEntity<ApiResponse<UserResDto>> fullUpdateUser(
-      @PathVariable("id") Long userId,
+      @PathVariable("id") String userId,
       @Validated @RequestBody FullUpdateReqDto userUpdateDto,
       @RequestHeader("Authorization") String authHeader,
       HttpServletRequest request) {
@@ -55,7 +55,7 @@ public class UserController {
 
   @PatchMapping("/{id}")
   public ResponseEntity<ApiResponse<UserResDto>> partialUpdateUser(
-      @PathVariable("id") Long userId,
+      @PathVariable("id") String userId,
       @Validated @RequestBody PartialUpdateReqDto userUpdateDto,
       @RequestHeader("Authorization") String authHeader,
       HttpServletRequest request) {
@@ -66,7 +66,7 @@ public class UserController {
 
   @PatchMapping("/{id}/deactivate")
   public ResponseEntity<ApiResponse<DeactivateResDto>> deactivateUser(
-      @PathVariable("id") Long userId,
+      @PathVariable("id") String userId,
       @RequestHeader("Authorization") String authHeader,
       HttpServletRequest request) {
 
