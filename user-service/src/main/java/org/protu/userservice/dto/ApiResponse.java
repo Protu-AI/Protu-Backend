@@ -1,10 +1,14 @@
 package org.protu.userservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.sql.Timestamp;
+import java.util.List;
 
-@JsonPropertyOrder({"status", "apiVersion", "message", "timestamp", "data", "request"})
-public record ApiResponse<T>(String status, String apiVersion, String message, T data, Timestamp timestamp ,RequestInfo request) {
-  public record RequestInfo(String uri, String method) {}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record ApiResponse<T>(String message, T data, List<Object> errors, MetaData meta) {
+  public record MetaData(String status, String apiVersion, Timestamp timestamp, RequestDetails request) {
+    public record RequestDetails(String method, String uri) {}
+  }
 }
+

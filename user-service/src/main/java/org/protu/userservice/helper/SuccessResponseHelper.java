@@ -10,9 +10,9 @@ import java.time.Instant;
 
 public class SuccessResponseHelper {
   public static <T> ResponseEntity<ApiResponse<T>> buildResponse(String apiVersion, HttpServletRequest request, HttpStatus status, T data, String message) {
-    return ResponseEntity.status(status)
-        .body(new ApiResponse<>("SUCCESS", apiVersion, message, data,
-            Timestamp.from(Instant.now()),
-            new ApiResponse.RequestInfo(request.getRequestURI(), request.getMethod())));
+  return ResponseEntity.status(status)
+        .body(new ApiResponse<>(message, data, null,
+            new ApiResponse.MetaData("SUCCESS", apiVersion, Timestamp.from(Instant.now()),
+            new ApiResponse.MetaData.RequestDetails(request.getMethod(), request.getRequestURI()))));
   }
 }
