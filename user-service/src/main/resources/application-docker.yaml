@@ -17,9 +17,15 @@ spring:
       ssl.enable: ${MAIL_SMTP_SSL_ENABLE}
       starttls.enable: ${MAIL_SMTP_STARTTLS_ENABLE}
 
-jwt:
-  secret: ${JWT_SECRET}
-  refresh-token-expiration-time: ${JWT_REFRESH_TOKEN_EXPIRATION_TIME}
-  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME}
-
-verification-code-expiration-time: ${VERIFICATION_CODE_EXPIRATION_TIME} # Minutes
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-ttl: ${JWT_ACCESS_TOKEN_TTL}
+    refresh-token-ttl: ${JWT_REFRESH_TOKEN_TTL}
+  otp:
+    email-ttl: ${OTP_EMAIL_TTL}
+    password-ttl: ${OTP_PASSWORD_TTL}
+    prefix:
+      jwt: ${OTP_PREFIX_JWT}
+      email: ${OTP_PREFIX_EMAIL}
+      password: ${OTP_PREFIX_PASSWORD}

@@ -11,8 +11,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     "authorities" TEXT NOT NULL,
     "is_active" BOOLEAN NOT NULL DEFAULT TRUE,
     "is_email_verified" BOOLEAN NOT NULL,
-    "verification_code" VARCHAR NOT NULL,
-    "code_expiry_date" TIMESTAMPTZ NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

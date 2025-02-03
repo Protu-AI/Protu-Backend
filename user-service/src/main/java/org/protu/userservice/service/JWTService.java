@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.protu.userservice.config.AppPropertiesConfig;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -19,17 +19,8 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JWTService {
-
   private final RedisTemplate<Object, Object> redisTemplate;
-
-  @Value("${jwt.secret}")
-  private String jwtSecret;
-
-  @Value("${jwt.access-token-expiration-time}")
-  private String accessTokenExpiryTime;
-
-  @Value("${jwt.refresh-token-expiration-time}")
-  private String refreshTokenExpiryTime;
+  private final AppPropertiesConfig appPropertiesConfig;
 
   private String generateToken(String userId, long expiryTime) {
     Instant now = Instant.now();
@@ -42,19 +33,19 @@ public class JWTService {
   }
 
   public String generateAccessToken(String userId) {
-    return generateToken(userId, Long.parseLong(accessTokenExpiryTime));
+    return generateToken(userId, appPropertiesConfig.getJwt().getAccessTokenTtL());
   }
 
   public String generateRefreshToken(String userId) {
-    return generateToken(userId, Long.parseLong(refreshTokenExpiryTime));
+    return generateToken(userId, appPropertiesConfig.getJwt().getRefreshTokenTtL());
   }
 
   public String getAccessTokenDuration() {
-    return Long.parseLong(accessTokenExpiryTime) / (1000 * 60) + " minutes";
+    return appPropertiesConfig.getJwt().getAccessTokenTtL() / (1000 * 60) + " minutes";
   }
 
   public String getRefreshTokenDuration() {
-    return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60) + " minutes";
+    return appPropertiesConfig.getJwt().getRefreshTokenTtL() / (1000 * 60) + " minutes";
   }
 
   private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -75,7 +66,7 @@ public class JWTService {
   }
 
   private SecretKey getSigningKey() {
-    return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    return Keys.hmacShaKeyFor(appPropertiesConfig.getJwt().getSecret().getBytes(StandardCharsets.UTF_8));
   }
 
   public String getTokenFromHeader(String authHeader) {
@@ -83,7 +74,7 @@ public class JWTService {
   }
 
   public Long getRefreshTokenDurationInMinutes() {
-    return Long.parseLong(refreshTokenExpiryTime) / (1000 * 60);
+    return appPropertiesConfig.getJwt().getRefreshTokenTtL() / (1000 * 60);
   }
 
   public String getUserIdFromToken(String token) {
@@ -95,7 +86,7 @@ public class JWTService {
   }
 
   private boolean isNotBlackListedToken(String token) {
-    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get(getUserIdFromToken(token));
+    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get("JWT_"+ getUserIdFromToken(token));
     Date issuedDate = extractClaim(token, Claims::getIssuedAt);
     return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
   }

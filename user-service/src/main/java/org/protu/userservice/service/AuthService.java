@@ -1,15 +1,16 @@
 package org.protu.userservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.config.AppPropertiesConfig;
 import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.request.ResetPasswordReqDto;
-import org.protu.userservice.dto.request.SendCodeDto;
+import org.protu.userservice.dto.request.SendOtpDto;
 import org.protu.userservice.dto.request.SignInReqDto;
 import org.protu.userservice.dto.request.SignUpReqDto;
 import org.protu.userservice.dto.response.RefreshResDto;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.dto.response.signUpResDto;
-import org.protu.userservice.exceptions.custom.UserEmailNotVerifiedException;
+import org.protu.userservice.exceptions.custom.EmailNotVerifiedException;
 import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.mapper.UserMapper;
@@ -20,8 +21,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,13 +33,15 @@ public class AuthService {
   private final JWTService jwtService;
   private final UserHelper userHelper;
   private final RedisTemplate<Object, Object> redisTemplate;
-  private final VerificationCodeService verificationCodeService;
+  private final OtpService otpService;
+  private final AppPropertiesConfig properties;
+  private final String VERIFY_EMAIL_SUBJECT = "Verify your email";
 
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
     userHelper.checkIfUserExists(signUpReqDto.email(), "email");
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
-    verificationCodeService.sendVerificationCode(user, "Verify your email");
+    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
     userRepo.save(user);
     return new signUpResDto(user.getEmail(), true);
   }
@@ -47,22 +49,20 @@ public class AuthService {
   public void validateUserIdentifier(String userIdentifier) {
     User user = userHelper.fetchUserOrThrow(userIdentifier, "username/email");
     if (!user.getIsEmailVerified()) {
-      verificationCodeService.sendVerificationCode(user, "Verify your email");
-      throw new UserEmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(userIdentifier));
+      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
+      throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(userIdentifier));
     }
   }
 
   public TokensResDto signIn(SignInReqDto signInReqDto) {
     User user = userHelper.fetchUserOrThrow(signInReqDto.userIdentifier(), "username/email");
     if (!user.getIsEmailVerified()) {
-      verificationCodeService.sendVerificationCode(user, "Verify your email");
-      throw new UserEmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
+      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
+      throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
-
     if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
       throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password", signInReqDto.password()));
     }
-
     return tokenMapper.toTokensDto(user, jwtService);
   }
 
@@ -71,21 +71,20 @@ public class AuthService {
     return tokenMapper.toTokensDto(authUserId, jwtService);
   }
 
-  public void forgotPassword(SendCodeDto requestDto) {
-    sendNewCode(requestDto, "Reset your password");
+  public void forgotPassword(SendOtpDto requestDto) {
+    Optional<User> userOpt = userHelper.findUserByIdentifier(requestDto.email(), Optional.of("email"));
+    if(userOpt.isEmpty())
+      return;
+    User user = userOpt.get();
+    otpService.sendOtp(5, properties.getOtp().getPrefix().getPassword() + user.getId(), user, "Reset your password", properties.getOtp().getPasswordTtl());
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {
     User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
-    verificationCodeService.validateCode(user, requestDto.verificationCode());
-    user.setCodeExpiryDate(Timestamp.from(Instant.now()));
+    otpService.checkIfUserEnteredOtpValid(properties.getOtp().getPrefix().getPassword() + user.getId(), requestDto.OTP());
+    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getPassword() + user.getId());
     user.setPassword(passwordEncoder.encode(requestDto.password()));
     userRepo.save(user);
     jwtService.invalidateUserTokens(user.getId());
-  }
-
-  public void sendNewCode(SendCodeDto requestDto, String subject) {
-    User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
-    verificationCodeService.sendVerificationCode(user, subject);
   }
 }

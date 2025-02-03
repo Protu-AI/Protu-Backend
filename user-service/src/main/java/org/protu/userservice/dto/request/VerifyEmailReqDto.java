@@ -10,6 +10,5 @@ public record VerifyEmailReqDto (
   @Size(max = 100, message = "Email must not exceed 100 characters")
   String email,
 
-  @NotBlank(message = "Verification code is required")
-  String verificationCode
-  ){}
+  @NotBlank(message = "OTP is required")
+  String OTP){}

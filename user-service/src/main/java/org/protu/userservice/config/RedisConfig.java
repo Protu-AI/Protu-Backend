@@ -1,6 +1,6 @@
 package org.protu.userservice.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,18 +9,15 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
+@RequiredArgsConstructor
 public class RedisConfig {
-  @Value("${spring.data.redis.host}")
-  String host;
-
-  @Value("${spring.data.redis.port}")
-  int port;
+  private final RedisPropertiesConfig redisPropertiesConfig;
 
   @Bean
   public RedisConnectionFactory redisConnectionFactory() {
     RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-    redisStandaloneConfiguration.setHostName(host);
-    redisStandaloneConfiguration.setPort(port);
+    redisStandaloneConfiguration.setHostName(redisPropertiesConfig.getHost());
+    redisStandaloneConfiguration.setPort(redisPropertiesConfig.getPort());
     return new LettuceConnectionFactory(redisStandaloneConfiguration);
   }
 

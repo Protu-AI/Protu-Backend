@@ -13,16 +13,13 @@ import java.time.LocalDateTime;
     indexes = {
         @Index(name = "idx_users_username", columnList = "username"),
         @Index(name = "idx_users_email", columnList = "email"),
-        @Index(name = "idx_users_public_id", columnList = "public_id")
-    }
-)
+        @Index(name = "idx_users_public_id", columnList = "public_id")})
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
-
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_gen")
   @SequenceGenerator(name = "users_id_gen", sequenceName = "users_user_id_seq", allocationSize = 1)
@@ -30,7 +27,7 @@ public class User {
   Long id;
 
   @Column(name = "public_id", nullable = false, unique = true)
-  private String publicId;
+  String publicId;
 
   @Column(name = "first_name", length = 50, nullable = false)
   String firstName;
@@ -59,18 +56,11 @@ public class User {
   @Column(name = "is_email_verified", nullable = false)
   Boolean isEmailVerified;
 
-  @Column(name = "verification_code", nullable = false)
-  String verificationCode;
-
-  @Column(name = "code_expiry_date", nullable = false)
-  Timestamp codeExpiryDate;
-
   @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
   Timestamp createdAt;
 
   @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   Timestamp updatedAt;
-
 
   @PrePersist
   protected void onCreate() {

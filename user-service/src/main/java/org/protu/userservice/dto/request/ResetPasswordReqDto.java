@@ -14,6 +14,5 @@ public record ResetPasswordReqDto (
   @Size(min = 8, message = "Password must be at least 8 characters long")
   String password,
 
-  @NotBlank(message = "Verification code is required")
-  String verificationCode
-) {}
+  @NotBlank(message = "OTP is required")
+  String OTP) {}
