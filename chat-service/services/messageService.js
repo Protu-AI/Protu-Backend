@@ -32,20 +32,6 @@ const createMessage = async (
   return message;
 };
 
-const getMessagesForChat = async chatId => {
-  const messages = await prisma.messages.findMany({
-    where: { chatId },
-    include: {
-      attachments: true
-    },
-    orderBy: {
-      createdAt: 'asc'
-    }
-  });
-  return messages;
-};
-
 module.exports = {
-  createMessage,
-  getMessagesForChat
+  createMessage
 };

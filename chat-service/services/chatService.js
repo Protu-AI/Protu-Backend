@@ -43,23 +43,23 @@ const getSingleChat = async (chatId, page, limit) => {
   const skip = (page - 1) * limit;
 
   const chat = await prisma.chats.findUnique({
-    where: { id: chatId },
-    include: {
-      messages: {
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' }
-      }
-    }
+    where: { id: chatId }
   });
 
   if (!chat) return null;
+
+  const messages = await prisma.messages.findMany({
+    where: { chatId },
+    skip,
+    take: limit,
+    orderBy: { createdAt: 'desc' }
+  });
 
   const totalMessages = await prisma.messages.count({ where: { chatId } });
 
   return {
     chat,
-    messages: chat.messages,
+    messages,
     pagination: {
       total: totalMessages,
       page,

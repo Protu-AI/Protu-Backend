@@ -1,21 +1,10 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
 const cors = require('cors');
-
-const socketHandler = require('./utils/socketHandler');
+const path = require('path');
+const multer = require('multer');
+const morgan = require('morgan');
 
 const app = express();
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  },
-  maxHttpBufferSize: 1e7 // 10 MB max file size
-});
-
 const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'DELETE'],
@@ -25,23 +14,71 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const chatRoutes = require('./routes/chatRoutes');
 const attachmentRoutes = require('./routes/attachmentRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 app.use('/api/v1', chatRoutes);
 app.use('/api/v1', attachmentRoutes);
-
-socketHandler(io);
+app.use('/api/v1', messageRoutes);
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Error details:', {
+    name: err.name,
+    message: err.message,
+    stack: err.stack
+  });
+
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        status: 'error',
+        message: 'File size is too large. Maximum size is 10MB'
+      });
+    }
+    return res.status(400).json({
+      status: 'error',
+      message: err.message
+    });
+  }
+
   res.status(err.status || 500).json({
     status: 'error',
     message: err.message || 'Internal server error'
   });
 });
 
-server.listen(8082, () => {
-  console.log('listening on *:8082');
+app.use((req, res) => {
+  res.status(404).json({
+    status: 'error',
+    message: 'Route not found'
+  });
+});
+
+const PORT = 8082;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+process.on('unhandledRejection', err => {
+  console.error('UNHANDLED REJECTION!');
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+
+process.on('uncaughtException', err => {
+  console.error('UNCAUGHT EXCEPTION!');
+  console.error(err.name, err.message);
+  process.exit(1);
 });
