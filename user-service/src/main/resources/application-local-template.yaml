@@ -17,9 +17,15 @@ spring:
       ssl.enable: false
       starttls.enable: true
 
-jwt:
-  secret: YOUR_JWT_SECRET_KEY
-  refresh-token-expiration-time: 240000 # In milliseconds
-  access-token-expiration-time: 120000 # In milliseconds
-
-verification-code-expiration-time: 2 # In minutes
+app:
+  jwt:
+    secret: verySecureJwtSecretKeyThatIsAtLeast32BytesLong12345678901234567890
+    access-token-ttl: 120000
+    refresh-token-ttl: 240000
+  otp:
+    email-ttl: 240000
+    password-ttl: 240000
+    prefix:
+      jwt: JWT_
+      email: EMAIL_
+      password: PASS_

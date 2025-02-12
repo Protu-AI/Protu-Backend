@@ -86,7 +86,7 @@ public class JWTService {
   }
 
   private boolean isNotBlackListedToken(String token) {
-    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get("JWT_"+ getUserIdFromToken(token));
+    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get(appPropertiesConfig.getOtp().getPrefix().getJwt()+ getUserIdFromToken(token));
     Date issuedDate = extractClaim(token, Claims::getIssuedAt);
     return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
   }
