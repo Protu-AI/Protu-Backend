@@ -1,7 +1,7 @@
 const path = require('path');
 const { getAIResponse } = require('../services/aiService');
 const messageService = require('../services/messageService');
-const asyncWrapper = require('../utils/asyncWrapper');
+const { asyncWrapper } = require('../middleware/errorMiddleware');
 
 const createMessage = asyncWrapper(async (req, res) => {
   const { chatId } = req.params;

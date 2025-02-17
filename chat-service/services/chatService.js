@@ -1,16 +1,24 @@
 const { PrismaClient } = require('@prisma/client');
 const { v4: uuidv7 } = require('uuid');
 const prisma = new PrismaClient();
+const { DatabaseError, NotFoundError } = require('../utils/errorTypes');
 
 const createChat = async (userId, name) => {
-  const chat = await prisma.chats.create({
-    data: {
-      id: uuidv7(),
-      userId: userId,
-      name
+  try {
+    const chat = await prisma.chats.create({
+      data: {
+        id: uuidv7(),
+        userId,
+        name
+      }
+    });
+    return { data: chat };
+  } catch (error) {
+    if (error.code === 'P2003') {
+      throw new ValidationError('Invalid user ID');
     }
-  });
-  return { data: chat };
+    throw new DatabaseError('Failed to create chat');
+  }
 };
 
 const getUserChats = async (userId, page, limit) => {
@@ -45,33 +53,40 @@ const deleteChat = async chatId => {
 };
 
 const getSingleChat = async (chatId, page, limit) => {
-  const skip = (page - 1) * limit;
+  try {
+    const chat = await prisma.chats.findUnique({
+      where: { id: chatId }
+    });
 
-  const chat = await prisma.chats.findUnique({
-    where: { id: chatId }
-  });
-
-  if (!chat) return null;
-
-  const messages = await prisma.messages.findMany({
-    where: { chatId },
-    skip,
-    take: limit,
-    orderBy: { createdAt: 'desc' }
-  });
-
-  const totalMessages = await prisma.messages.count({ where: { chatId } });
-
-  return {
-    chat,
-    messages,
-    pagination: {
-      total: totalMessages,
-      page,
-      limit,
-      totalPages: Math.ceil(totalMessages / limit)
+    if (!chat) {
+      throw new NotFoundError('Chat');
     }
-  };
+
+    const messages = await prisma.messages.findMany({
+      where: { chatId },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const totalMessages = await prisma.messages.count({
+      where: { chatId }
+    });
+
+    return {
+      chat,
+      messages,
+      pagination: {
+        total: totalMessages,
+        page,
+        limit,
+        totalPages: Math.ceil(totalMessages / limit)
+      }
+    };
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new DatabaseError('Failed to fetch chat');
+  }
 };
 
 module.exports = {

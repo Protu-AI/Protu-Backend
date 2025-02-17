@@ -1,19 +1,37 @@
-class AppError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-  }
-}
+const {
+  AppError,
+  ValidationError,
+  DatabaseError,
+  NotFoundError,
+  FileUploadError
+} = require('./errorTypes');
+const multer = require('multer');
+
+const prismaErrorHandler = error => {
+  if (error.code === 'P2002')
+    return new ValidationError('Unique constraint violation');
+  if (error.code === 'P2025') return new NotFoundError('Record');
+  return new DatabaseError('Database operation failed');
+};
 
 const globalErrorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('Error details:', {
+    name: err.name,
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  });
 
-  if (!err.statusCode) err.statusCode = 500;
-  res.status(err.statusCode).json({
+  if (err.name === 'PrismaClientKnownRequestError')
+    err = prismaErrorHandler(err);
+  if (err instanceof multer.MulterError) err = new FileUploadError(err.message);
+
+  res.status(err.statusCode || 500).json({
     status: 'error',
-    message: err.isOperational ? err.message : 'Internal Server Error'
+    errorCode: err.errorCode || 'INTERNAL_ERROR',
+    message: err.isOperational ? err.message : 'Internal server error'
   });
 };
 
-module.exports = { AppError, globalErrorHandler };
+module.exports = {
+  globalErrorHandler
+};

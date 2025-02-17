@@ -1,5 +1,6 @@
 const chatService = require('../services/chatService');
-const asyncWrapper = require('../utils/asyncWrapper');
+const { asyncWrapper } = require('../middleware/errorMiddleware');
+const { AppError } = require('../utils/errorHandler');
 
 const createChat = asyncWrapper(async (req, res) => {
   const { userId } = req.params;
@@ -26,7 +27,7 @@ const getUserChats = asyncWrapper(async (req, res) => {
   });
 });
 
-const getSingleChat = asyncWrapper(async (req, res) => {
+const getSingleChat = asyncWrapper(async (req, res, next) => {
   const { chatId } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
@@ -36,11 +37,7 @@ const getSingleChat = asyncWrapper(async (req, res) => {
     parseInt(limit)
   );
   if (!chat) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'Chat not found'
-    });
-    return;
+    return next(new AppError('Chat not found', 404));
   }
 
   res.status(200).json({

@@ -1,5 +1,5 @@
 const attachmentService = require('../services/attachmentService');
-const asyncWrapper = require('../utils/asyncWrapper');
+const { asyncWrapper } = require('../middleware/errorMiddleware');
 
 const getAttachmentsForMessage = asyncWrapper(async (req, res) => {
   const { messageId } = req.params;
