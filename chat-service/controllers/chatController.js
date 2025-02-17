@@ -4,7 +4,7 @@ const asyncWrapper = require('../utils/asyncWrapper');
 const createChat = asyncWrapper(async (req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
-  const chat = await chatService.createChat(parseInt(userId), name);
+  const chat = await chatService.createChat(userId, name);
   res.status(201).json({
     status: 'success',
     data: chat
@@ -16,7 +16,7 @@ const getUserChats = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   const chats = await chatService.getUserChats(
-    parseInt(userId),
+    userId,
     parseInt(page),
     parseInt(limit)
   );
@@ -31,7 +31,7 @@ const getSingleChat = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
 
   const chat = await chatService.getSingleChat(
-    parseInt(chatId),
+    chatId,
     parseInt(page),
     parseInt(limit)
   );
@@ -52,7 +52,7 @@ const getSingleChat = asyncWrapper(async (req, res) => {
 const deleteChat = asyncWrapper(async (req, res) => {
   const { chatId } = req.params;
 
-  const result = await chatService.deleteChat(parseInt(chatId));
+  const result = await chatService.deleteChat(chatId);
   res.status(200).json({
     status: 'success',
     message: 'Chat deleted successfully',

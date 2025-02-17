@@ -1,23 +1,26 @@
 CREATE TYPE "enum_messages_senderRole" AS ENUM ('user', 'model');
 
 CREATE TABLE IF NOT EXISTS "users" (
-    "id" SERIAL PRIMARY KEY,
-    "first_name" VARCHAR(50) NOT NULL,
-    "last_name" VARCHAR(50) NOT NULL,
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "publicId" VARCHAR(255) NOT NULL UNIQUE,
+    "firstName" VARCHAR(50) NOT NULL,
+    "lastName" VARCHAR(50) NOT NULL,
     "username" VARCHAR(50) NOT NULL UNIQUE,
     "email" VARCHAR(100) NOT NULL UNIQUE,
     "password" VARCHAR(100) NOT NULL,
-    "phone_number" VARCHAR(20) NOT NULL,
+    "phoneNumber" VARCHAR(20) NOT NULL,
     "authorities" TEXT NOT NULL,
-    "is_active" BOOLEAN NOT NULL DEFAULT TRUE,
-    "is_email_verified" BOOLEAN NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT TRUE,
+    "isEmailVerified" BOOLEAN NOT NULL,
+    "verification_code" VARCHAR(255),
+    "code_expiry_date" TIMESTAMPTZ,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS "chats" (
-    "id" SERIAL PRIMARY KEY,
-    "userId" INTEGER NOT NULL,
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "userId" UUID NOT NULL,
     "name" VARCHAR(100) NOT NULL,
     "createdAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -25,8 +28,8 @@ CREATE TABLE IF NOT EXISTS "chats" (
 );
 
 CREATE TABLE IF NOT EXISTS "messages" (
-    "id" SERIAL PRIMARY KEY,
-    "chatId" INTEGER NOT NULL,
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "chatId" UUID NOT NULL,
     "senderRole" "enum_messages_senderRole" NOT NULL,
     "content" TEXT NOT NULL,
     "attachmentName" VARCHAR(255) NOT NULL,
@@ -35,10 +38,10 @@ CREATE TABLE IF NOT EXISTS "messages" (
 );
 
 CREATE TABLE IF NOT EXISTS "attachments" (
-    "id" SERIAL PRIMARY KEY,
-    "messageId" INTEGER NOT NULL,
+    "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    "messageId" UUID NOT NULL,
     "filePath" VARCHAR(255) NOT NULL,
-    "fileType" VARCHAR(50) NOT NULL,
+    "fileType" VARCHAR(255) NOT NULL,
     "uploadedAt" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "attachments_messageId_fkey" FOREIGN KEY ("messageId") REFERENCES "messages"("id") ON DELETE CASCADE ON UPDATE NO ACTION
 );

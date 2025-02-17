@@ -3,6 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const morgan = require('morgan');
+const { globalErrorHandler } = require('./utils/errorHandler');
 
 const app = express();
 const corsOptions = {
@@ -65,6 +66,8 @@ app.use((req, res) => {
     message: 'Route not found'
   });
 });
+
+app.use(globalErrorHandler);
 
 const PORT = 8082;
 app.listen(PORT, () => {

@@ -1,25 +1,30 @@
 const { PrismaClient } = require('@prisma/client');
+const { v4: uuidv7 } = require('uuid');
 const prisma = new PrismaClient();
 
 const createChat = async (userId, name) => {
   const chat = await prisma.chats.create({
-    data: { userId, name }
+    data: {
+      id: uuidv7(),
+      userId: userId,
+      name
+    }
   });
-  return {
-    data: chat
-  };
+  return { data: chat };
 };
 
 const getUserChats = async (userId, page, limit) => {
   const skip = (page - 1) * limit;
   const chats = await prisma.chats.findMany({
-    where: { userId },
+    where: { userId: userId },
     skip,
     take: limit,
     orderBy: { createdAt: 'desc' }
   });
 
-  const totalChats = await prisma.chats.count({ where: { userId } });
+  const totalChats = await prisma.chats.count({
+    where: { userId: userId }
+  });
 
   return {
     chats,

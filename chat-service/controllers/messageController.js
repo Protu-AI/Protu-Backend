@@ -17,7 +17,7 @@ const createMessage = asyncWrapper(async (req, res) => {
   }
 
   const userMessage = await messageService.createMessage(
-    parseInt(chatId),
+    chatId,
     'user',
     content,
     attachmentPath,
@@ -27,7 +27,7 @@ const createMessage = asyncWrapper(async (req, res) => {
   const aiResponse = await getAIResponse(content);
 
   const aiMessage = await messageService.createMessage(
-    parseInt(chatId),
+    chatId,
     'model',
     aiResponse
   );

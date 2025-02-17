@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { v7: uuidv7 } = require('uuid');
 
 const createMessage = async (
   chatId,
@@ -10,6 +11,7 @@ const createMessage = async (
 ) => {
   const message = await prisma.messages.create({
     data: {
+      id: uuidv7(),
       chatId,
       senderRole,
       content,
@@ -18,6 +20,7 @@ const createMessage = async (
         ? {
             create: [
               {
+                id: uuidv7(),
                 filePath: attachmentPath,
                 fileType: attachmentPath.split('.').pop()
               }
