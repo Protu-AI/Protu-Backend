@@ -12,7 +12,13 @@ const createMessage = asyncWrapper(async (req, res) => {
   let attachmentName = null;
 
   if (file) {
-    attachmentPath = `/uploads/${chatId}/${file.filename}`;
+    attachmentPath = path.join(
+      __dirname,
+      '..',
+      'uploads',
+      chatId,
+      file.filename
+    );
     attachmentName = file.originalname;
   }
 

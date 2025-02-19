@@ -7,65 +7,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model attachments {
-  id         String    @id @db.Uuid
-  messageId  String    @db.Uuid
-  filePath   String    @db.VarChar(255)
-  fileType   String    @db.VarChar(255)
-  uploadedAt DateTime? @db.Timestamptz @default(now())
-  messages   messages  @relation(fields: [messageId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([messageId], map: "idx_attachments_messageId")
-}
-
-model chats {
-  id          String    @id @db.Uuid
-  userId      String    @db.Uuid
-  name        String    @db.VarChar(100)
-  createdAt   DateTime? @db.Timestamptz @default(now())
-  updatedAt   DateTime? @db.Timestamptz @default(now()) @updatedAt
-  user        users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  messages    messages[]
-
-  @@index([userId], map: "idx_chats_userId")
-  @@index([userId, createdAt(desc)], map: "idx_chats_userId_createdAt")
-}
-
-model messages {
-  id          String    @id @db.Uuid
-  chatId      String    @db.Uuid
-  senderRole  enum_messages_senderRole
-  content     String    @db.Text
-  attachmentName String @db.VarChar(255)
-  createdAt   DateTime? @db.Timestamptz @default(now())
-  attachments attachments[]
-  chat        chats      @relation(fields: [chatId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([chatId], map: "idx_messages_chatId")
-  @@index([chatId, createdAt(desc)], map: "idx_messages_chatId_createdAt")
-}
-
-model users {
-  id             String   @id @db.Uuid
-  publicId       String   @unique
-  firstName        String     @db.VarChar(100)
-  lastName         String     @db.VarChar(100)
-  username         String     @unique @db.VarChar(50)
-  email            String     @unique @db.VarChar(150)
-  chats            chats[]
-  password         String     @db.VarChar(100)
-  phoneNumber      String     @db.VarChar(20)
-  authorities      String     @db.Text
-  isActive         Boolean    @default(true)
-  isEmailVerified  Boolean    @default(false)
-  createdAt      DateTime? @db.Timestamptz @default(now()) @map("created_at")
-  updatedAt      DateTime? @db.Timestamptz @updatedAt @map("updated_at")
-  @@index([username], name: "idx_users_username")
-  @@index([email], name: "idx_users_email")
-  @@index([publicId], name: "idx_users_public_id")
-}
-
-enum enum_messages_senderRole {
+enum MessageSenderRole {
   user
   model
+
+  @@map("enum_messages_sender_role")
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  publicId        String   @unique @db.Char(26) @map("public_id")
+  firstName       String   @map("first_name") @db.VarChar(50)
+  lastName        String   @map("last_name") @db.VarChar(50)
+  username        String   @unique @db.VarChar(50)
+  email           String   @unique @db.VarChar(100)
+  password        String   @db.VarChar(100)
+  phoneNumber     String   @map("phone_number") @db.VarChar(20)
+  authorities     String   @db.Text
+  isActive       Boolean  @default(true) @map("is_active")
+  isEmailVerified Boolean  @default(false) @map("is_email_verified")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+  chats          Chat[]
+
+  @@map("users")
+}
+
+model Chat {
+  id        String    @id @db.Char(26)
+  userId    String    @map("user_id") @db.Char(26)
+  name      String    @db.VarChar(100)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamptz()
+  user      User      @relation(fields: [userId], references: [publicId], onDelete: Cascade)
+  messages  Message[]
+
+  @@index([userId])
+  @@map("chats")
+}
+
+model Message {
+  id             String    @id @db.Char(26)
+  chatId         String    @map("chat_id") @db.Char(26)
+  senderRole     MessageSenderRole @map("sender_role")
+  content        String           @db.Text
+  attachmentName String           @map("attachment_name") @db.VarChar(255)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+  chat           Chat             @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  attachments    Attachment[]
+
+  @@index([chatId])
+  @@map("messages")
+}
+
+model Attachment {
+  id         String   @id @db.Char(26)
+  messageId  String   @map("message_id") @db.Char(26)
+  filePath   String   @map("file_path") @db.VarChar(255)
+  fileType   String   @map("file_type") @db.VarChar(255)
+  uploadedAt DateTime @default(now()) @map("uploaded_at") @db.Timestamptz()
+  message    Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@map("attachments")
 }

@@ -1,19 +1,52 @@
 const { PrismaClient } = require('@prisma/client');
-const { v4: uuidv7 } = require('uuid');
+const { ulid } = require('ulid');
 const prisma = new PrismaClient();
-const { DatabaseError, NotFoundError } = require('../utils/errorTypes');
+
+const {
+  DatabaseError,
+  ValidationError,
+  NotFoundError
+} = require('../utils/errorTypes');
 
 const createChat = async (userId, name) => {
   try {
-    const chat = await prisma.chats.create({
-      data: {
-        id: uuidv7(),
-        userId,
-        name
+    if (!name) {
+      throw new ValidationError('Chat name is required');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        publicId: userId
+      },
+      select: {
+        publicId: true,
+        id: true,
+        username: true
       }
     });
+
+    if (!user) {
+      throw new NotFoundError('User');
+    }
+
+    const chat = await prisma.chat
+      .create({
+        data: {
+          id: ulid(),
+          userId: userId,
+          name: name
+        }
+      })
+      .catch(error => {
+        throw error;
+      });
+
     return { data: chat };
   } catch (error) {
+    if (error instanceof ValidationError || error instanceof NotFoundError) {
+      throw error;
+    }
+
     if (error.code === 'P2003') {
       throw new ValidationError('Invalid user ID');
     }
@@ -22,31 +55,35 @@ const createChat = async (userId, name) => {
 };
 
 const getUserChats = async (userId, page, limit) => {
-  const skip = (page - 1) * limit;
-  const chats = await prisma.chats.findMany({
-    where: { userId: userId },
-    skip,
-    take: limit,
-    orderBy: { createdAt: 'desc' }
-  });
+  try {
+    const skip = (page - 1) * limit;
+    const chats = await prisma.chat.findMany({
+      where: { userId: userId },
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' }
+    });
 
-  const totalChats = await prisma.chats.count({
-    where: { userId: userId }
-  });
+    const totalChats = await prisma.chat.count({
+      where: { userId: userId }
+    });
 
-  return {
-    chats,
-    pagination: {
-      total: totalChats,
-      page,
-      limit,
-      totalPages: Math.ceil(totalChats / limit)
-    }
-  };
+    return {
+      chats,
+      pagination: {
+        total: totalChats,
+        page,
+        limit,
+        totalPages: Math.ceil(totalChats / limit)
+      }
+    };
+  } catch (error) {
+    throw new DatabaseError('Failed to fetch user chats');
+  }
 };
 
 const deleteChat = async chatId => {
-  const result = await prisma.chats.delete({
+  const result = await prisma.chat.delete({
     where: { id: chatId }
   });
   return result;
@@ -54,7 +91,7 @@ const deleteChat = async chatId => {
 
 const getSingleChat = async (chatId, page, limit) => {
   try {
-    const chat = await prisma.chats.findUnique({
+    const chat = await prisma.chat.findUnique({
       where: { id: chatId }
     });
 
@@ -62,14 +99,14 @@ const getSingleChat = async (chatId, page, limit) => {
       throw new NotFoundError('Chat');
     }
 
-    const messages = await prisma.messages.findMany({
+    const messages = await prisma.message.findMany({
       where: { chatId },
       skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: 'desc' }
     });
 
-    const totalMessages = await prisma.messages.count({
+    const totalMessages = await prisma.message.count({
       where: { chatId }
     });
 

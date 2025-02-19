@@ -1,10 +1,16 @@
 const chatService = require('../services/chatService');
 const { asyncWrapper } = require('../middleware/errorMiddleware');
 const { AppError } = require('../utils/errorHandler');
+const { ValidationError } = require('../utils/errorTypes'); // Add this import
 
 const createChat = asyncWrapper(async (req, res) => {
   const { userId } = req.params;
   const { name } = req.body;
+
+  if (!name) {
+    throw new ValidationError('Chat name is required');
+  }
+
   const chat = await chatService.createChat(userId, name);
   res.status(201).json({
     status: 'success',
