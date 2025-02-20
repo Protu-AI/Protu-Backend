@@ -41,7 +41,7 @@ const createChat = async (userId, name) => {
         throw error;
       });
 
-    return { data: chat };
+    return chat; // Just return the data, controller will handle response format
   } catch (error) {
     if (error instanceof ValidationError || error instanceof NotFoundError) {
       throw error;

@@ -1,7 +1,8 @@
 const chatService = require('../services/chatService');
 const { asyncWrapper } = require('../middleware/errorMiddleware');
 const { AppError } = require('../utils/errorHandler');
-const { ValidationError } = require('../utils/errorTypes'); // Add this import
+const { ValidationError } = require('../utils/errorTypes');
+const { buildResponse } = require('../utils/responseHelper');
 
 const createChat = asyncWrapper(async (req, res) => {
   const { userId } = req.params;
@@ -12,10 +13,9 @@ const createChat = asyncWrapper(async (req, res) => {
   }
 
   const chat = await chatService.createChat(userId, name);
-  res.status(201).json({
-    status: 'success',
-    data: chat
-  });
+  res
+    .status(201)
+    .json(buildResponse(req, 'CREATED', chat, 'Chat created successfully'));
 });
 
 const getUserChats = asyncWrapper(async (req, res) => {
@@ -27,10 +27,9 @@ const getUserChats = asyncWrapper(async (req, res) => {
     parseInt(page),
     parseInt(limit)
   );
-  res.status(200).json({
-    status: 'success',
-    data: chats
-  });
+  res
+    .status(200)
+    .json(buildResponse(req, 'OK', chats, 'Chats retrieved successfully'));
 });
 
 const getSingleChat = asyncWrapper(async (req, res, next) => {
@@ -46,21 +45,18 @@ const getSingleChat = asyncWrapper(async (req, res, next) => {
     return next(new AppError('Chat not found', 404));
   }
 
-  res.status(200).json({
-    status: 'success',
-    data: chat
-  });
+  res
+    .status(200)
+    .json(buildResponse(req, 'OK', chat, 'Chat retrieved successfully'));
 });
 
 const deleteChat = asyncWrapper(async (req, res) => {
   const { chatId } = req.params;
 
   const result = await chatService.deleteChat(chatId);
-  res.status(200).json({
-    status: 'success',
-    message: 'Chat deleted successfully',
-    data: result
-  });
+  res
+    .status(200)
+    .json(buildResponse(req, 'OK', result, 'Chat deleted successfully'));
 });
 
 module.exports = {

@@ -2,6 +2,7 @@ const path = require('path');
 const { getAIResponse } = require('../services/aiService');
 const messageService = require('../services/messageService');
 const { asyncWrapper } = require('../middleware/errorMiddleware');
+const { buildResponse } = require('../utils/responseHelper');
 
 const createMessage = asyncWrapper(async (req, res) => {
   const { chatId } = req.params;
@@ -38,13 +39,17 @@ const createMessage = asyncWrapper(async (req, res) => {
     aiResponse
   );
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      userMessage,
-      aiMessage
-    }
-  });
+  res.status(201).json(
+    buildResponse(
+      req,
+      'CREATED',
+      {
+        userMessage,
+        aiMessage
+      },
+      'Messages created successfully'
+    )
+  );
 });
 
 module.exports = {
