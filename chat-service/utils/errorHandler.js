@@ -1,11 +1,11 @@
 const {
-  AppError,
   ValidationError,
   DatabaseError,
   NotFoundError,
   FileUploadError
 } = require('./errorTypes');
 const multer = require('multer');
+const { buildResponse } = require('./responseHelper');
 
 const prismaErrorHandler = error => {
   if (error.code === 'P2002')
@@ -25,11 +25,14 @@ const globalErrorHandler = (err, req, res, next) => {
     err = prismaErrorHandler(err);
   if (err instanceof multer.MulterError) err = new FileUploadError(err.message);
 
-  res.status(err.statusCode || 500).json({
-    status: 'error',
-    errorCode: err.errorCode || 'INTERNAL_ERROR',
-    message: err.isOperational ? err.message : 'Internal server error'
-  });
+  const response = buildResponse(req, 'ERROR', null, err.message);
+  response.meta.status = 'ERROR';
+  response.error = {
+    code: err.errorCode || 'INTERNAL_ERROR',
+    details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+  };
+
+  res.status(err.statusCode || 500).json(response);
 };
 
 module.exports = {

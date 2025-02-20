@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const multer = require('multer');
 const morgan = require('morgan');
 const { globalErrorHandler } = require('./utils/errorHandler');
+const { NotFoundError } = require('./utils/errorTypes');
 
 const app = express();
 const corsOptions = {
@@ -34,37 +34,8 @@ app.use('/api/v1', chatRoutes);
 app.use('/api/v1', attachmentRoutes);
 app.use('/api/v1', messageRoutes);
 
-app.use((err, req, res, next) => {
-  console.error('Error details:', {
-    name: err.name,
-    message: err.message,
-    stack: err.stack
-  });
-
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        status: 'error',
-        message: 'File size is too large. Maximum size is 10MB'
-      });
-    }
-    return res.status(400).json({
-      status: 'error',
-      message: err.message
-    });
-  }
-
-  res.status(err.status || 500).json({
-    status: 'error',
-    message: err.message || 'Internal server error'
-  });
-});
-
-app.use((req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
-  });
+app.use((req, res, next) => {
+  next(new NotFoundError('Route'));
 });
 
 app.use(globalErrorHandler);

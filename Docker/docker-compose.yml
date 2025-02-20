@@ -85,6 +85,29 @@ services:
     depends_on:
       - user-service
       - chat-service
+      # - model-service
+
+  # model-service:
+  #   container_name: model-service-container
+  #   build:
+  #     context: ../
+  #     dockerfile: Dockerfile
+  #   image: protu-ai/model-service:v1.0.0
+  #   ports:
+  #     - "8000:8000" # Expose port 8000 for the FastAPI application
+  #   env_file:
+  #     - ../model-service/.env # Path to the .env file for the model service
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_NAME: protu-db
+  #     DB_USER: ${POSTGRES_USER}
+  #     DB_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - model-data:/app/data
 
 volumes:
   node_modules:
@@ -92,3 +115,4 @@ volumes:
   maven-repo:
   postgres-data:
   redis-data:
+  # model-data:

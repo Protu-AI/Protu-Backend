@@ -41,7 +41,7 @@ const createChat = async (userId, name) => {
         throw error;
       });
 
-    return chat; // Just return the data, controller will handle response format
+    return chat;
   } catch (error) {
     if (error instanceof ValidationError || error instanceof NotFoundError) {
       throw error;
@@ -121,7 +121,7 @@ const getSingleChat = async (chatId, page, limit) => {
       }
     };
   } catch (error) {
-    if (error instanceof AppError) throw error;
+    if (error instanceof NotFoundError) throw error;
     throw new DatabaseError('Failed to fetch chat');
   }
 };
