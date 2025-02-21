@@ -3,7 +3,7 @@ api:
   version: v1
 
 logging.level:
-  org.springframework.amqp : TRACE
+  org.springframework.amqp : INFO
   io.lettuce.core: INFO
   com.zaxxer.hikari: INFO
 
@@ -17,3 +17,8 @@ spring:
     show-sql: false
     properties.hibernate.format_sql: false
     open-in-view: false
+
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB

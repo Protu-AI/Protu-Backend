@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 public class AppPropertiesConfig {
   JWT jwt;
   Otp otp;
+  Cloudinary cloudinary;
 
   @Data @Validated
   public static class JWT {
@@ -46,5 +47,17 @@ public class AppPropertiesConfig {
       @NotBlank
       String password;
     }
+  }
+
+  @Data @Validated
+  public static class Cloudinary {
+    @NotBlank
+    String cloudName;
+
+    @NotBlank
+    String apiKey;
+
+    @NotBlank
+    String apiSecret;
   }
 }

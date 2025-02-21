@@ -11,7 +11,8 @@ public enum SuccessMessages {
   GET_USER_MSG("User details is retrieved successfully."),
   UPDATE_USER_MSG("User profile is updated successfully."),
   DEACTIVATE_USER_MSG("User account is deactivated successfully."),
-  NEW_CODE_MSG("If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed.");
+  NEW_CODE_MSG("If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed."),
+  UPLOAD_PROFILE_PIC("Your profile picture is successfully uploaded and updated.");
 
   public final String message;
 

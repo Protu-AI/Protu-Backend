@@ -56,6 +56,9 @@ public class User {
   @Column(name = "is_email_verified", nullable = false)
   Boolean isEmailVerified;
 
+  @Column(name = "image_url")
+  String imageUrl;
+
   @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", updatable = false)
   Timestamp createdAt;
 

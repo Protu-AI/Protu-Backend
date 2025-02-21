@@ -8,6 +8,7 @@ import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.FullUpdateReqDto;
 import org.protu.userservice.dto.request.PartialUpdateReqDto;
 import org.protu.userservice.dto.response.DeactivateResDto;
+import org.protu.userservice.dto.response.ProfilePicResDto;
 import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.service.JWTService;
 import org.protu.userservice.service.UserService;
@@ -15,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static org.protu.userservice.helper.SuccessResponseHelper.buildResponse;
 
@@ -71,5 +75,16 @@ public class UserController {
 
     DeactivateResDto deactivateResDto = userService.deactivateUser(userId, getIdFromAuthHeader(authHeader));
     return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, deactivateResDto, SuccessMessages.DEACTIVATE_USER_MSG.message);
+  }
+
+  @PostMapping("/{id}/profile-picture")
+  public ResponseEntity<ApiResponse<ProfilePicResDto>> uploadProfilePic(
+      @PathVariable("id") String userId,
+      @RequestParam("file") MultipartFile file,
+      @RequestHeader("Authorization") String authHeader,
+      HttpServletRequest request) throws IOException {
+
+    ProfilePicResDto profilePicResDto = userService.uploadProfilePic(file, userId, getIdFromAuthHeader(authHeader));
+    return buildResponse(apiProperties.getVersion(), request, HttpStatus.CREATED, profilePicResDto, SuccessMessages.UPLOAD_PROFILE_PIC.message);
   }
 }

@@ -7,7 +7,9 @@ public enum FailureMessages {
   EMAIL_NOT_VERIFIED("Your email is registered but not verified. A new verification email is sent to your inbox."),
   EMAIL_ALREADY_VERIFIED("Your email is already verified."),
   UNAUTHORIZED_ACCESS("You do not have permission to access this resource."),
-  INVALID_OR_EXPIRED_OTP("The entered OTP code: %s is invalid or has expired. Please check and try again.");
+  INVALID_OR_EXPIRED_OTP("The entered OTP code: %s is invalid or has expired. Please check and try again."),
+  UPLOAD_PROFILE_PIC_FAILURE("There was an error uploading your profile picture. Please try again later");
+
   private final String message;
 
   FailureMessages(String message) {

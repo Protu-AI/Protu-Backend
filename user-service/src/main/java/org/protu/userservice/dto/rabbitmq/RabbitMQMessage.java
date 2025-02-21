@@ -1,4 +1,4 @@
-package org.protu.userservice.dto;
+package org.protu.userservice.dto.rabbitmq;
 
 import java.sql.Timestamp;
 
