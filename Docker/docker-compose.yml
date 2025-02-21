@@ -9,14 +9,14 @@ services:
     image: protu-ai/user-service:v1.0.0
     ports:
       - "8085:8085"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
     env_file:
       - ../user-service/.env
     depends_on:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     volumes:
       - maven-repo:/root/.m2
@@ -85,7 +85,42 @@ services:
     depends_on:
       - user-service
       - chat-service
-      # - model-service
+
+  notification-service:
+    container_name: notification-service-container
+    build:
+      context: ../notification-service
+      dockerfile: Dockerfile
+    image: protu-ai/notification-service:v1.0.0
+    ports:
+      - "8088:8088"
+    env_file:
+      - ../notification-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - maven-repo-2:/root/.m2
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-container
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq/
 
   # model-service:
   #   container_name: model-service-container
@@ -113,6 +148,8 @@ volumes:
   node_modules:
   attachments:
   maven-repo:
+  maven-repo-2:
   postgres-data:
   redis-data:
+  rabbitmq-data:
   # model-data:

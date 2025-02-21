@@ -35,13 +35,12 @@ public class AuthService {
   private final RedisTemplate<Object, Object> redisTemplate;
   private final OtpService otpService;
   private final AppPropertiesConfig properties;
-  private final String VERIFY_EMAIL_SUBJECT = "Verify your email";
 
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
     userHelper.checkIfUserExists(signUpReqDto.email(), "email");
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
-    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
+    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
     userRepo.save(user);
     return new signUpResDto(user.getEmail(), true);
   }
@@ -49,7 +48,7 @@ public class AuthService {
   public void validateUserIdentifier(String userIdentifier) {
     User user = userHelper.fetchUserOrThrow(userIdentifier, "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(userIdentifier));
     }
   }
@@ -57,7 +56,7 @@ public class AuthService {
   public TokensResDto signIn(SignInReqDto signInReqDto) {
     User user = userHelper.fetchUserOrThrow(signInReqDto.userIdentifier(), "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, VERIFY_EMAIL_SUBJECT, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
     if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
@@ -76,7 +75,7 @@ public class AuthService {
     if(userOpt.isEmpty())
       return;
     User user = userOpt.get();
-    otpService.sendOtp(5, properties.getOtp().getPrefix().getPassword() + user.getId(), user, "Reset your password", properties.getOtp().getPasswordTtl());
+    otpService.sendOtp(5, properties.getOtp().getPrefix().getPassword() + user.getId(), user, properties.getOtp().getPasswordTtl());
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {

@@ -1,9 +1,10 @@
 package org.protu.userservice.service;
 
-import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.config.AppPropertiesConfig;
 import org.protu.userservice.constants.FailureMessages;
+import org.protu.userservice.dto.EmailVerificationData;
+import org.protu.userservice.dto.RabbitMQMessage;
 import org.protu.userservice.dto.request.VerifyEmailReqDto;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.InvalidOrExpiredOtpException;
@@ -13,13 +14,13 @@ import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.mail.MailSendException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.security.SecureRandom;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
 @Service
@@ -27,12 +28,11 @@ import java.util.Objects;
 public class OtpService {
   private final TokenMapper tokenMapper;
   private final UserRepository userRepository;
-  private final EmailService emailService;
   private final JWTService jwtService;
-  private final TemplateEngine templateEngine;
   private final UserHelper userHelper;
   private final RedisTemplate<Object, Object> redisTemplate;
   private final AppPropertiesConfig properties;
+  private final RabbitMQProducer producer;
 
   private String generateOtp(int len) {
     String characters = "0123456789";
@@ -46,15 +46,12 @@ public class OtpService {
     return Otp.toString();
   }
 
-  private void sendEmail(String email, String generatedCode, String subject){
-    Context context = new Context();
-    context.setVariable("verificationCode", generatedCode);
-    String htmlContent = templateEngine.process("verification-email", context);
-    try {
-      emailService.sendEmail(email, subject, htmlContent);
-    } catch (MessagingException e) {
-      throw new MailSendException("Failed to send email", e);
-    }
+  @Async
+  public void sendEmail(String messageId, String to, Integer templateId, Object data){
+    RabbitMQMessage<Object> queueMessage = new RabbitMQMessage<>(messageId, to, "protu@gmail.com",
+        new RabbitMQMessage.Template<>(templateId, data),
+        new RabbitMQMessage.MetaData("user-service", Timestamp.from(Instant.now())));
+    producer.send(queueMessage);
   }
 
   public void checkIfUserEnteredOtpValid(String key, String userGivenOTP){
@@ -72,10 +69,11 @@ public class OtpService {
     return markUserEmailVerified(user);
   }
 
-  public void sendOtp(int len, String redisKey, User user, String subject, Long OtpTtlInMillis) {
-    String generatedCode = generateOtp(len);
-    redisTemplate.opsForValue().set(redisKey, generatedCode, Duration.ofMillis(OtpTtlInMillis));
-    sendEmail(user.getEmail(), generatedCode, subject);
+  public void sendOtp(int len, String redisKey, User user, Long OtpTtlInMillis) {
+    String otp = generateOtp(len);
+    redisTemplate.opsForValue().set(redisKey, otp, Duration.ofMillis(OtpTtlInMillis));
+    sendEmail("OTP_123", user.getEmail(), 1 ,
+        new EmailVerificationData(user.getUsername(), otp, String.valueOf(13)));
   }
 
   public TokensResDto markUserEmailVerified(User user) {

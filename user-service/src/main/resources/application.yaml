@@ -3,7 +3,7 @@ api:
   version: v1
 
 logging.level:
-  org.springframework.security: INFO
+  org.springframework.amqp : TRACE
   io.lettuce.core: INFO
   com.zaxxer.hikari: INFO
 

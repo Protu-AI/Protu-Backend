@@ -1,0 +1,19 @@
+server.port: 8086
+
+logging.level:
+  org.springframework.security: INFO
+
+spring:
+  profiles:
+    active: local
+  application.name: notification-service
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+  jpa:
+    hibernate.ddl-auto: update
+    show-sql: false
+    properties.hibernate.format_sql: false
+    open-in-view: false
+  thymeleaf:
+    check-template-location: false
