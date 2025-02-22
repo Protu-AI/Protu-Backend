@@ -60,7 +60,7 @@ public class AuthService {
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
     if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
-      throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password", signInReqDto.password()));
+      throw new BadCredentialsException(FailureMessages.BAD_CREDENTIALS.getMessage("password"));
     }
     return tokenMapper.toTokensDto(user, jwtService);
   }

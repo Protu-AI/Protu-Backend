@@ -8,11 +8,12 @@ public enum SuccessMessages {
   REFRESH_MSG("A new access token is generated successfully."),
   FORGOT_PASSWORD_MSG("If the provided email exists, a new password reset verification code is sent to your inbox. Please check your email to proceed."),
   RESET_PASSWORD_MSG("Password is reset successfully."),
-  GET_USER_MSG("User details is retrieved successfully."),
+  GET_USER_MSG("User details are retrieved successfully."),
   UPDATE_USER_MSG("User profile is updated successfully."),
   DEACTIVATE_USER_MSG("User account is deactivated successfully."),
   NEW_CODE_MSG("If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed."),
-  UPLOAD_PROFILE_PIC("Your profile picture is successfully uploaded and updated.");
+  UPLOAD_PROFILE_PIC("Your profile picture is successfully uploaded and updated."),
+  CHANGE_PASSWORD_MSG("Password changed successfully.");
 
   public final String message;
 

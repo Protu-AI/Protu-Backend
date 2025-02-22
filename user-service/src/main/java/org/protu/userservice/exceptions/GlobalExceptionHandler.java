@@ -8,6 +8,7 @@ import org.protu.userservice.config.ApiProperties;
 import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.exceptions.custom.*;
 import org.protu.userservice.helper.FailureResponseHelper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -80,8 +81,23 @@ public class GlobalExceptionHandler {
     return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.CONFLICT,e.getMessage(),"Email verification pending");
   }
 
+  @ExceptionHandler(PasswordMismatchException.class)
+  public ResponseEntity<ApiResponse<ErrorDetails>> handlePasswordMismatchException(PasswordMismatchException e, HttpServletRequest request) {
+    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
+  }
+
+  @ExceptionHandler(OldAndNewPasswordMatchException.class)
+  public ResponseEntity<ApiResponse<ErrorDetails>> handleOldAndNewPasswordMatchException(OldAndNewPasswordMatchException e, HttpServletRequest request) {
+    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ApiResponse<ErrorDetails>> handleDataIntegrityViolation(HttpServletRequest request) {
+    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.CONFLICT, "An error occurred while processing your request. Please try again later.","Data integrity issue");
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleException(Exception e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage(),"Internal server error");
+    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),"Internal server error");
   }
 }

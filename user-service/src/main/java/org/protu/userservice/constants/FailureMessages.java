@@ -8,7 +8,8 @@ public enum FailureMessages {
   EMAIL_ALREADY_VERIFIED("Your email is already verified."),
   UNAUTHORIZED_ACCESS("You do not have permission to access this resource."),
   INVALID_OR_EXPIRED_OTP("The entered OTP code: %s is invalid or has expired. Please check and try again."),
-  UPLOAD_PROFILE_PIC_FAILURE("There was an error uploading your profile picture. Please try again later");
+  UPLOAD_PROFILE_PIC_FAILURE("There was an error uploading your profile picture. Please try again later"),
+  OldAndNewPasswordMatch("New password cannot be the same as a previously used password.");
 
   private final String message;
 

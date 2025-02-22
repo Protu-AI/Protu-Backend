@@ -3,11 +3,14 @@ package org.protu.userservice.service;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.constants.FailureMessages;
+import org.protu.userservice.dto.request.ChangePasswordReqDto;
 import org.protu.userservice.dto.request.FullUpdateReqDto;
 import org.protu.userservice.dto.request.PartialUpdateReqDto;
 import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.ProfilePicResDto;
 import org.protu.userservice.dto.response.UserResDto;
+import org.protu.userservice.exceptions.custom.OldAndNewPasswordMatchException;
+import org.protu.userservice.exceptions.custom.PasswordMismatchException;
 import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
 import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.UserMapper;
@@ -18,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 @Service
@@ -85,18 +87,37 @@ public class UserService {
     return userMapper.toDeactivateDto(user);
   }
 
-  public ProfilePicResDto uploadProfilePic(MultipartFile file, String userId, String authUserId) throws IOException {
+  public ProfilePicResDto uploadProfilePic(MultipartFile file, String userId, String authUserId){
     User user = userHelper.fetchUserByIdOrThrow(userId);
     verifyUserAuthority(userId, authUserId);
 
-    File file1 = File.createTempFile("upload-", file.getOriginalFilename());
-    file.transferTo(file1);
-    Map uploadMap = ObjectUtils.asMap("asset_folder", "profile-pics");
-    Map uploadResults = cloudinaryService.cloudinary().uploader().upload(file1, uploadMap);
-    String secureAssetUrl = uploadResults.get("secure_url").toString();
-    String publicAssetId = uploadResults.get("public_id").toString();
-    user.setImageUrl(secureAssetUrl);
+    try {
+      File file1 = File.createTempFile("upload-", file.getOriginalFilename());
+      file.transferTo(file1);
+      Map uploadMap = ObjectUtils.asMap("asset_folder", "profile-pics");
+      Map uploadResults = cloudinaryService.cloudinary().uploader().upload(file1, uploadMap);
+      String secureAssetUrl = uploadResults.get("secure_url").toString();
+      String publicAssetId = uploadResults.get("public_id").toString();
+      user.setImageUrl(secureAssetUrl);
+      userRepo.save(user);
+      return new ProfilePicResDto(secureAssetUrl, publicAssetId);
+    } catch (Exception e) {
+      throw new RuntimeException(FailureMessages.UPLOAD_PROFILE_PIC_FAILURE.getMessage());
+    }
+  }
+
+  public void changePassword(ChangePasswordReqDto reqDto, String userId, String authUserId) {
+    User user = userHelper.fetchUserByIdOrThrow(userId);
+    verifyUserAuthority(userId, authUserId);
+    if(reqDto.oldPassword().equals(reqDto.newPassword())) {
+      throw new OldAndNewPasswordMatchException(FailureMessages.OldAndNewPasswordMatch.getMessage());
+    }
+
+    if(!passwordEncoder.matches(reqDto.oldPassword(), user.getPassword())) {
+      throw new PasswordMismatchException(FailureMessages.BAD_CREDENTIALS.getMessage("old password"));
+    }
+
+    user.setPassword(passwordEncoder.encode(reqDto.newPassword()));
     userRepo.save(user);
-    return new ProfilePicResDto(secureAssetUrl, publicAssetId);
   }
 }
