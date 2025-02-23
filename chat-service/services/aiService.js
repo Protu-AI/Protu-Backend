@@ -9,7 +9,7 @@ const getAIResponse = async (chatId, hasAttachment) => {
       `${AI_BASE_URL}/protu/ai/data/process`,
       {
         chat_id: chatId,
-        has_attachment: hasAttachment
+        is_attached: hasAttachment
       },
       {
         headers: {

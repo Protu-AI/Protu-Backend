@@ -31,25 +31,39 @@ const createMessage = asyncWrapper(async (req, res) => {
     attachmentName
   );
 
-  const aiResponse = await getAIResponse(content);
+  try {
+    const hasAttachment = !!file;
+    const aiResponse = await getAIResponse(chatId, hasAttachment);
 
-  const aiMessage = await messageService.createMessage(
-    chatId,
-    'model',
-    aiResponse
-  );
+    const aiMessage = await messageService.createMessage(
+      chatId,
+      'model',
+      aiResponse.answer
+    );
 
-  res.status(201).json(
-    buildResponse(
-      req,
-      'CREATED',
-      {
-        userMessage,
-        aiMessage
-      },
-      'Messages created successfully'
-    )
-  );
+    res.status(201).json(
+      buildResponse(
+        req,
+        'CREATED',
+        {
+          userMessage,
+          aiMessage
+        },
+        'Messages created successfully'
+      )
+    );
+  } catch (error) {
+    res.status(500).json(
+      buildResponse(
+        req,
+        'ERROR',
+        {
+          userMessage
+        },
+        'Failed to get AI response'
+      )
+    );
+  }
 });
 
 module.exports = {

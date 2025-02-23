@@ -144,6 +144,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - model-data:/app/data
+      - attachments:/app/uploads
 
 volumes:
   node_modules:
