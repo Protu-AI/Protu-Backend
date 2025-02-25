@@ -1,6 +1,6 @@
 FROM openjdk:17-jdk-alpine AS build
 
-WORKDIR notification-service
+WORKDIR /notification-service
 
 COPY mvnw pom.xml ./
 COPY .mvn ./.mvn

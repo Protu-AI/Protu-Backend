@@ -1,6 +1,6 @@
 FROM openjdk:17-jdk-alpine AS build
 
-WORKDIR user-service
+WORKDIR /user-service
 
 COPY mvnw pom.xml ./
 COPY .mvn ./.mvn
