@@ -1,2 +1,16 @@
 /.idea/
 */.env
+**/application-local.yaml
+
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Code editors ###
+.idea
+*.iws
+*.iml
+*.ipr
+.vscode/
