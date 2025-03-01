@@ -1,12 +1,12 @@
-package com.hazem.notificationservice.service;
+package org.protu.notificationservice.service;
 
-import com.hazem.notificationservice.dto.RabbitMQMessage;
-import com.hazem.notificationservice.helper.TemplateProcessor;
-import com.hazem.notificationservice.model.Template;
-import com.hazem.notificationservice.repository.TemplateRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.protu.notificationservice.dto.RabbitMQMessage;
+import org.protu.notificationservice.helper.TemplateProcessor;
+import org.protu.notificationservice.model.Template;
+import org.protu.notificationservice.repository.TemplateRepository;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class EmailService {
 
   public void prepareAndSendEmail(RabbitMQMessage rabbitMQMessage) throws MessagingException {
     Template template = templateRepository.findById(rabbitMQMessage.template().id())
-        .orElseThrow( () -> new RuntimeException("Template not found!"));
+        .orElseThrow(() -> new RuntimeException("Template not found!"));
 
     String body = prepareEmailBody(rabbitMQMessage, template.getBody());
     sendEmail(rabbitMQMessage.to(), template.getSubject(), body);

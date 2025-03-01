@@ -1,4 +1,4 @@
-package com.hazem.notificationservice.config;
+package org.protu.notificationservice.config;
 
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
   @Bean
-  public Queue emailNotificationQueue(){
+  public Queue emailNotificationQueue() {
     return new Queue("notification.email.queue", false);
   }
 

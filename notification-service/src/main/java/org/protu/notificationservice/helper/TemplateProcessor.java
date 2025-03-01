@@ -1,4 +1,4 @@
-package com.hazem.notificationservice.helper;
+package org.protu.notificationservice.helper;
 
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;

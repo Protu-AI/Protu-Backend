@@ -1,7 +1,7 @@
-package com.hazem.notificationservice.service;
+package org.protu.notificationservice.service;
 
-import com.hazem.notificationservice.dto.RabbitMQMessage;
 import lombok.RequiredArgsConstructor;
+import org.protu.notificationservice.dto.RabbitMQMessage;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;

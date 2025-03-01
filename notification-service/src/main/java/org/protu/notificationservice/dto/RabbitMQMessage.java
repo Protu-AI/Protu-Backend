@@ -1,10 +1,13 @@
-package com.hazem.notificationservice.dto;
+package org.protu.notificationservice.dto;
 
 import java.sql.Timestamp;
 
 public record RabbitMQMessage(String messageId, String to, String from, Template template, MetaData metaData) {
   public record Template(String id, EmailData data) {
-    public record EmailData(String username, String otp, int otpTtl) {}
+    public record EmailData(String username, String otp, int otpTtl) {
+    }
   }
-  public record MetaData(String service, Timestamp timestamp) {}
+
+  public record MetaData(String service, Timestamp timestamp) {
+  }
 }

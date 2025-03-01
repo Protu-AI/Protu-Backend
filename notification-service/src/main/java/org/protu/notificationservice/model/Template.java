@@ -1,4 +1,4 @@
-package com.hazem.notificationservice.model;
+package org.protu.notificationservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
