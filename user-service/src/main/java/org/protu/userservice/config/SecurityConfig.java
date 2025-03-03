@@ -12,6 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.time.Duration;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -23,6 +29,7 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(configure -> configure
             .requestMatchers("/api/v1/auth/**").permitAll()
@@ -36,5 +43,18 @@ public class SecurityConfig {
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration corsConfiguration = new CorsConfiguration();
+    corsConfiguration.setAllowCredentials(true);
+    corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+    corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+    corsConfiguration.setAllowedOrigins(List.of("http://localhost:5176", "http://localhost:5173", "http://localhost:5177"));
+    corsConfiguration.setMaxAge(Duration.ofHours(1));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/api/**", corsConfiguration);
+    return source;
   }
 }
