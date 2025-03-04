@@ -22,8 +22,8 @@ public class RedisConfig {
   }
 
   @Bean
-  public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory factory) {
-    RedisTemplate<Object, Object> template = new RedisTemplate<>();
+  public RedisTemplate<Object, String> redisTemplate(RedisConnectionFactory factory) {
+    RedisTemplate<Object, String> template = new RedisTemplate<>();
     template.setConnectionFactory(factory);
     return template;
   }

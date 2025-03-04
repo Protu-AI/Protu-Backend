@@ -32,7 +32,7 @@ public class AuthService {
   private final UserMapper userMapper;
   private final JWTService jwtService;
   private final UserHelper userHelper;
-  private final RedisTemplate<Object, Object> redisTemplate;
+  private final RedisTemplate<Object, String> redisTemplate;
   private final OtpService otpService;
   private final AppPropertiesConfig properties;
 
@@ -40,8 +40,8 @@ public class AuthService {
     userHelper.checkIfUserExists(signUpReqDto.email(), "email");
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
-    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
     userRepo.save(user);
+    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
     return new signUpResDto(user.getEmail(), true);
   }
 
@@ -72,7 +72,7 @@ public class AuthService {
 
   public void forgotPassword(SendOtpDto requestDto) {
     Optional<User> userOpt = userHelper.findUserByIdentifier(requestDto.email(), Optional.of("email"));
-    if(userOpt.isEmpty())
+    if (userOpt.isEmpty())
       return;
     User user = userOpt.get();
     otpService.sendOtp(5, properties.getOtp().getPrefix().getPassword() + user.getId(), user, properties.getOtp().getPasswordTtl());

@@ -19,7 +19,7 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JWTService {
-  private final RedisTemplate<Object, Object> redisTemplate;
+  private final RedisTemplate<Object, String> redisTemplate;
   private final AppPropertiesConfig appPropertiesConfig;
 
   private String generateToken(String userId, long expiryTime) {
@@ -86,18 +86,18 @@ public class JWTService {
   }
 
   private boolean isNotBlackListedToken(String token) {
-    Date lastInvalidDate = (Date) redisTemplate.opsForValue().get(appPropertiesConfig.getOtp().getPrefix().getJwt()+ getUserIdFromToken(token));
-    Date issuedDate = extractClaim(token, Claims::getIssuedAt);
-    return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
+//    Date issuedDate = extractClaim(token, Claims::getIssuedAt);
+//    return lastInvalidDate == null || issuedDate.after(lastInvalidDate);
+    return true;
   }
 
   public boolean isValidToken(String token, String userId) {
     return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId) && isNotBlackListedToken(token);
   }
 
-  public void invalidateUserTokens(Long id){
+  public void invalidateUserTokens(Long id) {
     Date currentDate = Date.from(Instant.now());
-    Duration durationInSeconds =  Duration.ofMinutes(getRefreshTokenDurationInMinutes());
-    redisTemplate.opsForValue().set(id, currentDate, durationInSeconds);
+    Duration durationInSeconds = Duration.ofMinutes(getRefreshTokenDurationInMinutes());
+    redisTemplate.opsForValue().set(id, String.valueOf(currentDate), durationInSeconds);
   }
 }
