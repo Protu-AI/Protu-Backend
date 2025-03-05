@@ -1,11 +1,16 @@
 package org.protu.userservice.helper;
 
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.config.AppPropertiesConfig;
 import org.protu.userservice.constants.FailureMessages;
+import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
+import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.model.User;
 import org.protu.userservice.repository.UserRepository;
+import org.protu.userservice.service.JWTService;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -14,6 +19,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserHelper {
   private final UserRepository userRepo;
+  private final TokenMapper tokenMapper;
+  private final AppPropertiesConfig properties;
+  private final JWTService jwtService;
+  private final RedisTemplate<Object, String> redisTemplate;
 
   public Optional<User> findUserByIdentifier(String identifier, Optional<String> type) {
     if (type.isEmpty())
@@ -22,18 +31,25 @@ public class UserHelper {
   }
 
   public void checkIfUserExists(String identifier, String type) {
-    findUserByIdentifier(identifier, Optional.of(type)).ifPresent( user -> {
-      throw new UserAlreadyExistsException(FailureMessages.USER_ALREADY_EXISTS.getMessage(type,identifier));
+    findUserByIdentifier(identifier, Optional.of(type)).ifPresent(user -> {
+      throw new UserAlreadyExistsException(FailureMessages.USER_ALREADY_EXISTS.getMessage(type, identifier));
     });
   }
 
-  public User fetchUserOrThrow(String identifier, String type){
-    return findUserByIdentifier(identifier,Optional.empty())
+  public User fetchUserOrThrow(String identifier, String type) {
+    return findUserByIdentifier(identifier, Optional.empty())
         .orElseThrow(() -> new UserNotFoundException(FailureMessages.USER_NOT_FOUND.getMessage(type, identifier)));
   }
 
-  public User fetchUserByIdOrThrow(String userId){
+  public User fetchUserByIdOrThrow(String userId) {
     return userRepo.findByPublicId(userId)
         .orElseThrow(() -> new UserNotFoundException(FailureMessages.USER_NOT_FOUND.getMessage("id", userId)));
+  }
+
+  public TokensResDto markUserEmailVerified(User user) {
+    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getEmail() + user.getId());
+    user.setIsEmailVerified(true);
+    userRepo.save(user);
+    return tokenMapper.toTokensDto(user, jwtService);
   }
 }

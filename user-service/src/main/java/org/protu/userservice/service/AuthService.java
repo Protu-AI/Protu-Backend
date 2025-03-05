@@ -3,14 +3,13 @@ package org.protu.userservice.service;
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.config.AppPropertiesConfig;
 import org.protu.userservice.constants.FailureMessages;
-import org.protu.userservice.dto.request.ResetPasswordReqDto;
-import org.protu.userservice.dto.request.SendOtpDto;
-import org.protu.userservice.dto.request.SignInReqDto;
-import org.protu.userservice.dto.request.SignUpReqDto;
+import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.RefreshResDto;
 import org.protu.userservice.dto.response.TokensResDto;
+import org.protu.userservice.dto.response.ValidateIdentifierResDto;
 import org.protu.userservice.dto.response.signUpResDto;
 import org.protu.userservice.exceptions.custom.EmailNotVerifiedException;
+import org.protu.userservice.exceptions.custom.UserEmailAlreadyVerifiedException;
 import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.TokenMapper;
 import org.protu.userservice.mapper.UserMapper;
@@ -41,22 +40,34 @@ public class AuthService {
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
     userRepo.save(user);
-    otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+    otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
     return new signUpResDto(user.getEmail(), true);
   }
 
-  public void validateUserIdentifier(String userIdentifier) {
+  public TokensResDto verifyUserEmail(VerifyEmailReqDto requestDto) {
+    User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
+    if (user.getIsEmailVerified()) {
+      throw new UserEmailAlreadyVerifiedException(FailureMessages.EMAIL_ALREADY_VERIFIED.getMessage());
+    }
+
+    otpService.verifyUserEnteredOtpOrThrow(properties.getOtp().getPrefix().getEmail() + user.getId(), requestDto.OTP());
+    return userHelper.markUserEmailVerified(user);
+  }
+
+  public ValidateIdentifierResDto validateUserIdentifier(String userIdentifier) {
     User user = userHelper.fetchUserOrThrow(userIdentifier, "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(userIdentifier));
     }
+
+    return new ValidateIdentifierResDto(user.getImageUrl());
   }
 
   public TokensResDto signIn(SignInReqDto signInReqDto) {
     User user = userHelper.fetchUserOrThrow(signInReqDto.userIdentifier(), "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(5, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
     if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
@@ -75,13 +86,17 @@ public class AuthService {
     if (userOpt.isEmpty())
       return;
     User user = userOpt.get();
-    otpService.sendOtp(5, properties.getOtp().getPrefix().getPassword() + user.getId(), user, properties.getOtp().getPasswordTtl());
+    otpService.sendOtp(6, properties.getOtp().getPrefix().getPassword() + user.getId(), user, properties.getOtp().getPasswordTtl());
+  }
+
+  public void verifyResetPasswordOtp(VerifyResetPasswordOtpDto requestDto) {
+    User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
+    otpService.verifyUserEnteredOtpOrThrow(properties.getOtp().getPrefix().getPassword() + user.getId(), requestDto.OTP());
+    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getPassword() + user.getId());
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {
     User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
-    otpService.checkIfUserEnteredOtpValid(properties.getOtp().getPrefix().getPassword() + user.getId(), requestDto.OTP());
-    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getPassword() + user.getId());
     user.setPassword(passwordEncoder.encode(requestDto.password()));
     userRepo.save(user);
     jwtService.invalidateUserTokens(user.getId());

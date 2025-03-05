@@ -28,6 +28,7 @@ public class EmailService {
         "otp_3", rabbitMQMessage.template().data().otp().charAt(2),
         "otp_4", rabbitMQMessage.template().data().otp().charAt(3),
         "otp_5", rabbitMQMessage.template().data().otp().charAt(4),
+        "otp_6", rabbitMQMessage.template().data().otp().charAt(5),
         "otpTtl", rabbitMQMessage.template().data().otpTtl());
     return templateProcessor.processTemplate(html, variables);
   }

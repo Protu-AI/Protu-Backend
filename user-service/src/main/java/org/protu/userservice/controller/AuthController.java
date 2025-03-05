@@ -8,10 +8,10 @@ import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.RefreshResDto;
 import org.protu.userservice.dto.response.TokensResDto;
+import org.protu.userservice.dto.response.ValidateIdentifierResDto;
 import org.protu.userservice.dto.response.signUpResDto;
 import org.protu.userservice.service.AuthService;
 import org.protu.userservice.service.JWTService;
-import org.protu.userservice.service.OtpService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +25,6 @@ import static org.protu.userservice.helper.SuccessResponseHelper.buildResponse;
 public class AuthController {
   private final JWTService jwtService;
   private final AuthService authService;
-  private final OtpService otpService;
   private final ApiProperties apiProperties;
 
   @PostMapping("/sign-up")
@@ -36,14 +35,14 @@ public class AuthController {
 
   @PostMapping("/verify-email")
   public ResponseEntity<ApiResponse<TokensResDto>> verifyUserEmail(@Validated @RequestBody VerifyEmailReqDto requestDto, HttpServletRequest request) {
-    TokensResDto responseDTO = otpService.verifyUserEmailAndOTP(requestDto);
+    TokensResDto responseDTO = authService.verifyUserEmail(requestDto);
     return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, responseDTO, SuccessMessages.VERIFY_MSG.message);
   }
 
   @PostMapping("/validate-identifier")
-  public ResponseEntity<ApiResponse<Void>> validateUserIdentifier(@RequestParam String userIdentifier, HttpServletRequest request) {
-    authService.validateUserIdentifier(userIdentifier);
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, null, SuccessMessages.VALIDATE_MSG.message);
+  public ResponseEntity<ApiResponse<ValidateIdentifierResDto>> validateUserIdentifier(@RequestParam String userIdentifier, HttpServletRequest request) {
+    ValidateIdentifierResDto responseDto = authService.validateUserIdentifier(userIdentifier);
+    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, responseDto, SuccessMessages.VALIDATE_MSG.message);
   }
 
   @PostMapping("/sign-in")
@@ -65,11 +64,15 @@ public class AuthController {
     return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, null, SuccessMessages.FORGOT_PASSWORD_MSG.message);
   }
 
+  @PostMapping("/verify-password-otp")
+  public ResponseEntity<ApiResponse<Void>> verifyResetPasswordOtp(@Validated @RequestBody VerifyResetPasswordOtpDto requestDto, HttpServletRequest request) {
+    authService.verifyResetPasswordOtp(requestDto);
+    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, null, SuccessMessages.PASSWORD_RESET_OTP_MSG.message);
+  }
+
   @PostMapping("/reset-password")
   public ResponseEntity<ApiResponse<Void>> resetPassword(@Validated @RequestBody ResetPasswordReqDto requestDto, HttpServletRequest request) {
     authService.resetPassword(requestDto);
     return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, null, SuccessMessages.RESET_PASSWORD_MSG.message);
   }
 }
-
-
