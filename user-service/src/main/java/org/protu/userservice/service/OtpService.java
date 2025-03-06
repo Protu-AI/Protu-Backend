@@ -42,10 +42,8 @@ public class OtpService {
 
   public void sendOtp(int len, String redisKey, User user, Long otpTtlInMillis) {
     String otp = generateOtp(len);
-    System.out.println(otp);
     redisTemplate.opsForValue().set(redisKey, otp, Duration.ofMillis(otpTtlInMillis));
     long durationInMinutes = otpTtlInMillis / (1000 * 60);
-    System.out.println("duration in minutes: " + durationInMinutes); // todo
     sendEmail("OTP Verification", user.getEmail(), 1, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
   }
 

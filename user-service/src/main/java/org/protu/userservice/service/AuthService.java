@@ -99,6 +99,6 @@ public class AuthService {
     User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
     user.setPassword(passwordEncoder.encode(requestDto.password()));
     userRepo.save(user);
-    jwtService.invalidateUserTokens(user.getId());
+    jwtService.blockCurrentUserTokens(user.getPublicId());
   }
 }
