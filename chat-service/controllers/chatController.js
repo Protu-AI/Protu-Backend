@@ -5,7 +5,7 @@ const { ValidationError } = require('../utils/errorTypes');
 const { buildResponse } = require('../utils/responseHelper');
 
 const createChat = asyncWrapper(async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;
   const { name } = req.body;
 
   if (!name) {
@@ -19,7 +19,7 @@ const createChat = asyncWrapper(async (req, res) => {
 });
 
 const getUserChats = asyncWrapper(async (req, res) => {
-  const { userId } = req.params;
+  const userId = req.user.id;
   const { page = 1, limit = 10 } = req.query;
 
   const chats = await chatService.getUserChats(
@@ -33,17 +33,16 @@ const getUserChats = asyncWrapper(async (req, res) => {
 });
 
 const getSingleChat = asyncWrapper(async (req, res, next) => {
+  const userId = req.user.id;
   const { chatId } = req.params;
   const { page = 1, limit = 10 } = req.query;
 
   const chat = await chatService.getSingleChat(
     chatId,
     parseInt(page),
-    parseInt(limit)
+    parseInt(limit),
+    userId
   );
-  if (!chat) {
-    return next(new AppError('Chat not found', 404));
-  }
 
   res
     .status(200)
@@ -51,9 +50,10 @@ const getSingleChat = asyncWrapper(async (req, res, next) => {
 });
 
 const deleteChat = asyncWrapper(async (req, res) => {
+  const userId = req.user.id;
   const { chatId } = req.params;
 
-  const result = await chatService.deleteChat(chatId);
+  const result = await chatService.deleteChat(chatId, userId);
   res
     .status(200)
     .json(buildResponse(req, 'OK', result, 'Chat deleted successfully'));

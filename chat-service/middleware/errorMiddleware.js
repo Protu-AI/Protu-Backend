@@ -1,4 +1,5 @@
 const { NotFoundError } = require('../utils/errorTypes');
+const { UnauthorizedError } = require('../utils/errorTypes');
 
 const notFoundMiddleware = (req, res, next) => {
   next(new NotFoundError('Route'));
@@ -18,7 +19,21 @@ const asyncWrapper = asyncFn => {
   };
 };
 
+const handleErrors = (err, req, res, next) => {
+  if (err instanceof UnauthorizedError) {
+    return res.status(401).json({
+      status: 'ERROR',
+      error: {
+        code: 'UNAUTHORIZED',
+        message: err.message
+      }
+    });
+  }
+
+  next(new NotFoundError('Route'));
+};
+
 module.exports = {
-  notFoundMiddleware,
+  handleErrors,
   asyncWrapper
 };

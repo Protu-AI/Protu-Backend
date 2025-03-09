@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 const {
   DatabaseError,
   ValidationError,
-  NotFoundError
+  NotFoundError,
+  UnauthorizedError
 } = require('../utils/errorTypes');
 
 const createChat = async (userId, name) => {
@@ -82,28 +83,36 @@ const getUserChats = async (userId, page, limit) => {
   }
 };
 
-const deleteChat = async chatId => {
-  const result = await prisma.chat.delete({
+const verifyOwnership = async (chatId, userId) => {
+  const chat = await prisma.chat.findUnique({
     where: { id: chatId }
   });
-  return result;
+
+  if (!chat) {
+    throw new NotFoundError('Chat');
+  }
+
+  if (chat.userId !== userId) {
+    throw new UnauthorizedError(
+      'You do not have permission to access this chat'
+    );
+  }
+
+  return chat;
 };
 
-const getSingleChat = async (chatId, page, limit) => {
+const getSingleChat = async (chatId, page, limit, userId) => {
   try {
-    const chat = await prisma.chat.findUnique({
-      where: { id: chatId }
-    });
-
-    if (!chat) {
-      throw new NotFoundError('Chat');
-    }
+    const chat = await verifyOwnership(chatId, userId);
 
     const messages = await prisma.message.findMany({
       where: { chatId },
       skip: (page - 1) * limit,
       take: limit,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: {
+        attachments: true
+      }
     });
 
     const totalMessages = await prisma.message.count({
@@ -121,14 +130,25 @@ const getSingleChat = async (chatId, page, limit) => {
       }
     };
   } catch (error) {
-    if (error instanceof NotFoundError) throw error;
+    if (error instanceof NotFoundError || error instanceof UnauthorizedError)
+      throw error;
     throw new DatabaseError('Failed to fetch chat');
   }
+};
+
+const deleteChat = async (chatId, userId) => {
+  await verifyOwnership(chatId, userId);
+
+  const result = await prisma.chat.delete({
+    where: { id: chatId }
+  });
+  return result;
 };
 
 module.exports = {
   createChat,
   getUserChats,
   deleteChat,
-  getSingleChat
+  getSingleChat,
+  verifyOwnership
 };

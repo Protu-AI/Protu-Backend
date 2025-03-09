@@ -3,10 +3,13 @@ const { asyncWrapper } = require('../middleware/errorMiddleware');
 const { buildResponse } = require('../utils/responseHelper');
 
 const getAttachmentsForMessage = asyncWrapper(async (req, res) => {
+  const userId = req.user.id;
   const { messageId } = req.params;
   const attachments = await attachmentService.getAttachmentsForMessage(
-    messageId
+    messageId,
+    userId
   );
+
   res
     .status(200)
     .json(

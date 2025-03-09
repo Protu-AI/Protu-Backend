@@ -1,10 +1,12 @@
 const express = require('express');
+const jwtMiddleware = require('../middleware/jwtMiddleware');
 const chatController = require('../controllers/chatController');
 
 const router = express.Router();
+router.use(jwtMiddleware);
 
-router.post('/chats/:userId', chatController.createChat);
-router.get('/chats/:userId', chatController.getUserChats);
+router.post('/chats', chatController.createChat);
+router.get('/chats', chatController.getUserChats);
 router.delete('/chats/:chatId', chatController.deleteChat);
 router.get('/chats/single/:chatId', chatController.getSingleChat);
 

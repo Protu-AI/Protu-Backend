@@ -31,7 +31,10 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['text/plain', 'application/pdf'];
+  const allowedTypes = [
+    'text/plain',
+    'application/pdf'
+  ];
   if (allowedTypes.includes(file.mimetype)) return cb(null, true);
   cb(
     new Error(`Invalid file type. Allowed types: ${allowedTypes.join(', ')}`),

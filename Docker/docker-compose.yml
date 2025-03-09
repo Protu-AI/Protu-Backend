@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: protu-db
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -67,11 +67,11 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval: 1s
       timeout: 3s
       retries: 5
-    command: [ "redis-server" ]
+    command: ["redis-server"]
     volumes:
       - redis-data:/data
 
@@ -87,41 +87,41 @@ services:
       - user-service
       - chat-service
 
-  notification-service:
-    container_name: notification-service-container
-    build:
-      context: ../notification-service
-      dockerfile: Dockerfile
-    image: protu-ai/notification-service:v1.0.0
-    ports:
-      - "8088:8088"
-    env_file:
-      - ../notification-service/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    volumes:
-      - maven-repo:/root/.m2
+  # notification-service:
+  #   container_name: notification-service-container
+  #   build:
+  #     context: ../notification-service
+  #     dockerfile: Dockerfile
+  #   image: protu-ai/notification-service:v1.0.0
+  #   ports:
+  #     - "8088:8088"
+  #   env_file:
+  #     - ../notification-service/.env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
+  #   volumes:
+  #     - maven-repo:/root/.m2
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: rabbitmq-container
-    environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq/
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   container_name: rabbitmq-container
+  #   environment:
+  #     RABBITMQ_DEFAULT_USER: guest
+  #     RABBITMQ_DEFAULT_PASS: guest
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   healthcheck:
+  #     test: rabbitmq-diagnostics -q ping
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 10s
+  #   volumes:
+  #     - rabbitmq-data:/var/lib/rabbitmq/
 
   #  model-service:
   #    container_name: model-service-container
@@ -146,16 +146,16 @@ services:
   #      - model-data:/app/data
   #      - attachments:/app/uploads
 
-  service-discovery:
-    container_name: service-discovery-container
-    build:
-      context: ../service-discovery
-      dockerfile: Dockerfile
-    image: protu-ai/service-discovery:v1.0.0
-    ports:
-      - "8761:8761"
-    volumes:
-      - maven-repo:/root/.m2
+  # service-discovery:
+  #   container_name: service-discovery-container
+  #   build:
+  #     context: ../service-discovery
+  #     dockerfile: Dockerfile
+  #   image: protu-ai/service-discovery:v1.0.0
+  #   ports:
+  #     - "8761:8761"
+  #   volumes:
+  #     - maven-repo:/root/.m2
 
 volumes:
   node_modules:

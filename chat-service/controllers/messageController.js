@@ -3,11 +3,15 @@ const { getAIResponse } = require('../services/aiService');
 const messageService = require('../services/messageService');
 const { asyncWrapper } = require('../middleware/errorMiddleware');
 const { buildResponse } = require('../utils/responseHelper');
+const chatService = require('../services/chatService');
 
 const createMessage = asyncWrapper(async (req, res) => {
+  const userId = req.user.id;
   const { chatId } = req.params;
   const { content } = req.body;
   const file = req.file;
+
+  await chatService.verifyOwnership(chatId, userId);
 
   let attachmentPath = null;
   let attachmentName = null;

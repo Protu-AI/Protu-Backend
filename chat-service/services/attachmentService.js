@@ -1,7 +1,32 @@
 const { PrismaClient } = require('@prisma/client');
 const { ulid } = require('ulid');
 const prisma = new PrismaClient();
-const { DatabaseError, NotFoundError } = require('../utils/errorTypes');
+const {
+  DatabaseError,
+  NotFoundError,
+  UnauthorizedError
+} = require('../utils/errorTypes');
+
+const verifyMessageOwnership = async (messageId, userId) => {
+  const message = await prisma.message.findUnique({
+    where: { id: messageId },
+    include: {
+      chat: true
+    }
+  });
+
+  if (!message) {
+    throw new NotFoundError('Message');
+  }
+
+  if (message.chat.userId !== userId) {
+    throw new UnauthorizedError(
+      'You do not have permission to access this attachment'
+    );
+  }
+
+  return message;
+};
 
 const createAttachment = async (messageId, filePath, fileType) => {
   try {
@@ -30,15 +55,9 @@ const createAttachment = async (messageId, filePath, fileType) => {
   }
 };
 
-const getAttachmentsForMessage = async messageId => {
+const getAttachmentsForMessage = async (messageId, userId) => {
   try {
-    const message = await prisma.message.findUnique({
-      where: { id: messageId }
-    });
-
-    if (!message) {
-      throw new NotFoundError('Message');
-    }
+    await verifyMessageOwnership(messageId, userId);
 
     const attachments = await prisma.attachment.findMany({
       where: { messageId },
@@ -52,7 +71,7 @@ const getAttachmentsForMessage = async messageId => {
 
     return attachments;
   } catch (error) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof NotFoundError || error instanceof UnauthorizedError) {
       throw error;
     }
     throw new DatabaseError('Failed to fetch attachments');

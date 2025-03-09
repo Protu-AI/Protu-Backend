@@ -14,6 +14,12 @@ class ValidationError extends AppError {
   }
 }
 
+class UnauthorizedError extends AppError {
+  constructor(message) {
+    super(message, 401, 'UNAUTHORIZED');
+  }
+}
+
 class DatabaseError extends AppError {
   constructor(message) {
     super(message, 500, 'DATABASE_ERROR');
@@ -35,6 +41,7 @@ class FileUploadError extends AppError {
 module.exports = {
   AppError,
   ValidationError,
+  UnauthorizedError,
   DatabaseError,
   NotFoundError,
   FileUploadError
