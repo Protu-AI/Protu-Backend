@@ -1,7 +1,7 @@
 package org.protu.userservice.helper;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.AppPropertiesConfig;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.response.TokensResDto;
 import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
@@ -20,7 +20,7 @@ import java.util.Optional;
 public class UserHelper {
   private final UserRepository userRepo;
   private final TokenMapper tokenMapper;
-  private final AppPropertiesConfig properties;
+  private final AppProperties properties;
   private final JWTService jwtService;
   private final RedisTemplate<Object, String> redisTemplate;
 
@@ -47,7 +47,7 @@ public class UserHelper {
   }
 
   public TokensResDto markUserEmailVerified(User user) {
-    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getEmail() + user.getId());
+    redisTemplate.opsForValue().getAndDelete(properties.otp().prefix().email() + user.getId());
     user.setIsEmailVerified(true);
     userRepo.save(user);
     return tokenMapper.toTokensDto(user, jwtService);

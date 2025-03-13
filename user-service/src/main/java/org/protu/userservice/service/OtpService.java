@@ -15,12 +15,13 @@ import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OtpService {
   private final RedisTemplate<Object, String> redisTemplate;
-  private final RabbitMQProducer producer;
+  private final EmailNotificationProducer producer;
 
   private String generateOtp(int len) {
     String characters = "0123456789";
@@ -44,14 +45,15 @@ public class OtpService {
     String otp = generateOtp(len);
     redisTemplate.opsForValue().set(redisKey, otp, Duration.ofMillis(otpTtlInMillis));
     long durationInMinutes = otpTtlInMillis / (1000 * 60);
-    sendEmail("OTP Verification", user.getEmail(), 1, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
+    sendEmail(user.getEmail(), 1, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
   }
 
   @Async
-  public void sendEmail(String messageId, String to, Integer templateId, Object data) {
-    RabbitMQMessage<Object> queueMessage = new RabbitMQMessage<>(messageId, to, "protu@gmail.com",
+  public void sendEmail(String to, Integer templateId, Object data) {
+    RabbitMQMessage<Object> message = new RabbitMQMessage<>(
+        UUID.randomUUID().toString(), to, "protu@gmail.com",
         new RabbitMQMessage.Template<>(templateId, data),
         new RabbitMQMessage.MetaData("user-service", Timestamp.from(Instant.now())));
-    producer.send(queueMessage);
+    producer.send(message);
   }
 }

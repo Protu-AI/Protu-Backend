@@ -4,24 +4,24 @@ spring:
     username: YOUR_DATABASE_USERNAME
     password: YOUR_DATABASE_PASSWORD
     driver-class-name: org.postgresql.Driver
+
   data:
     redis:
       port: 6379
       host: localhost
-  mail:
-    host: YOUR_MAIL_HOST
-    port: 1111 # Replace it with the actual port
-    username: YOUR_MAIL_USERNAME
-    password: YOUR_MAIL_PASSWORD
-    properties.mail.smtp:
-      ssl.enable: false
-      starttls.enable: true
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 app:
   jwt:
     secret: verySecureJwtSecretKeyThatIsAtLeast32BytesLong12345678901234567890
     access-token-ttl: 120000
     refresh-token-ttl: 240000
+
   otp:
     email-ttl: 240000
     password-ttl: 240000
@@ -29,6 +29,15 @@ app:
       jwt: JWT_
       email: EMAIL_
       password: PASS_
+
+  cloudinary:
+    cloud-name: protu
+    api-key: YOUR_API_KEY
+    api-secret: YOUR_API_SECRET
+
+  rabbitmq:
+    email-main-queue: email.notification.main.queue
+    email-retry-queue: email.notification.retry.queue
 
 eureka:
   client:

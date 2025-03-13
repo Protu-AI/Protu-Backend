@@ -2,7 +2,7 @@ package org.protu.userservice.service;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.AppPropertiesConfig;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.helper.JWTHelper;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,23 +15,23 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JWTService {
   private final RedisTemplate<Object, String> redisTemplate;
-  private final AppPropertiesConfig properties;
+  private final AppProperties properties;
   private final JWTHelper jwtHelper;
 
   public String generateAccessToken(String userId) {
-    return jwtHelper.generateToken(userId, properties.getJwt().getAccessTokenTtL());
+    return jwtHelper.generateToken(userId, properties.jwt().accessTokenTtL());
   }
 
   public String generateRefreshToken(String userId) {
-    return jwtHelper.generateToken(userId, properties.getJwt().getRefreshTokenTtL());
+    return jwtHelper.generateToken(userId, properties.jwt().refreshTokenTtL());
   }
 
   public String getAccessTokenDuration() {
-    return properties.getJwt().getAccessTokenTtL() / (1000 * 60) + " minutes";
+    return properties.jwt().accessTokenTtL() / (1000 * 60) + " minutes";
   }
 
   public String getRefreshTokenDuration() {
-    return properties.getJwt().getRefreshTokenTtL() / (1000 * 60) + " minutes";
+    return properties.jwt().refreshTokenTtL() / (1000 * 60) + " minutes";
   }
 
   public String getTokenFromHeader(String authHeader) {
@@ -39,7 +39,7 @@ public class JWTService {
   }
 
   public Long getRefreshTokenDurationInMinutes() {
-    return properties.getJwt().getRefreshTokenTtL() / (1000 * 60);
+    return properties.jwt().refreshTokenTtL() / (1000 * 60);
   }
 
   public String getUserIdFromToken(String token) {
@@ -53,7 +53,7 @@ public class JWTService {
   private boolean isNotBlackListedToken(String token) {
     Date issuedDate = jwtHelper.extractClaim(token, Claims::getIssuedAt);
     String publicId = getUserIdFromToken(token);
-    String dateString = redisTemplate.opsForValue().get(properties.getOtp().getPrefix().getJwt() + publicId);
+    String dateString = redisTemplate.opsForValue().get(properties.otp().prefix().jwt() + publicId);
     if (dateString == null)
       return true;
 
@@ -68,6 +68,6 @@ public class JWTService {
   public void blockCurrentUserTokens(String publicId) {
     long currentDate = Date.from(Instant.now()).getTime();
     Duration durationInMillis = Duration.ofMillis(getRefreshTokenDurationInMinutes() * 60 * 1000);
-    redisTemplate.opsForValue().set(properties.getOtp().getPrefix().getJwt() + publicId, String.valueOf(currentDate), durationInMillis);
+    redisTemplate.opsForValue().set(properties.otp().prefix().jwt() + publicId, String.valueOf(currentDate), durationInMillis);
   }
 }

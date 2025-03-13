@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.AppPropertiesConfig;
+import org.protu.userservice.config.AppProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Component
 @RequiredArgsConstructor
 public class JWTHelper {
-  private final AppPropertiesConfig properties;
+  private final AppProperties properties;
 
   public String generateToken(String userId, long expiryTime) {
     Instant now = Instant.now();
@@ -47,6 +47,6 @@ public class JWTHelper {
   }
 
   public SecretKey getSigningKey() {
-    return Keys.hmacShaKeyFor(properties.getJwt().getSecret().getBytes(StandardCharsets.UTF_8));
+    return Keys.hmacShaKeyFor(properties.jwt().secret().getBytes(StandardCharsets.UTF_8));
   }
 }

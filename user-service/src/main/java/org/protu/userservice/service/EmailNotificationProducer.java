@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class RabbitMQProducer {
+public class EmailNotificationProducer {
   private final RabbitTemplate rabbitTemplate;
   private final Queue queue;
 
-  public void send(RabbitMQMessage queueMessage) {
-    rabbitTemplate.convertAndSend(queue.getName(), queueMessage);
+  public void send(RabbitMQMessage<Object> message) {
+    rabbitTemplate.convertAndSend(queue.getName(), message);
   }
 }

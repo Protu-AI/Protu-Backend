@@ -19,3 +19,17 @@ spring:
     port: 5672
     username: guest
     password: guest
+    listener:
+      simple:
+        default-requeue-rejected: false
+
+app:
+  rabbitmq:
+    email:
+      queue:
+        main: email.notification.main.queue
+        retry: email.notification.retry.queue
+        dead: email.notification.dead.queue
+      retry:
+        count: 3
+        delay: 5000

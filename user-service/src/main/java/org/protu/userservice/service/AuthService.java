@@ -1,7 +1,7 @@
 package org.protu.userservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.AppPropertiesConfig;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.request.*;
 import org.protu.userservice.dto.response.RefreshResDto;
@@ -33,14 +33,14 @@ public class AuthService {
   private final UserHelper userHelper;
   private final RedisTemplate<Object, String> redisTemplate;
   private final OtpService otpService;
-  private final AppPropertiesConfig properties;
+  private final AppProperties properties;
 
   public signUpResDto signUpUser(SignUpReqDto signUpReqDto) {
     userHelper.checkIfUserExists(signUpReqDto.email(), "email");
     userHelper.checkIfUserExists(signUpReqDto.username(), "username");
     User user = userMapper.toUserEntity(signUpReqDto, passwordEncoder);
     userRepo.save(user);
-    otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+    otpService.sendOtp(6, properties.otp().prefix().email() + user.getId(), user, properties.otp().emailTtl());
     return new signUpResDto(user.getEmail(), true);
   }
 
@@ -50,14 +50,14 @@ public class AuthService {
       throw new UserEmailAlreadyVerifiedException(FailureMessages.EMAIL_ALREADY_VERIFIED.getMessage());
     }
 
-    otpService.verifyUserEnteredOtpOrThrow(properties.getOtp().getPrefix().getEmail() + user.getId(), requestDto.OTP());
+    otpService.verifyUserEnteredOtpOrThrow(properties.otp().prefix().email() + user.getId(), requestDto.OTP());
     return userHelper.markUserEmailVerified(user);
   }
 
   public ValidateIdentifierResDto validateUserIdentifier(String userIdentifier) {
     User user = userHelper.fetchUserOrThrow(userIdentifier, "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(6, properties.otp().prefix().email() + user.getId(), user, properties.otp().emailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(userIdentifier));
     }
 
@@ -67,7 +67,7 @@ public class AuthService {
   public TokensResDto signIn(SignInReqDto signInReqDto) {
     User user = userHelper.fetchUserOrThrow(signInReqDto.userIdentifier(), "username/email");
     if (!user.getIsEmailVerified()) {
-      otpService.sendOtp(6, properties.getOtp().getPrefix().getEmail() + user.getId(), user, properties.getOtp().getEmailTtl());
+      otpService.sendOtp(6, properties.otp().prefix().email() + user.getId(), user, properties.otp().emailTtl());
       throw new EmailNotVerifiedException(FailureMessages.EMAIL_NOT_VERIFIED.getMessage(signInReqDto.userIdentifier()));
     }
     if (!passwordEncoder.matches(signInReqDto.password(), user.getPassword())) {
@@ -86,13 +86,13 @@ public class AuthService {
     if (userOpt.isEmpty())
       return;
     User user = userOpt.get();
-    otpService.sendOtp(6, properties.getOtp().getPrefix().getPassword() + user.getId(), user, properties.getOtp().getPasswordTtl());
+    otpService.sendOtp(6, properties.otp().prefix().password() + user.getId(), user, properties.otp().passwordTtl());
   }
 
   public void verifyResetPasswordOtp(VerifyResetPasswordOtpDto requestDto) {
     User user = userHelper.fetchUserOrThrow(requestDto.email(), "email");
-    otpService.verifyUserEnteredOtpOrThrow(properties.getOtp().getPrefix().getPassword() + user.getId(), requestDto.OTP());
-    redisTemplate.opsForValue().getAndDelete(properties.getOtp().getPrefix().getPassword() + user.getId());
+    otpService.verifyUserEnteredOtpOrThrow(properties.otp().prefix().password() + user.getId(), requestDto.OTP());
+    redisTemplate.opsForValue().getAndDelete(properties.otp().prefix().password() + user.getId());
   }
 
   public void resetPassword(ResetPasswordReqDto requestDto) {
