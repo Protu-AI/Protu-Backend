@@ -41,15 +41,15 @@ public class OtpService {
     }
   }
 
-  public void sendOtp(int len, String redisKey, User user, Long otpTtlInMillis) {
+  public void sendOtp(int len, String redisKey, User user, Long otpTtlInMillis, String templateId) {
     String otp = generateOtp(len);
     redisTemplate.opsForValue().set(redisKey, otp, Duration.ofMillis(otpTtlInMillis));
     long durationInMinutes = otpTtlInMillis / (1000 * 60);
-    sendEmail(user.getEmail(), 1, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
+    sendEmail(user.getEmail(), templateId, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
   }
 
   @Async
-  public void sendEmail(String to, Integer templateId, Object data) {
+  public void sendEmail(String to, String templateId, Object data) {
     RabbitMQMessage<Object> message = new RabbitMQMessage<>(
         UUID.randomUUID().toString(), to, "protu@gmail.com",
         new RabbitMQMessage.Template<>(templateId, data),

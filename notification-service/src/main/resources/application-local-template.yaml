@@ -1,10 +1,4 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/protu-db
-    username: YOUR_DATABASE_USERNAME
-    password: YOUR_DATABASE_PASSWORD
-    driver-class-name: org.postgresql.Driver
-
   mail:
     host: YOUR_MAIL_HOST
     port: 2525
