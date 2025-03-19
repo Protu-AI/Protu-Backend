@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.response.TokensResDto;
+import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
 import org.protu.userservice.exceptions.custom.UserAlreadyExistsException;
 import org.protu.userservice.exceptions.custom.UserNotFoundException;
 import org.protu.userservice.mapper.TokenMapper;
@@ -13,6 +14,7 @@ import org.protu.userservice.service.JWTService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -51,5 +53,19 @@ public class UserHelper {
     user.setIsEmailVerified(true);
     userRepo.save(user);
     return tokenMapper.toTokensDto(user, jwtService);
+  }
+
+  public void verifyUserAuthority(String userId, String authUserId) {
+    if (!userId.equals(authUserId)) {
+      throw new UnauthorizedAccessException(FailureMessages.UNAUTHORIZED_ACCESS.getMessage());
+    }
+  }
+
+  public void checkIfUserIsAdminOrThrow(String token) {
+    String userRoles = jwtService.getUserRoles(token);
+    boolean hasAdminRole = Arrays.asList(userRoles.split(",")).contains("ROLE_ADMIN");
+    if (!hasAdminRole) {
+      throw new UnauthorizedAccessException("You don't have permission to do such operation");
+    }
   }
 }

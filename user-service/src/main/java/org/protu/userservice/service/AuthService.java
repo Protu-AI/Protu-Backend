@@ -80,7 +80,8 @@ public class AuthService {
 
   public RefreshResDto refreshAccessToken(String refreshToken) {
     String authUserId = jwtService.getUserIdFromToken(refreshToken);
-    return tokenMapper.toTokensDto(authUserId, jwtService);
+    User user = userHelper.fetchUserByIdOrThrow(authUserId);
+    return tokenMapper.toTokensDto(authUserId, jwtService, user);
   }
 
   public void forgotPassword(SendOtpDto requestDto) {

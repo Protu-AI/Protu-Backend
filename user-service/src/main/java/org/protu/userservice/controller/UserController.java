@@ -8,7 +8,6 @@ import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.ChangePasswordReqDto;
 import org.protu.userservice.dto.request.FullUpdateReqDto;
 import org.protu.userservice.dto.request.PartialUpdateReqDto;
-import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.ProfilePicResDto;
 import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.service.JWTService;
@@ -63,17 +62,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.partialUpdateUser(userId, getIdFromAuthHeader(authHeader), userUpdateDto);
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);  }
-
-
-  @PatchMapping("/{id}/deactivate")
-  public ResponseEntity<ApiResponse<DeactivateResDto>> deactivateUser(
-      @PathVariable("id") String userId,
-      @RequestHeader("Authorization") String authHeader,
-      HttpServletRequest request) {
-
-    DeactivateResDto deactivateResDto = userService.deactivateUser(userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, deactivateResDto, SuccessMessages.DEACTIVATE_USER_MSG.message);
+    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
   }
 
   @PostMapping("/{id}/profile-picture")

@@ -47,8 +47,8 @@ public class User {
   @Column(name = "phone_number", length = 20, nullable = false)
   String phoneNumber;
 
-  @Column(name = "authorities", nullable = false, columnDefinition = "TEXT")
-  String authorities;
+  @Column(name = "roles", nullable = false, columnDefinition = "TEXT")
+  String roles;
 
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
   Boolean isActive = true;

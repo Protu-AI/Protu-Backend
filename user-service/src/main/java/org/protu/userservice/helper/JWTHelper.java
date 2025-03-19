@@ -19,10 +19,11 @@ import java.util.function.Function;
 public class JWTHelper {
   private final AppProperties properties;
 
-  public String generateToken(String userId, long expiryTime) {
+  public String generateToken(String userId, long expiryTime, String userRoles) {
     Instant now = Instant.now();
     return Jwts.builder()
         .subject(userId)
+        .claim("roles", userRoles)
         .issuedAt(Date.from(now))
         .expiration(Date.from(now.plus(expiryTime, ChronoUnit.MILLIS)))
         .signWith(getSigningKey())
@@ -44,6 +45,10 @@ public class JWTHelper {
 
   public Date extractExpiration(String token) {
     return extractClaim(token, Claims::getExpiration);
+  }
+
+  public String extractUserRoles(String token) {
+    return extractClaim(token, claims -> claims.get("roles", String.class));
   }
 
   public SecretKey getSigningKey() {

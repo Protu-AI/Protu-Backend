@@ -1,17 +1,17 @@
 package org.protu.userservice.service;
 
+import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.constants.FailureMessages;
 import org.protu.userservice.dto.request.ChangePasswordReqDto;
 import org.protu.userservice.dto.request.FullUpdateReqDto;
 import org.protu.userservice.dto.request.PartialUpdateReqDto;
-import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.ProfilePicResDto;
 import org.protu.userservice.dto.response.UserResDto;
 import org.protu.userservice.exceptions.custom.OldAndNewPasswordMatchException;
 import org.protu.userservice.exceptions.custom.PasswordMismatchException;
-import org.protu.userservice.exceptions.custom.UnauthorizedAccessException;
 import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.UserMapper;
 import org.protu.userservice.model.User;
@@ -30,25 +30,18 @@ public class UserService {
   private final PasswordEncoder passwordEncoder;
   private final UserMapper userMapper;
   private final UserHelper userHelper;
-  private final CloudinaryService cloudinaryService;
-
-
-  public void verifyUserAuthority(String userId, String authUserId) {
-    if (!userId.equals(authUserId)) {
-      throw new UnauthorizedAccessException(FailureMessages.UNAUTHORIZED_ACCESS.getMessage());
-    }
-  }
+  private final AppProperties properties;
 
   public UserResDto getUserById(String userId, String authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
+    userHelper.verifyUserAuthority(userId, authUserId);
     return userMapper.toUserDto(user);
   }
 
   public UserResDto fullUpdateUser(String userId, String authUserId, FullUpdateReqDto fullUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
-    userHelper.checkIfUserExists(fullUpdateReqDto.username(),"username");
+    userHelper.verifyUserAuthority(userId, authUserId);
+    userHelper.checkIfUserExists(fullUpdateReqDto.username(), "username");
     user.setUsername(fullUpdateReqDto.username());
     user.setFirstName(fullUpdateReqDto.firstName());
     user.setLastName(fullUpdateReqDto.lastName());
@@ -61,9 +54,9 @@ public class UserService {
 
   public UserResDto partialUpdateUser(String userId, String authUserId, PartialUpdateReqDto partialUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
+    userHelper.verifyUserAuthority(userId, authUserId);
     if (partialUpdateReqDto.username() != null) {
-      userHelper.checkIfUserExists(partialUpdateReqDto.username(),"username");
+      userHelper.checkIfUserExists(partialUpdateReqDto.username(), "username");
       user.setUsername(partialUpdateReqDto.username());
     }
     if (partialUpdateReqDto.firstName() != null) {
@@ -79,23 +72,20 @@ public class UserService {
     return userMapper.toUserDto(user);
   }
 
-  public DeactivateResDto deactivateUser(String userId, String authUserId) {
+  public ProfilePicResDto uploadProfilePic(MultipartFile file, String userId, String authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
-    user.setIsActive(false);
-    userRepo.save(user);
-    return userMapper.toDeactivateDto(user);
-  }
-
-  public ProfilePicResDto uploadProfilePic(MultipartFile file, String userId, String authUserId){
-    User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
+    userHelper.verifyUserAuthority(userId, authUserId);
 
     try {
       File file1 = File.createTempFile("upload-", file.getOriginalFilename());
       file.transferTo(file1);
       Map uploadMap = ObjectUtils.asMap("asset_folder", "profile-pics");
-      Map uploadResults = cloudinaryService.cloudinary().uploader().upload(file1, uploadMap);
+      Map uploadResults = new Cloudinary(ObjectUtils.asMap(
+          "cloud_name", properties.cloudinary().cloudName(),
+          "api_key", properties.cloudinary().apiKey(),
+          "api_secret", properties.cloudinary().apiSecret()
+      )).uploader().upload(file1, uploadMap);
+
       String secureAssetUrl = uploadResults.get("secure_url").toString();
       String publicAssetId = uploadResults.get("public_id").toString();
       user.setImageUrl(secureAssetUrl);
@@ -108,12 +98,12 @@ public class UserService {
 
   public void changePassword(ChangePasswordReqDto reqDto, String userId, String authUserId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    verifyUserAuthority(userId, authUserId);
-    if(reqDto.oldPassword().equals(reqDto.newPassword())) {
+    userHelper.verifyUserAuthority(userId, authUserId);
+    if (reqDto.oldPassword().equals(reqDto.newPassword())) {
       throw new OldAndNewPasswordMatchException(FailureMessages.OldAndNewPasswordMatch.getMessage());
     }
 
-    if(!passwordEncoder.matches(reqDto.oldPassword(), user.getPassword())) {
+    if (!passwordEncoder.matches(reqDto.oldPassword(), user.getPassword())) {
       throw new PasswordMismatchException(FailureMessages.BAD_CREDENTIALS.getMessage("old password"));
     }
 

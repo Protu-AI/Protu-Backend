@@ -14,8 +14,9 @@ public enum SuccessMessages {
   NEW_CODE_MSG("If the provided email exists, a new verification code will be sent to your inbox. Please check your email to proceed."),
   UPLOAD_PROFILE_PIC("Your profile picture is successfully uploaded and updated."),
   CHANGE_PASSWORD_MSG("Password changed successfully."),
-  PASSWORD_RESET_OTP_MSG("Password reset OTP is verified successfully");
-
+  PASSWORD_RESET_OTP_MSG("Password reset OTP is verified successfully"),
+  ACTIVATE_USER_MSG("User is account is activated successfully"),
+  NEW_ROLE_FOR_USER("User role is added successfully");
   public final String message;
 
   SuccessMessages(String message) {

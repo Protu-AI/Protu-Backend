@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS "users"
     "email"             VARCHAR(100) NOT NULL UNIQUE,
     "password"          VARCHAR(100) NOT NULL,
     "phone_number"      VARCHAR(20)  NOT NULL,
-    "authorities"       TEXT         NOT NULL,
+    "roles"             TEXT         NOT NULL,
     "is_active"         BOOLEAN      NOT NULL DEFAULT TRUE,
     "is_email_verified" BOOLEAN      NOT NULL DEFAULT FALSE,
     "image_url"         VARCHAR(255),
