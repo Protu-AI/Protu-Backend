@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: local
+  application.name: content-service
+  main:
+    banner-mode: off
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+    database: postgresql
+    properties:
+      hibernate:
+        format_sql: false
+    hibernate:
+      ddl-auto: update
