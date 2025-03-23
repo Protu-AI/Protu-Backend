@@ -111,6 +111,9 @@ func (g *Gateway) useStaticConfiguration() {
 	if chatTarget, err := url.Parse("http://chat-service-container:8082"); err == nil {
 		g.services["chat-service"] = httputil.NewSingleHostReverseProxy(chatTarget)
 	}
+	if codeExecutionTarget, err := url.Parse("http://code-execution-service-container:8086"); err == nil {
+		g.services["code-execution-service"] = httputil.NewSingleHostReverseProxy(codeExecutionTarget)
+	}
 }
 
 func (g *Gateway) periodicUpdate() {
@@ -142,6 +145,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		strings.HasPrefix(path, "/api/v1/chats") ||
 		strings.HasPrefix(path, "/api/v1/attachments/"):
 		if proxy, ok := g.services["chat-service"]; ok {
+			proxy.ServeHTTP(w, r)
+			return
+		}
+	case strings.HasPrefix(path, "/api/v1/execute"):
+		if proxy, ok := g.services["code-execution-service"]; ok {
 			proxy.ServeHTTP(w, r)
 			return
 		}
