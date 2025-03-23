@@ -1,4 +1,4 @@
-package org.protu.contentservice.entity;
+package org.protu.contentservice.lesson;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,21 +6,20 @@ import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
 
 @Entity
 @Table(
-    name = "courses",
+    name = "lessons",
     indexes = {
-        @Index(name = "idx_courses_name", columnList = "name"),
-        @Index(name = "idx_courses_trackId", columnList = "track_id")
+        @Index(name = "idx_lessons_name", columnList = "name"),
+        @Index(name = "idx_lessons_lessonOrder", columnList = "lesson_order")
     })
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Course {
+public class Lesson {
   @Id
   @Column(name = "id", nullable = false)
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,15 +28,11 @@ public class Course {
   @Column(name = "name", nullable = false, unique = true, length = 30)
   String name;
 
-  @Column(name = "description", columnDefinition = "TEXT")
-  String description;
+  @Column(name = "content", columnDefinition = "TEXT")
+  String content;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "track_id")
-  Track track;
-
-  @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-  List<Lesson> lessons;
+  @Column(name = "lesson_order", nullable = false, unique = true)
+  Integer lessonOrder = 0;
 
   @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   Timestamp createdAt;

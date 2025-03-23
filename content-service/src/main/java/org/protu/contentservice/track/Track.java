@@ -1,8 +1,9 @@
-package org.protu.contentservice.entity;
+package org.protu.contentservice.track;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.protu.contentservice.course.Course;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -32,7 +33,7 @@ public class Track {
   @Column(name = "description", columnDefinition = "TEXT")
   String description;
 
-  @OneToMany(mappedBy = "track", cascade = CascadeType.ALL)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   List<Course> courses = new ArrayList<>();
 
   @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/protu-db
+    username: YOUR_USERNAME
+    password: YOUR_PASSWORD
+    driver-class-name: org.postgresql.Driver

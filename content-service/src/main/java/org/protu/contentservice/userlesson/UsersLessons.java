@@ -1,4 +1,4 @@
-package org.protu.contentservice.entity;
+package org.protu.contentservice.userlesson;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
