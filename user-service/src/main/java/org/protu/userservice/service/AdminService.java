@@ -3,7 +3,6 @@ package org.protu.userservice.service;
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.dto.response.DeactivateResDto;
 import org.protu.userservice.dto.response.UserDetailsForAdminDto;
-import org.protu.userservice.exceptions.custom.UserNotFoundException;
 import org.protu.userservice.helper.UserHelper;
 import org.protu.userservice.mapper.UserMapper;
 import org.protu.userservice.model.User;
@@ -55,10 +54,6 @@ public class AdminService {
 
   public void deleteUser(String userId, String token) {
     userHelper.checkIfUserIsAdminOrThrow(token);
-    try {
-      User user = userHelper.fetchUserByIdOrThrow(userId);
-      userRepo.delete(user);
-    } catch (UserNotFoundException ignored) {
-    }
+    userRepo.findByPublicId(userId).ifPresent(userRepo::delete);
   }
 }
