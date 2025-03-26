@@ -1,5 +1,6 @@
 app:
-  api-version: v1
+  api:
+    version: v1
 
 spring:
   profiles:

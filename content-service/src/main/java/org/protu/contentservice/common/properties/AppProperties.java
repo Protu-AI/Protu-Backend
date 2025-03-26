@@ -6,5 +6,8 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties("app")
-public record AppProperties(@NotBlank String apiVersion) {
+public record AppProperties(Api api) {
+
+  public record Api(@NotBlank String version) {
+  }
 }

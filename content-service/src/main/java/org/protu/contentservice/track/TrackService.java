@@ -1,9 +1,9 @@
 package org.protu.contentservice.track;
 
 import lombok.RequiredArgsConstructor;
+import org.protu.contentservice.common.enums.FailureMessage;
 import org.protu.contentservice.track.dto.TrackRequest;
 import org.protu.contentservice.track.dto.TrackResponse;
-import org.protu.contentservice.track.enums.TrackFailureMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +16,13 @@ public class TrackService {
   private final TrackRepository trackRepo;
   private final TrackMapper trackMapper;
 
-  private Track fetchTrackByNameOrThrow(String trackName) {
-    return trackRepo.findTracksByName(trackName).orElseThrow(() -> new RuntimeException(TrackFailureMessage.TRACK_NOT_FOUND.toString()));
+  public Track fetchTrackByNameOrThrow(String trackName) {
+    return trackRepo.findTracksByName(trackName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Track", trackName)));
   }
 
   public TrackResponse createTrack(TrackRequest trackRequest) {
     trackRepo.findTracksByName(trackRequest.name()).ifPresent(track -> {
-      throw new RuntimeException(TrackFailureMessage.TRACK_ALREADY_EXISTS.getMessage(trackRequest.name()));
+      throw new RuntimeException(FailureMessage.ENTITY_ALREADY_EXISTS.getMessage("Track", trackRequest.name()));
     });
 
     Track track = trackMapper.toTrackEntity(trackRequest);
