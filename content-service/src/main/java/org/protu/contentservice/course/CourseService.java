@@ -4,13 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.protu.contentservice.common.enums.FailureMessage;
 import org.protu.contentservice.course.dto.CourseRequest;
 import org.protu.contentservice.course.dto.CourseResponse;
+import org.protu.contentservice.course.dto.CourseSummary;
+import org.protu.contentservice.lesson.dto.LessonSummary;
 import org.protu.contentservice.track.Track;
 import org.protu.contentservice.track.TrackRepository;
 import org.protu.contentservice.track.TrackService;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,31 @@ public class CourseService {
   private final TrackRepository trackRepo;
   private final CourseRepository courseRepo;
   private final CourseMapper courseMapper;
+
+  private List<CourseSummary> findAllCoursesWithLessonSummary(List<Object[]> queryResult) {
+    Map<Integer, CourseSummary> courseMap = new HashMap<>();
+
+    for (Object[] row : queryResult) {
+      Integer courseId = (Integer) row[0];
+      CourseSummary courseSummary = courseMap.computeIfAbsent(courseId,
+          id -> new CourseSummary(id, (String) row[1], (String) row[2], (Timestamp) row[3], (Timestamp) row[4], new ArrayList<>()));
+      
+      courseMap.put(courseId, courseSummary);
+      if (row[5] != null) {
+        LessonSummary lessonSummary = new LessonSummary(
+            (Integer) row[5],
+            (String) row[6],
+            (Integer) row[7],
+            (Timestamp) row[8],
+            (Timestamp) row[9]
+        );
+
+        courseSummary.lessons().add(lessonSummary);
+      }
+    }
+
+    return new ArrayList<>(courseMap.values());
+  }
 
   private Course fetchCourseByNameOrThrow(String courseName) {
     return courseRepo.findCourseByName(courseName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Course", courseName)));
@@ -48,9 +75,9 @@ public class CourseService {
     return courseMapper.toCourseDto(course);
   }
 
-  public List<CourseResponse> getAllCourses() {
-    List<Course> courses = courseRepo.findAll();
-    return courseMapper.toCourseDtoList(courses);
+  public List<CourseSummary> getAllCourses() {
+    List<Object[]> queryResult = courseRepo.findAllProjectedBy();
+    return findAllCoursesWithLessonSummary(queryResult);
   }
 
   public List<CourseResponse> getAllCoursesForTrack(String trackName) {

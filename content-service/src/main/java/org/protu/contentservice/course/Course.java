@@ -37,7 +37,7 @@ public class Course {
   @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   List<Lesson> lessons;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "track_id")
   private Track track;
 

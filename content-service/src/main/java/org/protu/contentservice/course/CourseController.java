@@ -7,6 +7,7 @@ import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
 import org.protu.contentservice.course.dto.CourseRequest;
 import org.protu.contentservice.course.dto.CourseResponse;
+import org.protu.contentservice.course.dto.CourseSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -25,8 +26,8 @@ public class CourseController {
   private final AppProperties properties;
 
   @GetMapping("/courses")
-  public ResponseEntity<ApiResponse<List<CourseResponse>>> getAllCourses(HttpServletRequest request) {
-    List<CourseResponse> courses = courseService.getAllCourses();
+  public ResponseEntity<ApiResponse<List<CourseSummary>>> getAllCourses(HttpServletRequest request) {
+    List<CourseSummary> courses = courseService.getAllCourses();
     return buildApiResponse(SuccessMessage.GET_ALL_ENTITIES.getMessage("Courses"), courses, null, HttpStatus.OK, properties.api().version(), request);
   }
 

@@ -1,10 +1,10 @@
 package org.protu.contentservice.course.dto;
 
-import org.protu.contentservice.lesson.dto.LessonSummaryResponse;
+import org.protu.contentservice.lesson.dto.LessonSummary;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 public record CourseResponse(Integer id, String name, String description,
-                             List<LessonSummaryResponse> lessons, Timestamp createdAt, Timestamp updatedAt) {
+                             List<LessonSummary> lessons, Timestamp createdAt, Timestamp updatedAt) {
 }
