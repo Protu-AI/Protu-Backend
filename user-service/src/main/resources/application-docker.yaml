@@ -32,6 +32,10 @@ app:
     api-key: ${CLOUDINARY_API_KEY}
     api-secret: ${CLOUDINARY_API_SECRET}
 
+  rabbitmq:
+    email-main-queue: email.notification.main.queue
+    email-retry-queue: email.notification.retry.queue
+
 eureka:
   client:
     service-url.defaultZone:
