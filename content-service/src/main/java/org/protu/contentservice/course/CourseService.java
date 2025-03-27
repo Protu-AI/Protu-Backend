@@ -30,7 +30,7 @@ public class CourseService {
       Integer courseId = (Integer) row[0];
       CourseSummary courseSummary = courseMap.computeIfAbsent(courseId,
           id -> new CourseSummary(id, (String) row[1], (String) row[2], (Timestamp) row[3], (Timestamp) row[4], new ArrayList<>()));
-      
+
       courseMap.put(courseId, courseSummary);
       if (row[5] != null) {
         LessonSummary lessonSummary = new LessonSummary(
@@ -48,7 +48,7 @@ public class CourseService {
     return new ArrayList<>(courseMap.values());
   }
 
-  private Course fetchCourseByNameOrThrow(String courseName) {
+  public Course fetchCourseByNameOrThrow(String courseName) {
     return courseRepo.findCourseByName(courseName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Course", courseName)));
   }
 
@@ -97,8 +97,11 @@ public class CourseService {
   public void deleteCourseFromTrack(String trackName, String courseName) {
     Track track = trackService.fetchTrackByNameOrThrow(trackName);
     Course course = fetchCourseByNameOrThrow(courseName);
-    track.getCourses().remove(course);
-    course.setTrack(null);
+    if (track.getCourses().remove(course)) {
+      course.setTrack(null);
+    }
+    
     trackRepo.save(track);
+    courseRepo.save(course);
   }
 }

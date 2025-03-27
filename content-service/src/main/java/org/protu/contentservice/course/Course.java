@@ -8,6 +8,7 @@ import org.protu.contentservice.track.Track;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -34,8 +35,8 @@ public class Course {
   @Column(name = "description", columnDefinition = "TEXT")
   String description;
 
-  @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-  List<Lesson> lessons;
+  @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.MERGE})
+  List<Lesson> lessons = new ArrayList<>();
 
   @ManyToOne
   @JoinColumn(name = "track_id")

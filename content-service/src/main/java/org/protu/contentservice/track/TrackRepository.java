@@ -17,5 +17,5 @@ public interface TrackRepository extends JpaRepository<Track, Integer> {
   List<Track> findAll();
 
   @Query("SELECT t FROM Track t LEFT JOIN FETCH t.courses WHERE t.name = :name")
-  Optional<Track> findTracksByName(@Param("name") String name);
+  Optional<Track> findTrackByName(@Param("name") String name);
 }

@@ -17,11 +17,11 @@ public class TrackService {
   private final TrackMapper trackMapper;
 
   public Track fetchTrackByNameOrThrow(String trackName) {
-    return trackRepo.findTracksByName(trackName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Track", trackName)));
+    return trackRepo.findTrackByName(trackName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Track", trackName)));
   }
 
   public TrackResponse createTrack(TrackRequest trackRequest) {
-    trackRepo.findTracksByName(trackRequest.name()).ifPresent(track -> {
+    trackRepo.findTrackByName(trackRequest.name()).ifPresent(track -> {
       throw new RuntimeException(FailureMessage.ENTITY_ALREADY_EXISTS.getMessage("Track", trackRequest.name()));
     });
 
@@ -50,6 +50,6 @@ public class TrackService {
   }
 
   public void deleteTrack(String trackName) {
-    trackRepo.findTracksByName(trackName).ifPresent(trackRepo::delete);
+    trackRepo.findTrackByName(trackName).ifPresent(trackRepo::delete);
   }
 }
