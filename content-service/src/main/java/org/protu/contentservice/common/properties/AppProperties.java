@@ -6,8 +6,11 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties("app")
-public record AppProperties(Api api) {
+public record AppProperties(Api api, JWT jwt) {
 
   public record Api(@NotBlank String version) {
+  }
+
+  public record JWT(@NotBlank String secret) {
   }
 }

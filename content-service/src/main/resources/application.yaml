@@ -1,13 +1,12 @@
 app:
-  api:
-    version: v1
+  api.version: v1
+
+server.port: 8087
 
 spring:
-  profiles:
-    active: local
+  profiles.active: local
   application.name: content-service
-  main:
-    banner-mode: off
+  main.banner-mode: off
 
   jpa:
     open-in-view: false
@@ -17,10 +16,4 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-
-  data:
-    rest:
-      base-path: /api
-
-server:
-  port: 8087
+  

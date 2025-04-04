@@ -1,4 +1,4 @@
-package org.protu.contentservice.usercourse;
+package org.protu.contentservice.progress.userlesson;
 
 import jakarta.persistence.Embeddable;
 
@@ -6,25 +6,23 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class UsersCoursesId implements Serializable {
+public class UsersLessonsPK implements Serializable {
 
-  private Integer userId;
-
+  private Long userId;
   private Integer lessonId;
 
-  public UsersCoursesId(Integer userId, Integer lessonId) {
-    this.userId = userId;
-    this.lessonId = lessonId;
+  public UsersLessonsPK() {
   }
 
-  public UsersCoursesId() {
-
+  public UsersLessonsPK(Long userId, Integer lessonId) {
+    this.userId = userId;
+    this.lessonId = lessonId;
   }
 
   @Override
   public boolean equals(Object o) {
     if (o == null || getClass() != o.getClass()) return false;
-    UsersCoursesId that = (UsersCoursesId) o;
+    UsersLessonsPK that = (UsersLessonsPK) o;
     return Objects.equals(userId, that.userId) && Objects.equals(lessonId, that.lessonId);
   }
 
