@@ -1,10 +1,9 @@
 package org.protu.userservice.exceptions;
 
 
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.ApiProperties;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.exceptions.custom.*;
 import org.protu.userservice.helper.FailureResponseHelper;
@@ -25,26 +24,26 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
-  private final ApiProperties apiProperties;
+  private final AppProperties properties;
 
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleBadCredentialsException(BadCredentialsException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.UNAUTHORIZED,e.getMessage(),"Authentication failed");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.UNAUTHORIZED, e.getMessage(), "Authentication failed");
   }
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.NOT_FOUND,e.getMessage(),"User not found");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.NOT_FOUND, e.getMessage(), "User not found");
   }
 
   @ExceptionHandler(UserAlreadyExistsException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUserAlreadyExistsException(UserAlreadyExistsException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.CONFLICT,e.getMessage(),"User already exists");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.CONFLICT, e.getMessage(), "User already exists");
   }
 
   @ExceptionHandler(AccessDeniedException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.FORBIDDEN,e.getMessage(),"Access denied");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.FORBIDDEN, e.getMessage(), "Access denied");
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -53,51 +52,46 @@ public class GlobalExceptionHandler {
     List<String> errorMessages = bindingResult.getAllErrors().stream()
         .map(ObjectError::getDefaultMessage)
         .collect(Collectors.toList());
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.BAD_REQUEST,String.join(", ", errorMessages), "Validation failed");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.BAD_REQUEST, String.join(", ", errorMessages), "Validation failed");
   }
 
   @ExceptionHandler(UnauthorizedAccessException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUnauthorizedAccessException(UnauthorizedAccessException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.UNAUTHORIZED,e.getMessage(),"Unauthorized access");
-  }
-
-  @ExceptionHandler(ExpiredJwtException.class)
-  public ResponseEntity<ApiResponse<ErrorDetails>> handleExpiredJwtException(ExpiredJwtException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.UNAUTHORIZED,e.getMessage().split("\\.")[0],"Session expired");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.UNAUTHORIZED, e.getMessage(), "Unauthorized access");
   }
 
   @ExceptionHandler(InvalidOrExpiredOtpException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleInvalidVerificationTokenException(InvalidOrExpiredOtpException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.BAD_REQUEST,e.getMessage(),"Invalid verification code");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Invalid verification code");
   }
 
   @ExceptionHandler(UserEmailAlreadyVerifiedException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUserEmailAlreadyVerified(UserEmailAlreadyVerifiedException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.CONFLICT,e.getMessage(),"Email already verified");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.CONFLICT, e.getMessage(), "Email already verified");
   }
 
   @ExceptionHandler(EmailNotVerifiedException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUserEmailNotVerified(EmailNotVerifiedException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request,HttpStatus.CONFLICT,e.getMessage(),"Email verification pending");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.CONFLICT, e.getMessage(), "Email verification pending");
   }
 
   @ExceptionHandler(PasswordMismatchException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handlePasswordMismatchException(PasswordMismatchException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
   }
 
   @ExceptionHandler(OldAndNewPasswordMatchException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleOldAndNewPasswordMatchException(OldAndNewPasswordMatchException e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.BAD_REQUEST, e.getMessage(), "Password change failed");
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleDataIntegrityViolation(HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.CONFLICT, "An error occurred while processing your request. Please try again later.","Data integrity issue");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.CONFLICT, "An error occurred while processing your request. Please try again later.", "Data integrity issue");
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleException(Exception e, HttpServletRequest request) {
-    return FailureResponseHelper.buildResponse(apiProperties.getVersion(), request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(),"Internal server error");
+    return FailureResponseHelper.buildResponse(properties.api().version(), request, HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), "Internal server error");
   }
 }

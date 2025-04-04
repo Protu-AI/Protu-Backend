@@ -81,7 +81,7 @@ public class AuthService {
   public RefreshResDto refreshAccessToken(String refreshToken) {
     String authUserId = jwtService.getUserIdFromToken(refreshToken);
     User user = userHelper.fetchUserByIdOrThrow(authUserId);
-    return tokenMapper.toTokensDto(authUserId, jwtService, user);
+    return tokenMapper.toTokensDto(jwtService, user);
   }
 
   public void forgotPassword(SendOtpDto requestDto) {

@@ -1,11 +1,9 @@
+app.api.version: v1
+
 server.port: 8085
-api:
-  version: v1
 
 logging.level:
-  org.springframework.amqp: INFO
-  io.lettuce.core: INFO
-  com.zaxxer.hikari: INFO
+  org.springframework.security: INFO
 
 spring:
   profiles:

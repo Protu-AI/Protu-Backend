@@ -6,7 +6,10 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(JWT jwt, Otp otp, Cloudinary cloudinary, RabbitMQ rabbitMQ) {
+public record AppProperties(Api api, JWT jwt, Otp otp, Cloudinary cloudinary, RabbitMQ rabbitMQ) {
+
+  public record Api(@NotBlank String version) {
+  }
 
   public record JWT(
       @NotBlank String secret,

@@ -12,14 +12,14 @@ import org.protu.userservice.service.JWTService;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface TokenMapper {
 
-  @Mapping(target = "accessToken", expression = "java(jwtService.generateAccessToken(user.getPublicId(), user.getRoles()))")
-  @Mapping(target = "refreshToken", expression = "java(jwtService.generateRefreshToken(user.getPublicId(), user.getRoles()))")
+  @Mapping(target = "accessToken", expression = "java(jwtService.generateAccessToken(user))")
+  @Mapping(target = "refreshToken", expression = "java(jwtService.generateRefreshToken(user))")
   @Mapping(target = "accessTokenExpiresIn", expression = "java(jwtService.getAccessTokenDuration())")
   @Mapping(target = "refreshTokenExpiresIn", expression = "java(jwtService.getRefreshTokenDuration())")
   @Mapping(target = "tokenType", constant = "Bearer")
   TokensResDto toTokensDto(User user, @Context JWTService jwtService);
 
-  @Mapping(target = "accessToken", expression = "java(jwtService.generateAccessToken(authUserId, user.getRoles()))")
+  @Mapping(target = "accessToken", expression = "java(jwtService.generateAccessToken(user))")
   @Mapping(target = "expiresIn", expression = "java(jwtService.getAccessTokenDuration())")
-  RefreshResDto toTokensDto(String authUserId, @Context JWTService jwtService, User user);
+  RefreshResDto toTokensDto(@Context JWTService jwtService, User user);
 }

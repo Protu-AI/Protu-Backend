@@ -2,7 +2,7 @@ package org.protu.userservice.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.protu.userservice.config.ApiProperties;
+import org.protu.userservice.config.AppProperties;
 import org.protu.userservice.constants.SuccessMessages;
 import org.protu.userservice.dto.ApiResponse;
 import org.protu.userservice.dto.request.ChangePasswordReqDto;
@@ -21,12 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 import static org.protu.userservice.helper.SuccessResponseHelper.buildResponse;
 
 @RestController
-@RequestMapping("/api/${api.version}/users")
+@RequestMapping("/api/${app.api.version}/users")
 @RequiredArgsConstructor
 public class UserController {
   private final JWTService jwtService;
   private final UserService userService;
-  private final ApiProperties apiProperties;
+  private final AppProperties properties;
 
   private String getIdFromAuthHeader(String authHeader) {
     String token = jwtService.getTokenFromHeader(authHeader);
@@ -40,7 +40,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.getUserById(userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, userResDto, SuccessMessages.GET_USER_MSG.message);
+    return buildResponse(properties.api().version(), request, HttpStatus.OK, userResDto, SuccessMessages.GET_USER_MSG.message);
   }
 
   @PutMapping("/{id}")
@@ -51,7 +51,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.fullUpdateUser(userId, getIdFromAuthHeader(authHeader), userUpdateDto);
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
+    return buildResponse(properties.api().version(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
   }
 
   @PatchMapping("/{id}")
@@ -62,7 +62,7 @@ public class UserController {
       HttpServletRequest request) {
 
     UserResDto userResDto = userService.partialUpdateUser(userId, getIdFromAuthHeader(authHeader), userUpdateDto);
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
+    return buildResponse(properties.api().version(), request, HttpStatus.OK, userResDto, SuccessMessages.UPDATE_USER_MSG.message);
   }
 
   @PostMapping("/{id}/profile-picture")
@@ -73,7 +73,7 @@ public class UserController {
       HttpServletRequest request) {
 
     ProfilePicResDto profilePicResDto = userService.uploadProfilePic(file, userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.CREATED, profilePicResDto, SuccessMessages.UPLOAD_PROFILE_PIC.message);
+    return buildResponse(properties.api().version(), request, HttpStatus.CREATED, profilePicResDto, SuccessMessages.UPLOAD_PROFILE_PIC.message);
   }
 
   @PostMapping("/{id}/change-password")
@@ -84,6 +84,6 @@ public class UserController {
       HttpServletRequest request
   ) {
     userService.changePassword(reqDto, userId, getIdFromAuthHeader(authHeader));
-    return buildResponse(apiProperties.getVersion(), request, HttpStatus.OK, null, SuccessMessages.CHANGE_PASSWORD_MSG.message);
+    return buildResponse(properties.api().version(), request, HttpStatus.OK, null, SuccessMessages.CHANGE_PASSWORD_MSG.message);
   }
 }
