@@ -1,8 +1,6 @@
-package org.protu.contentservice.common.helpers;
+package org.protu.contentservice.progress.user;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.progress.user.User;
-import org.protu.contentservice.progress.user.UserRepository;
 import org.springframework.stereotype.Component;
 
 @Component

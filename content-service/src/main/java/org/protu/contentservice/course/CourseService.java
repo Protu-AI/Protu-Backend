@@ -1,7 +1,8 @@
 package org.protu.contentservice.course;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.common.enums.FailureMessage;
+import org.protu.contentservice.common.exception.custom.EntityAlreadyExistsException;
+import org.protu.contentservice.common.exception.custom.EntityNotFoundException;
 import org.protu.contentservice.course.dto.CourseRequest;
 import org.protu.contentservice.course.dto.CourseResponse;
 import org.protu.contentservice.course.dto.CourseSummary;
@@ -49,12 +50,12 @@ public class CourseService {
   }
 
   public Course fetchCourseByNameOrThrow(String courseName) {
-    return courseRepo.findCourseByName(courseName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Course", courseName)));
+    return courseRepo.findCourseByName(courseName).orElseThrow(() -> new EntityNotFoundException("Course", courseName));
   }
 
   public CourseResponse createCourse(CourseRequest courseRequest) {
     courseRepo.findCourseByName(courseRequest.name()).ifPresent(course -> {
-      throw new RuntimeException(FailureMessage.ENTITY_ALREADY_EXISTS.getMessage(courseRequest.name()));
+      throw new EntityAlreadyExistsException(courseRequest.name());
     });
 
     Course course = courseMapper.toCourseEntity(courseRequest);
@@ -100,7 +101,7 @@ public class CourseService {
     if (track.getCourses().remove(course)) {
       course.setTrack(null);
     }
-    
+
     trackRepo.save(track);
     courseRepo.save(course);
   }

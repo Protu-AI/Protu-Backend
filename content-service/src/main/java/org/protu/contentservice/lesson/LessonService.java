@@ -1,7 +1,7 @@
 package org.protu.contentservice.lesson;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.common.enums.FailureMessage;
+import org.protu.contentservice.common.exception.custom.EntityAlreadyExistsException;
 import org.protu.contentservice.course.Course;
 import org.protu.contentservice.course.CourseRepository;
 import org.protu.contentservice.course.CourseService;
@@ -20,15 +20,12 @@ public class LessonService {
   private final CourseService courseService;
   private final CourseRepository courseRepo;
   private final LessonRepository lessonRepo;
+  private final LessonHelper lessonHelper;
   private final LessonMapper lessonMapper;
-
-  private Lesson fetchLessonByNameOrThrow(String lessonName) {
-    return lessonRepo.findLessonByName(lessonName).orElseThrow(() -> new RuntimeException(FailureMessage.ENTITY_NOT_FOUND.getMessage("Lesson", lessonName)));
-  }
 
   public LessonResponse createLesson(LessonRequest lessonRequest) {
     lessonRepo.findLessonByName(lessonRequest.name()).ifPresent(lesson -> {
-      throw new RuntimeException(FailureMessage.ENTITY_ALREADY_EXISTS.getMessage(lessonRequest.name()));
+      throw new EntityAlreadyExistsException(lessonRequest.name());
     });
 
     Lesson lesson = lessonMapper.toLessonEntity(lessonRequest);
@@ -37,12 +34,12 @@ public class LessonService {
   }
 
   public LessonResponse getLessonByName(String lessonName) {
-    Lesson lesson = fetchLessonByNameOrThrow(lessonName);
+    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
     return lessonMapper.toLessonDto(lesson);
   }
 
   public LessonResponse updateLesson(String lessonName, LessonUpdateRequest lessonRequest) {
-    Lesson lesson = fetchLessonByNameOrThrow(lessonName);
+    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
     Optional.ofNullable(lessonRequest.name()).ifPresent(lesson::setName);
     Optional.ofNullable(lessonRequest.content()).ifPresent(lesson::setContent);
     Optional.ofNullable(lessonRequest.lessonOrder()).ifPresent(lesson::setLessonOrder);
@@ -57,7 +54,7 @@ public class LessonService {
 
   public void addExistingLessonToCourse(String courseName, String lessonName) {
     Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    Lesson lesson = fetchLessonByNameOrThrow(lessonName);
+    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
     lesson.setCourse(course);
     course.getLessons().add(lesson);
     courseRepo.save(course);
@@ -65,7 +62,7 @@ public class LessonService {
 
   public void deleteLessonFromCourse(String courseName, String lessonName) {
     Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    Lesson lesson = fetchLessonByNameOrThrow(lessonName);
+    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
     if (course.getLessons().remove(lesson)) {
       lesson.setCourse(null);
     }

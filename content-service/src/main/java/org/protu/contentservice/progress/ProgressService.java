@@ -1,17 +1,17 @@
 package org.protu.contentservice.progress;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.common.helpers.LessonHelper;
-import org.protu.contentservice.common.helpers.UserHelper;
+import org.protu.contentservice.common.exception.custom.EntityNotFoundException;
 import org.protu.contentservice.course.Course;
 import org.protu.contentservice.course.CourseRepository;
 import org.protu.contentservice.lesson.Lesson;
+import org.protu.contentservice.lesson.LessonHelper;
 import org.protu.contentservice.lesson.LessonRepository;
 import org.protu.contentservice.progress.dto.UserProgressInCourse;
-import org.protu.contentservice.progress.enums.FailureMessage;
 import org.protu.contentservice.progress.user.User;
+import org.protu.contentservice.progress.user.UserHelper;
 import org.protu.contentservice.progress.usercourse.UserCourseRepository;
-import org.protu.contentservice.progress.usercourse.UserNotEnrolledInCourse;
+import org.protu.contentservice.progress.usercourse.UserNotEnrolledInCourseException;
 import org.protu.contentservice.progress.usercourse.UsersCourses;
 import org.protu.contentservice.progress.usercourse.UsersCoursesPK;
 import org.protu.contentservice.progress.userlesson.UserLessonRepository;
@@ -46,7 +46,7 @@ public class ProgressService {
   public UsersCourses enrollUserInCourse(Long userId, Integer courseId) {
     UsersCoursesPK usersCoursesPK = new UsersCoursesPK(userId, courseId);
     User user = userHelper.fetchUserByIdOrThrow(userId);
-    Course course1 = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found!"));
+    Course course1 = courseRepository.findById(courseId).orElseThrow(() -> new EntityNotFoundException("Course", courseId));
     UsersCourses usersCourses = userCourseRepo.findById(usersCoursesPK)
         .orElseGet(() -> UsersCourses.builder().id(usersCoursesPK).completedLessons(0).user(user).course(course1).build());
     return userCourseRepo.save(usersCourses);
@@ -54,7 +54,7 @@ public class ProgressService {
 
   public void cancelUserEnrollmentInCourse(Long userId, Integer courseId) {
     UsersCourses usersCourses = userCourseRepo.findById(new UsersCoursesPK(userId, courseId))
-        .orElseThrow(() -> new UserNotEnrolledInCourse(FailureMessage.USER_NOT_ENROLLED_IN_COURSE.getMessage()));
+        .orElseThrow(UserNotEnrolledInCourseException::new);
     usersCourses.setCompletedLessons(0);
     userCourseRepo.save(usersCourses);
   }
@@ -72,7 +72,8 @@ public class ProgressService {
 
   public void decrementCompletedLessonsForUser(Long userId, Integer courseId) {
     UsersCoursesPK usersCoursesPK = new UsersCoursesPK(userId, courseId);
-    UsersCourses usersCourses = userCourseRepo.findById(usersCoursesPK).orElseThrow(() -> new UserNotEnrolledInCourse(FailureMessage.USER_NOT_ENROLLED_IN_COURSE.getMessage()));
+    UsersCourses usersCourses = userCourseRepo.findById(usersCoursesPK)
+        .orElseThrow(UserNotEnrolledInCourseException::new);
     if (usersCourses.getCompletedLessons() == 0) {
       return;
     }

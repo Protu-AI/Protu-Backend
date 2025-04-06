@@ -37,7 +37,7 @@ public class TrackController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<TrackResponse>> createTrack(@RequestBody TrackRequest trackRequest, HttpServletRequest request) {
+  public ResponseEntity<ApiResponse<TrackResponse>> createTrack(@RequestBody @Validated TrackRequest trackRequest, HttpServletRequest request) {
     TrackResponse trackResponse = trackService.createTrack(trackRequest);
     return buildApiResponse(SuccessMessage.CREATE_NEW_ENTITY.getMessage("Track"), trackResponse, null, HttpStatus.CREATED, properties.api().version(), request);
   }

@@ -8,9 +8,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-public class ApiResponseBuilder<T> {
+public class ApiResponseBuilder {
 
-  public static <T> ResponseEntity<ApiResponse<T>> buildApiResponse(String message, T data, List<Object> errors, HttpStatus status, String apiVersion, HttpServletRequest request) {
+  public static <T> ResponseEntity<ApiResponse<T>> buildApiResponse(String message, T data, List<ErrorDetails> errors, HttpStatus status, String apiVersion, HttpServletRequest request) {
     String statusText = (errors == null || errors.isEmpty()) ? "SUCCESS" : "FAILURE";
 
     return ResponseEntity.status(status).body(new ApiResponse<>(message, data, errors,

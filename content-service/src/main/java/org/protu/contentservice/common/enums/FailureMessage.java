@@ -1,9 +1,8 @@
 package org.protu.contentservice.common.enums;
 
 public enum FailureMessage {
-  ENTITY_NOT_FOUND("%s with name: %s is not found"),
-  ENTITY_ALREADY_EXISTS("%s with name: %s already exists");
-
+  ENTITY_NOT_FOUND("%s: %s is not found"),
+  ENTITY_ALREADY_EXISTS("%s: %s already exists");
 
   private final String message;
 
