@@ -33,8 +33,18 @@ public class ProgressService {
   private UsersLessons buildUserLessons(Long userId, Integer lessonId) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     Lesson lesson = lessonHelper.fetchLessonByIdOrThrow(lessonId);
+    UsersLessonsPK usersLessonsPK = new UsersLessonsPK(userId, lessonId);
     return userLessonRepository.findById(new UsersLessonsPK(userId, lessonId))
-        .orElseGet(() -> UsersLessons.builder().user(user).lesson(lesson).build());
+        .orElseGet(() -> {
+          UsersLessons usersLessons = UsersLessons.builder()
+              .id(usersLessonsPK)
+              .user(user)
+              .lesson(lesson)
+              .isCompleted(false)
+              .build();
+          userLessonRepository.save(usersLessons);
+          return usersLessons;
+        });
   }
 
   public UserProgressInCourse getUserProgressInCourse(Long userId, Integer courseId) {
