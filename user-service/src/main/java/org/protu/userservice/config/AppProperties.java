@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app")
-public record AppProperties(Api api, JWT jwt, Otp otp, Cloudinary cloudinary, RabbitMQ rabbitMQ) {
+public record AppProperties(Api api, JWT jwt, Otp otp, Cloudinary cloudinary, Rabbit rabbit) {
 
   public record Api(@NotBlank String version) {
   }
@@ -35,10 +35,22 @@ public record AppProperties(Api api, JWT jwt, Otp otp, Cloudinary cloudinary, Ra
       @NotBlank String apiSecret) {
   }
 
-  public record RabbitMQ(
-      @NotBlank String emailMainQueue,
-      @NotBlank String emailRetryQueue
-  ) {
+  public record Rabbit(Exchange exchange, Queue queue, RoutingKey routingKey) {
 
+    public record Exchange(@NotBlank String userEvents) {
+    }
+
+    public record Queue(
+        @NotBlank String userReplica,
+        @NotBlank String emailMainQueue,
+        @NotBlank String emailRetryQueue) {
+    }
+
+    public record RoutingKey(
+        @NotBlank String userCreated,
+        @NotBlank String userUpdated,
+        @NotBlank String userDeleted,
+        @NotBlank String userPattern) {
+    }
   }
 }

@@ -1,9 +1,27 @@
-app.api.version: v1
+app:
+  api.version: v1
+
+  rabbit:
+    exchange:
+      user-events: user.events.topic
+
+    queue:
+      user-replica: content-service.user-replica.queue
+      email-main-queue: email.notification.main.queue
+      email-retry-queue: email.notification.retry.queue
+
+    routing-key:
+      user-created: user.created
+      user-updated: user.updated
+      user-deleted: user.deleted
+      user-pattern: user.*
+
+
 
 server.port: 8085
 
 logging.level:
-  org.springframework.security: INFO
+  org.springframework.security: TRACE
 
 spring:
   profiles:

@@ -35,9 +35,6 @@ app:
     api-key: YOUR_API_KEY
     api-secret: YOUR_API_SECRET
 
-  rabbitmq:
-    email-main-queue: email.notification.main.queue
-    email-retry-queue: email.notification.retry.queue
 
 eureka:
   client:

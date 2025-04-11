@@ -1,6 +1,19 @@
 app:
   api.version: v1
 
+  rabbit:
+    exchange:
+      user-events: user.events.topic
+
+    queue:
+      user-replica: content-service.user-replica.queue
+
+    routing-key:
+      user-created: user.created
+      user-updated: user.updated
+      user-deleted: user.deleted
+      user-pattern: user.*
+
 server.port: 8087
 
 spring:
@@ -16,4 +29,12 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: update
-  
+
+  rabbitmq.listener.simple:
+    retry:
+      enabled: true
+      initial-interval: 2000
+      max-attempts: 3
+      multiplier: 2
+      max-interval: 60000
+    default-requeue-rejected: true

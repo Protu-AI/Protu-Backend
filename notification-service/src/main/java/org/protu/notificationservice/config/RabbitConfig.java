@@ -13,31 +13,30 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableRabbit
 @RequiredArgsConstructor
-public class RabbitMQConfig {
-  
-  private final EmailRabbitMQProperties rabbitMQProperties;
-  private final EmailRabbitMQProperties properties;
+public class RabbitConfig {
+
+  private final AppProperties props;
 
   @Bean
   public Queue emailMainQueue() {
-    return QueueBuilder.durable(properties.queue().main())
+    return QueueBuilder.durable(props.queue().email().main())
         .deadLetterExchange("")
-        .deadLetterRoutingKey(properties.queue().retry())
+        .deadLetterRoutingKey(props.queue().email().retry())
         .build();
   }
 
   @Bean
   public Queue emailRetryQueue() {
-    return QueueBuilder.durable(properties.queue().retry())
+    return QueueBuilder.durable(props.queue().email().retry())
         .deadLetterExchange("")
-        .deadLetterRoutingKey(properties.queue().main())
-        .ttl((int) rabbitMQProperties.retry().delay())
+        .deadLetterRoutingKey(props.queue().email().main())
+        .ttl((int) props.retry().delay())
         .build();
   }
 
   @Bean
   public Queue emailDeadQueue() {
-    return QueueBuilder.durable(properties.queue().dead()).build();
+    return QueueBuilder.durable(props.queue().email().dead()).build();
   }
 
   @Bean

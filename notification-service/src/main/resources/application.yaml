@@ -1,3 +1,14 @@
+app:
+  rabbit:
+    queue:
+      email:
+        main: email.notification.main.queue
+        retry: email.notification.retry.queue
+        dead: email.notification.dead.queue
+    retry:
+      count: 3
+      delay: 5000
+
 logging.level:
   org.springframework.security: INFO
 
