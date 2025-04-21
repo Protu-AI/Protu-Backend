@@ -5,10 +5,7 @@ WORKDIR /gateway
 COPY mvnw pom.xml ./
 COPY .mvn ./.mvn
 
-RUN apk add --no-cache curl tar \
-    && chmod +x mvnw
-
-RUN ./mvnw dependency:go-offline -B
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B -T 1C
 
 COPY src ./src
 
