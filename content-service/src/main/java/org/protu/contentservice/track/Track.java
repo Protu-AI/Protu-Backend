@@ -33,7 +33,7 @@ public class Track {
   @Column(name = "description", columnDefinition = "TEXT")
   String description;
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "track", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.MERGE})
   List<Course> courses = new ArrayList<>();
 
   @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")

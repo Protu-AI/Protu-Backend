@@ -1,9 +1,10 @@
 package org.protu.contentservice.track;
 
 import lombok.RequiredArgsConstructor;
+import org.protu.contentservice.common.exception.custom.EntityAlreadyExistsException;
+import org.protu.contentservice.common.exception.custom.EntityNotFoundException;
 import org.protu.contentservice.track.dto.TrackRequest;
 import org.protu.contentservice.track.dto.TrackResponse;
-import org.protu.contentservice.track.enums.TrackFailureMessage;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +17,13 @@ public class TrackService {
   private final TrackRepository trackRepo;
   private final TrackMapper trackMapper;
 
-  private Track fetchTrackByNameOrThrow(String trackName) {
-    return trackRepo.findTracksByName(trackName).orElseThrow(() -> new RuntimeException(TrackFailureMessage.TRACK_NOT_FOUND.toString()));
+  public Track fetchTrackByNameOrThrow(String trackName) {
+    return trackRepo.findTrackByName(trackName).orElseThrow(() -> new EntityNotFoundException("Track", trackName));
   }
 
   public TrackResponse createTrack(TrackRequest trackRequest) {
-    trackRepo.findTracksByName(trackRequest.name()).ifPresent(track -> {
-      throw new RuntimeException(TrackFailureMessage.TRACK_ALREADY_EXISTS.getMessage(trackRequest.name()));
+    trackRepo.findTrackByName(trackRequest.name()).ifPresent(track -> {
+      throw new EntityAlreadyExistsException("Track", trackRequest.name());
     });
 
     Track track = trackMapper.toTrackEntity(trackRequest);
@@ -50,6 +51,6 @@ public class TrackService {
   }
 
   public void deleteTrack(String trackName) {
-    trackRepo.findTracksByName(trackName).ifPresent(trackRepo::delete);
+    trackRepo.findTrackByName(trackName).ifPresent(trackRepo::delete);
   }
 }

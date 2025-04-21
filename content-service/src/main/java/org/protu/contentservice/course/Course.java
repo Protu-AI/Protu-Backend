@@ -4,9 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.protu.contentservice.lesson.Lesson;
+import org.protu.contentservice.track.Track;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,8 +35,12 @@ public class Course {
   @Column(name = "description", columnDefinition = "TEXT")
   String description;
 
-  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-  List<Lesson> lessons;
+  @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.MERGE})
+  List<Lesson> lessons = new ArrayList<>();
+
+  @ManyToOne
+  @JoinColumn(name = "track_id")
+  private Track track;
 
   @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   Timestamp createdAt;
@@ -51,5 +57,16 @@ public class Course {
   @PreUpdate
   public void onUpdate() {
     this.updatedAt = Timestamp.from(Instant.now());
+  }
+
+  @Override
+  public final boolean equals(Object o) {
+    if (!(o instanceof Course course)) return false;
+    return id.equals(course.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
   }
 }

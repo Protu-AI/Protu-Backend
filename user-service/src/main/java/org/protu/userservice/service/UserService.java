@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -55,19 +56,14 @@ public class UserService {
   public UserResDto partialUpdateUser(String userId, String authUserId, PartialUpdateReqDto partialUpdateReqDto) {
     User user = userHelper.fetchUserByIdOrThrow(userId);
     userHelper.verifyUserAuthority(userId, authUserId);
-    if (partialUpdateReqDto.username() != null) {
-      userHelper.checkIfUserExists(partialUpdateReqDto.username(), "username");
-      user.setUsername(partialUpdateReqDto.username());
-    }
-    if (partialUpdateReqDto.firstName() != null) {
-      user.setFirstName(partialUpdateReqDto.firstName());
-    }
-    if (partialUpdateReqDto.lastName() != null) {
-      user.setLastName(partialUpdateReqDto.lastName());
-    }
-    if (partialUpdateReqDto.phoneNumber() != null) {
-      user.setPhoneNumber(partialUpdateReqDto.phoneNumber());
-    }
+
+    Optional.ofNullable(partialUpdateReqDto.username()).ifPresent(username -> {
+      userHelper.checkIfUserExists(username, "username");
+      user.setUsername(username);
+    });
+    Optional.ofNullable(partialUpdateReqDto.firstName()).ifPresent(user::setFirstName);
+    Optional.ofNullable(partialUpdateReqDto.lastName()).ifPresent(user::setLastName);
+    Optional.ofNullable(partialUpdateReqDto.phoneNumber()).ifPresent(user::setPhoneNumber);
     userRepo.save(user);
     return userMapper.toUserDto(user);
   }

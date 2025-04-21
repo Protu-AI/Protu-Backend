@@ -3,6 +3,7 @@ package org.protu.contentservice.lesson;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.protu.contentservice.course.Course;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -33,6 +34,10 @@ public class Lesson {
 
   @Column(name = "lesson_order", nullable = false, unique = true)
   Integer lessonOrder = 0;
+
+  @ManyToOne
+  @JoinColumn(name = "course_id")
+  private Course course;
 
   @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   Timestamp createdAt;

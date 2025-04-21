@@ -3,7 +3,7 @@ package org.protu.notificationservice.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
-import org.protu.notificationservice.dto.RabbitMQMessage;
+import org.protu.notificationservice.dto.EmailData;
 import org.protu.notificationservice.helper.TemplateProcessor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -27,9 +27,9 @@ public class EmailService {
     mailSender.send(mimeMessage);
   }
 
-  public void prepareAndSendEmail(RabbitMQMessage message, TemplateProcessor templateProcessor) throws MessagingException {
-    Map<String, Object> variables = templateProcessor.getVariables(message);
+  public void prepareAndSendEmail(EmailData emailData, TemplateProcessor templateProcessor) throws MessagingException {
+    Map<String, Object> variables = templateProcessor.getVariables(emailData);
     String htmlBody = templateProcessor.loadTemplate(variables);
-    sendEmail(message.to(), "Verify your email", htmlBody);
+    sendEmail(emailData.to(), "Verify your email", htmlBody);
   }
 }

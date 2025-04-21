@@ -1,9 +1,9 @@
 package org.protu.userservice.service;
 
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.config.AppProperties;
-import org.protu.userservice.helper.JWTHelper;
+import org.protu.userservice.helper.JwtHelper;
+import org.protu.userservice.model.User;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,14 @@ import java.util.Date;
 public class JWTService {
   private final RedisTemplate<Object, String> redisTemplate;
   private final AppProperties properties;
-  private final JWTHelper jwtHelper;
+  private final JwtHelper jwtHelper;
 
-  public String generateAccessToken(String userId, String userRoles) {
-    return jwtHelper.generateToken(userId, properties.jwt().accessTokenTtL(), userRoles);
+  public String generateAccessToken(User user) {
+    return jwtHelper.generateToken(user, properties.jwt().accessTokenTtL());
   }
 
-  public String generateRefreshToken(String userId, String userRoles) {
-    return jwtHelper.generateToken(userId, properties.jwt().refreshTokenTtL(), userRoles);
+  public String generateRefreshToken(User user) {
+    return jwtHelper.generateToken(user, properties.jwt().refreshTokenTtL());
   }
 
   public String getAccessTokenDuration() {
@@ -35,6 +35,10 @@ public class JWTService {
   }
 
   public String getTokenFromHeader(String authHeader) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      throw new IllegalArgumentException("Invalid Authorization header format");
+    }
+
     return authHeader.split(" ")[1];
   }
 
@@ -43,19 +47,15 @@ public class JWTService {
   }
 
   public String getUserIdFromToken(String token) {
-    return jwtHelper.extractClaim(token, Claims::getSubject);
+    return jwtHelper.extractUserId(token);
   }
 
   public String getUserRoles(String token) {
     return jwtHelper.extractUserRoles(token);
   }
 
-  private boolean isTokenExpired(String token) {
-    return jwtHelper.extractExpiration(token).before(Date.from(Instant.now()));
-  }
-
   private boolean isNotBlackListedToken(String token) {
-    Date issuedDate = jwtHelper.extractClaim(token, Claims::getIssuedAt);
+    Date issuedDate = jwtHelper.extractClaim(token, "iat");
     String publicId = getUserIdFromToken(token);
     String dateString = redisTemplate.opsForValue().get(properties.otp().prefix().jwt() + publicId);
     if (dateString == null)
@@ -63,10 +63,6 @@ public class JWTService {
 
     long lastInvalidDate = Long.parseLong(dateString);
     return issuedDate.getTime() > lastInvalidDate;
-  }
-
-  public boolean isValidToken(String token, String userId) {
-    return !isTokenExpired(token) && getUserIdFromToken(token).equals(userId) && isNotBlackListedToken(token);
   }
 
   public void blockCurrentUserTokens(String publicId) {

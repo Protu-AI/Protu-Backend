@@ -2,20 +2,18 @@ package org.protu.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.protu.userservice.constants.FailureMessages;
-import org.protu.userservice.dto.rabbitmq.EmailVerificationData;
-import org.protu.userservice.dto.rabbitmq.RabbitMQMessage;
+import org.protu.userservice.dto.rabbitmq.EmailData;
+import org.protu.userservice.dto.rabbitmq.RabbitMessage;
 import org.protu.userservice.exceptions.custom.InvalidOrExpiredOtpException;
 import org.protu.userservice.model.User;
+import org.protu.userservice.producer.EmailNotificationProducer;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.sql.Timestamp;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,15 +43,15 @@ public class OtpService {
     String otp = generateOtp(len);
     redisTemplate.opsForValue().set(redisKey, otp, Duration.ofMillis(otpTtlInMillis));
     long durationInMinutes = otpTtlInMillis / (1000 * 60);
-    sendEmail(user.getEmail(), templateId, new EmailVerificationData(user.getUsername(), otp, String.valueOf(durationInMinutes)));
+    EmailData data = new EmailData(templateId, user.getEmail(), "protu@gmail.com", user.getUsername(),
+        new EmailData.Otp(otp, String.valueOf(durationInMinutes)));
+
+    sendEmail(data);
   }
 
   @Async
-  public void sendEmail(String to, String templateId, Object data) {
-    RabbitMQMessage<Object> message = new RabbitMQMessage<>(
-        UUID.randomUUID().toString(), to, "protu@gmail.com",
-        new RabbitMQMessage.Template<>(templateId, data),
-        new RabbitMQMessage.MetaData("user-service", Timestamp.from(Instant.now())));
+  public void sendEmail(EmailData data) {
+    RabbitMessage<EmailData> message = new RabbitMessage<>("email-notification", "task", data);
     producer.send(message);
   }
 }

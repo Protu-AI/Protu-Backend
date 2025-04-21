@@ -1,10 +1,10 @@
 package org.protu.contentservice.track.dto;
 
-import org.protu.contentservice.course.Course;
+import org.protu.contentservice.course.dto.CourseSummaryResponse;
 
 import java.sql.Timestamp;
 import java.util.List;
 
 public record TrackResponse(Integer id, String name, String description,
-                            List<Course> courses, Timestamp createdAt, Timestamp updatedAt) {
+                            List<CourseSummaryResponse> courses, Timestamp createdAt, Timestamp updatedAt) {
 }

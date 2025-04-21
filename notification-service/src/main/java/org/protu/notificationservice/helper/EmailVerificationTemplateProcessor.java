@@ -1,7 +1,7 @@
 package org.protu.notificationservice.helper;
 
 import lombok.RequiredArgsConstructor;
-import org.protu.notificationservice.dto.RabbitMQMessage;
+import org.protu.notificationservice.dto.EmailData;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -16,12 +16,12 @@ public class EmailVerificationTemplateProcessor implements TemplateProcessor {
   private final TemplateEngine templateEngine;
 
   @Override
-  public Map<String, Object> getVariables(RabbitMQMessage message) {
+  public Map<String, Object> getVariables(EmailData emailData) {
     Map<String, Object> variables = new HashMap<>();
-    variables.put("username", message.template().data().username());
-    variables.put("otpTtl", message.template().data().otpTtl());
+    variables.put("username", emailData.username());
+    variables.put("otpTtl", emailData.otp().ttlInMinutes());
 
-    String otp = message.template().data().otp();
+    String otp = emailData.otp().value();
     for (int i = 0; i < otp.length(); i++) {
       variables.put("otp_" + (i + 1), otp.charAt(i));
     }

@@ -51,7 +51,7 @@ public class User {
   String roles;
 
   @Column(name = "is_active", nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
-  Boolean isActive = true;
+  Boolean isActive;
 
   @Column(name = "is_email_verified", nullable = false)
   Boolean isEmailVerified;
