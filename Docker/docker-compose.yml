@@ -78,14 +78,14 @@ services:
   gateway:
     container_name: gateway-container
     build:
-      context: ../gateway-service
+      context: ../gateway
       dockerfile: Dockerfile
     image: protu-ai/gateway:v1.0.0
     ports:
       - "80:80"
     depends_on:
-      - user-service
-      - chat-service
+      service-discovery:
+        condition: service_started
 
   notification-service:
     container_name: notification-service-container
