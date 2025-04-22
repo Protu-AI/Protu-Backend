@@ -1,0 +1,11 @@
+services:
+  code-execution-service:
+    container_name: code-execution-service-container
+    build:
+      context: ../code-execution-service
+      dockerfile: Dockerfile
+    image: protu-ai/code-execution-service:v1.0.0
+    ports:
+      - "8086:8086"
+    env_file:
+      - ./.env

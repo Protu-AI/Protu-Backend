@@ -1,0 +1,16 @@
+services:
+  notification-service:
+    container_name: notification-service-container
+    build:
+      context: ../notification-service
+      dockerfile: Dockerfile
+    image: protu-ai/notification-service:v1.0.0
+    ports:
+      - "8088:8088"
+    env_file:
+      - ./.env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - maven-repo:/root/.m2

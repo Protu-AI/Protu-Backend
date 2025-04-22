@@ -1,0 +1,40 @@
+services:
+  content-service:
+    container_name: content-service-container
+    build:
+      context: ../content-service
+      dockerfile: Dockerfile
+    image: protu-ai/content-service:v1.0.0
+    ports:
+      - "8087:8087"
+    env_file:
+      - ./.env
+    depends_on:
+      content-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - maven-repo:/root/.m2
+
+  content-db:
+    image: postgres:latest
+    container_name: content-db-container
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: content-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-content-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-content-data:
