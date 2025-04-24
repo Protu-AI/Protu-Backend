@@ -25,7 +25,7 @@ public class LessonService {
 
   public LessonResponse createLesson(LessonRequest lessonRequest) {
     lessonRepo.findLessonByName(lessonRequest.name()).ifPresent(lesson -> {
-      throw new EntityAlreadyExistsException(lessonRequest.name());
+      throw new EntityAlreadyExistsException("Lesson", lessonRequest.name());
     });
 
     Lesson lesson = lessonMapper.toLessonEntity(lessonRequest);

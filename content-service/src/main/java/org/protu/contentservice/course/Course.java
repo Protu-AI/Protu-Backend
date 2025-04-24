@@ -35,6 +35,9 @@ public class Course {
   @Column(name = "description", columnDefinition = "TEXT")
   String description;
 
+  @Column(name = "course_pic")
+  String coursePicURL;
+
   @OneToMany(mappedBy = "course", fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.MERGE})
   List<Lesson> lessons = new ArrayList<>();
 

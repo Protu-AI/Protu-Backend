@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties("app")
-public record AppProperties(Api api, JWT jwt, Rabbit rabbit) {
+public record AppProperties(Api api, JWT jwt, Rabbit rabbit, Cloudinary cloudinary) {
 
   public record Api(@NotBlank String version) {
   }
@@ -28,5 +28,11 @@ public record AppProperties(Api api, JWT jwt, Rabbit rabbit) {
         @NotBlank String userDeleted,
         @NotBlank String userPattern) {
     }
+  }
+
+  public record Cloudinary(
+      @NotBlank String cloudName,
+      @NotBlank String apiKey,
+      @NotBlank String apiSecret) {
   }
 }

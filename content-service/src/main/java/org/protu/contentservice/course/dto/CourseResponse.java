@@ -6,5 +6,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public record CourseResponse(Integer id, String name, String description,
-                             List<LessonSummary> lessons, Timestamp createdAt, Timestamp updatedAt) {
+                             String coursePicURL, List<LessonSummary> lessons,
+                             Timestamp createdAt, Timestamp updatedAt) {
 }
