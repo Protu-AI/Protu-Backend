@@ -11,11 +11,11 @@ import java.util.Map;
 @RestController
 public class FallbackController {
 
-  @RequestMapping("/fallback")
-  public ResponseEntity<Map<String, Object>> fallback() {
-    Map<String, Object> response = new HashMap<>();
-    response.put("error", "Not Found");
-    response.put("message", "The requested resource does not exist.");
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-  }
+    @RequestMapping("/fallback")
+    public ResponseEntity<Map<String, Object>> fallback() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", "Service Unavailable");
+        response.put("message", "The requested service is currently unavailable. Please try again later.");
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+    }
 }
