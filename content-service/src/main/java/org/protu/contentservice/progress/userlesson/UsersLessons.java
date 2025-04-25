@@ -29,6 +29,6 @@ public class UsersLessons {
   @JoinColumn(name = "lesson_id")
   private Lesson lesson;
 
-  @Column(name = "is_completed", nullable = false)
+  @Column(name = "is_completed", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
   private Boolean isCompleted = false;
 }

@@ -7,6 +7,7 @@ import org.protu.contentservice.course.CourseRepository;
 import org.protu.contentservice.lesson.Lesson;
 import org.protu.contentservice.lesson.LessonHelper;
 import org.protu.contentservice.lesson.LessonRepository;
+import org.protu.contentservice.lesson.dto.LessonsWithCompletion;
 import org.protu.contentservice.progress.dto.UserProgressInCourse;
 import org.protu.contentservice.progress.user.User;
 import org.protu.contentservice.progress.user.UserHelper;
@@ -18,6 +19,8 @@ import org.protu.contentservice.progress.userlesson.UserLessonRepository;
 import org.protu.contentservice.progress.userlesson.UsersLessons;
 import org.protu.contentservice.progress.userlesson.UsersLessonsPK;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +51,8 @@ public class ProgressService {
   }
 
   public UserProgressInCourse getUserProgressInCourse(Long userId, Integer courseId) {
+    userHelper.fetchUserByIdOrThrow(userId);
+    courseRepository.findById(courseId).orElseThrow(() -> new EntityNotFoundException("Course", courseId));
     int completedLessons = userCourseRepo.getCompletedLessonsByUserForCourse(userId, courseId);
     int totalNumberOfLessons = lessonRepo.findNumberOfLessonsForCourseWithId(courseId);
     return new UserProgressInCourse(courseId, completedLessons, totalNumberOfLessons);
@@ -101,5 +106,9 @@ public class ProgressService {
     UsersLessons userLesson = buildUserLessons(userId, lessonId);
     userLesson.setIsCompleted(false);
     userLessonRepository.save(userLesson);
+  }
+
+  public List<LessonsWithCompletion> getAllLessonsWithCompletionStatus(Long userId, Integer courseId) {
+    return lessonRepo.findLessonsWithCompletionStatus(userId, courseId);
   }
 }

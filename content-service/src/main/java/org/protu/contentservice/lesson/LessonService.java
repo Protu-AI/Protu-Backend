@@ -7,6 +7,7 @@ import org.protu.contentservice.course.CourseRepository;
 import org.protu.contentservice.course.CourseService;
 import org.protu.contentservice.lesson.dto.LessonRequest;
 import org.protu.contentservice.lesson.dto.LessonResponse;
+import org.protu.contentservice.lesson.dto.LessonSummary;
 import org.protu.contentservice.lesson.dto.LessonUpdateRequest;
 import org.springframework.stereotype.Service;
 
@@ -47,9 +48,8 @@ public class LessonService {
     return lessonMapper.toLessonDto(lesson);
   }
 
-  public List<LessonResponse> getAllLessonsForCourse(String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    return lessonMapper.toLessonDtoList(course.getLessons());
+  public List<LessonSummary> getAllLessonsForCourse(Integer courseId) {
+    return lessonRepo.findAllLessonsInCourse(courseId);
   }
 
   public void addExistingLessonToCourse(String courseName, String lessonName) {

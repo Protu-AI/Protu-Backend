@@ -34,6 +34,7 @@ public class SecurityConfig {
         .csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .authorizeHttpRequests(configurer -> configurer
+            .requestMatchers("/courses/{courseId}/lessons/progress").authenticated()
             .requestMatchers(HttpMethod.GET).permitAll()
             .anyRequest().authenticated()
         )
