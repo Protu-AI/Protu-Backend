@@ -15,6 +15,7 @@ public class FallbackConfig {
   public RouterFunction<ServerResponse> routerFunction(GatewayFallbackProvider fallbackProvider) {
     return RouterFunctions.route(RequestPredicates.path("/fallback/user-service"), fallbackProvider)
         .andRoute(RequestPredicates.path("/fallback/chat-service"), fallbackProvider)
-        .andRoute(RequestPredicates.path("/fallback/code-execution-service"), fallbackProvider);
+        .andRoute(RequestPredicates.path("/fallback/code-execution-service"), fallbackProvider)
+        .andRoute(RequestPredicates.path("/fallback/content-service"), fallbackProvider);
   }
 }
