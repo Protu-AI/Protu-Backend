@@ -1,19 +1,11 @@
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
 const morgan = require('morgan');
 const { globalErrorHandler } = require('./utils/errorHandler');
 const { NotFoundError } = require('./utils/errorTypes');
 
 const app = express();
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-};
 
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
