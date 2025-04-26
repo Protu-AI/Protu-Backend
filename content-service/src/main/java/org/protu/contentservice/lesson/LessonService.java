@@ -48,8 +48,9 @@ public class LessonService {
     return lessonMapper.toLessonDto(lesson);
   }
 
-  public List<LessonSummary> getAllLessonsForCourse(Integer courseId) {
-    return lessonRepo.findAllLessonsInCourse(courseId);
+  public List<LessonSummary> getAllLessonsForCourse(String courseName) {
+    Course course = courseService.fetchCourseByNameOrThrow(courseName);
+    return lessonRepo.findAllLessonsInCourse(course.getId());
   }
 
   public void addExistingLessonToCourse(String courseName, String lessonName) {

@@ -55,20 +55,20 @@ public class LessonController {
     return buildApiResponse(SuccessMessage.UPDATE_ENTITY.getMessage("Lesson"), lesson, null, HttpStatus.OK, apiVersion, request);
   }
 
-  @GetMapping("/courses/{courseId}/lessons")
-  public ResponseEntity<ApiResponse<List<LessonSummary>>> getAllLessonsForCourse(@PathVariable Integer courseId, HttpServletRequest request) {
-    List<LessonSummary> lessons = lessonService.getAllLessonsForCourse(courseId);
+  @GetMapping("/courses/{courseName}/lessons")
+  public ResponseEntity<ApiResponse<List<LessonSummary>>> getAllLessonsForCourse(@PathVariable String courseName, HttpServletRequest request) {
+    List<LessonSummary> lessons = lessonService.getAllLessonsForCourse(courseName);
     return buildApiResponse(SuccessMessage.GET_ALL_ENTITIES.getMessage("Lessons"), lessons, null, HttpStatus.OK, apiVersion, request);
   }
 
-  @GetMapping("/courses/{courseId}/lessons/progress")
+  @GetMapping("/courses/{courseName}/lessons/progress")
   public ResponseEntity<ApiResponse<List<LessonsWithCompletion>>> getAllLessonsWithCompletionStatus(
-      @PathVariable Integer courseId,
+      @PathVariable String courseName,
       @RequestHeader("Authorization") String bearer,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearer);
-    List<LessonsWithCompletion> lessons = progressService.getAllLessonsWithCompletionStatus(userId, courseId);
+    List<LessonsWithCompletion> lessons = progressService.getAllLessonsWithCompletionStatus(userId, courseName);
     return buildApiResponse(SuccessMessage.GET_ALL_ENTITIES.getMessage("Lessons"), lessons, null, HttpStatus.OK, apiVersion, request);
   }
 

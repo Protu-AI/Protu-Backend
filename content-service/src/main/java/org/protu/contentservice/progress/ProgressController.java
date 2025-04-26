@@ -31,62 +31,62 @@ public class ProgressController {
     return jwtHelper.extractUserId(token);
   }
 
-  @GetMapping("/courses/{courseId}")
+  @GetMapping("/courses/{courseName}")
   public ResponseEntity<ApiResponse<UserProgressInCourse>> getUserProgressInCourse(
-      @PathVariable Integer courseId,
+      @PathVariable String courseName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    UserProgressInCourse userProgressInCourse = progressService.getUserProgressInCourse(userId, courseId);
+    UserProgressInCourse userProgressInCourse = progressService.getUserProgressInCourse(userId, courseName);
     return buildApiResponse(SuccessMessage.GET_USER_PROGRESS_IN_COURSE.message, userProgressInCourse, null, HttpStatus.OK, apiVersion, request);
   }
 
-  @PostMapping("/courses/{courseId}/enrollments")
+  @PostMapping("/courses/{courseName}/enrollments")
   public ResponseEntity<ApiResponse<Void>> enrollUserInACourse(
-      @PathVariable Integer courseId,
+      @PathVariable String courseName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.enrollUserInCourse(userId, courseId);
+    progressService.enrollUserInCourse(userId, courseName);
     return buildApiResponse(SuccessMessage.USER_ENROLLED_IN_COURSE.message, null, null, HttpStatus.CREATED, apiVersion, request);
   }
 
-  @DeleteMapping("/courses/{courseId}/enrollments")
+  @DeleteMapping("/courses/{courseName}/enrollments")
   public ResponseEntity<ApiResponse<Void>> cancelUserEnrollmentInCourse(
-      @PathVariable Integer courseId,
+      @PathVariable String courseName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.cancelUserEnrollmentInCourse(userId, courseId);
+    progressService.cancelUserEnrollmentInCourse(userId, courseName);
     return buildApiResponse(SuccessMessage.USER_CANCELLED_ENROLLMENT_IN_COURSE.message, null, null, HttpStatus.OK, apiVersion, request);
   }
 
-  @PostMapping("/courses/{courseId}/lessons/{lessonId}/completed")
+  @PostMapping("/courses/{courseName}/lessons/{lessonName}/completed")
   public ResponseEntity<ApiResponse<Void>> markLessonCompleted(
-      @PathVariable Integer courseId,
-      @PathVariable Integer lessonId,
+      @PathVariable String courseName,
+      @PathVariable String lessonName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.markLessonCompleted(userId, lessonId);
-    progressService.incrementCompletedLessonsForUser(userId, courseId);
+    progressService.markLessonCompleted(userId, lessonName);
+    progressService.incrementCompletedLessonsForUser(userId, courseName);
     return buildApiResponse(SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message, null, null, HttpStatus.OK, apiVersion, request);
   }
 
-  @DeleteMapping("/courses/{courseId}/lessons/{lessonId}/completed")
+  @DeleteMapping("/courses/{courseName}/lessons/{lessonName}/completed")
   public ResponseEntity<ApiResponse<Void>> markLessonNotCompleted(
-      @PathVariable Integer courseId,
-      @PathVariable Integer lessonId,
+      @PathVariable String courseName,
+      @PathVariable String lessonName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.markLessonNotCompleted(userId, lessonId);
-    progressService.decrementCompletedLessonsForUser(userId, courseId);
+    progressService.markLessonNotCompleted(userId, lessonName);
+    progressService.decrementCompletedLessonsForUser(userId, courseName);
     return buildApiResponse(SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message, null, null, HttpStatus.OK, apiVersion, request);
   }
 }
