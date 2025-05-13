@@ -15,20 +15,19 @@ app:
       user-pattern: user.*
 
 server.port: 8087
+logging.level:
+  org.springframework:
+    jdbc: INFO
+    security: INFO
 
 spring:
   profiles.active: local
   application.name: content-service
   main.banner-mode: off
 
-  jpa:
-    open-in-view: false
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
-    hibernate:
-      ddl-auto: update
+  sql.init:
+    mode: never
+    schema-locations: classpath:schema.sql
 
   rabbitmq.listener.simple:
     retry:

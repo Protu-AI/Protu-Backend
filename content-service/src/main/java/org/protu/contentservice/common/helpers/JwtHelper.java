@@ -1,14 +1,16 @@
 package org.protu.contentservice.common.helpers;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class JwtHelper {
   private final JwtDecoder jwtDecoder;
+
+  public JwtHelper(JwtDecoder jwtDecoder) {
+    this.jwtDecoder = jwtDecoder;
+  }
 
   private <T> T extractClaim(String token, String claim) {
     Jwt jwt = jwtDecoder.decode(token);

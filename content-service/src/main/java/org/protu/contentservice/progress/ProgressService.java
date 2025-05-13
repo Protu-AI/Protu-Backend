@@ -1,142 +1,125 @@
 package org.protu.contentservice.progress;
 
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.course.Course;
 import org.protu.contentservice.course.CourseService;
+import org.protu.contentservice.course.CourseWithLessons;
 import org.protu.contentservice.lesson.Lesson;
-import org.protu.contentservice.lesson.LessonHelper;
-import org.protu.contentservice.lesson.LessonRepository;
-import org.protu.contentservice.lesson.dto.LessonsWithCompletion;
+import org.protu.contentservice.lesson.LessonService;
 import org.protu.contentservice.progress.dto.UserProgressInCourse;
-import org.protu.contentservice.progress.user.User;
-import org.protu.contentservice.progress.user.UserHelper;
-import org.protu.contentservice.progress.usercourse.UserCourseRepository;
-import org.protu.contentservice.progress.usercourse.UserNotEnrolledInCourseException;
-import org.protu.contentservice.progress.usercourse.UsersCourses;
-import org.protu.contentservice.progress.usercourse.UsersCoursesPK;
-import org.protu.contentservice.progress.userlesson.UserLessonRepository;
-import org.protu.contentservice.progress.userlesson.UsersLessons;
-import org.protu.contentservice.progress.userlesson.UsersLessonsPK;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ProgressService {
 
-  private final UserCourseRepository userCourseRepo;
-  private final LessonRepository lessonRepo;
   private final CourseService courseService;
-  private final UserLessonRepository userLessonRepository;
-  private final UserHelper userHelper;
-  private final LessonHelper lessonHelper;
+  private final LessonService lessonService;
+  private final UserReplicaService userReplicaService;
+  private final JdbcClient jdbcClient;
 
-  private UsersLessons buildUserLessons(Long userId, String lessonName) {
-    User user = userHelper.fetchUserByIdOrThrow(userId);
-    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
+  public ProgressService(CourseService courseService, LessonService lessonService, UserReplicaService userReplicaService, JdbcClient jdbcClient) {
+    this.courseService = courseService;
+    this.lessonService = lessonService;
+    this.userReplicaService = userReplicaService;
+    this.jdbcClient = jdbcClient;
+  }
 
-    UsersLessonsPK pk = new UsersLessonsPK(userId, lesson.getId());
-    return userLessonRepository.findById(pk)
-        .orElseGet(() -> UsersLessons.builder()
-            .id(pk)
-            .user(user)
-            .lesson(lesson)
-            .isCompleted(false).build());
+  private int getTotalNumberOfLessonsInCourse(Integer courseId) {
+    Optional<Integer> countOpt = jdbcClient.sql("SELECT COUNT(*) FROM courses_lessons AS cl WHERE cl.course_id = :courseId")
+        .param("courseId", courseId)
+        .query(Integer.class)
+        .optional();
+
+    return countOpt.orElseThrow(() -> new RuntimeException("No lessons found for this course"));
+  }
+
+  private int getTotalNumberOfCompletedLessonsInCourse(Long userId, Integer courseId) {
+    Optional<Integer> countOpt = jdbcClient.sql("SELECT completed_lessons FROM users_courses WHERE user_id = :userId AND course_id = :courseId")
+        .param("userId", userId)
+        .param("courseId", courseId)
+        .query(Integer.class)
+        .optional();
+
+    return countOpt.orElseThrow(() -> new RuntimeException("This course is not enrolled for this user"));
   }
 
   public UserProgressInCourse getUserProgressInCourse(Long userId, String courseName) {
-    userHelper.checkIfUserExistsOrThrow(userId);
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
+    userReplicaService.getUserById(userId);
+    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
 
-    int completedLessons = userCourseRepo.getCompletedLessonsByUserForCourse(userId, course.getId());
-    int totalNumberOfLessons = lessonRepo.findNumberOfLessonsForCourseWithId(course.getId());
-    return new UserProgressInCourse(course.getId(), completedLessons, totalNumberOfLessons);
+    int completedLessons = getTotalNumberOfCompletedLessonsInCourse(userId, course.id());
+    int totalLessons = getTotalNumberOfLessonsInCourse(course.id());
+    return new UserProgressInCourse(course.id(), completedLessons, totalLessons);
   }
 
-  @Transactional
   public void enrollUserInCourse(Long userId, String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    User user = userHelper.fetchUserByIdOrThrow(userId);
+    userReplicaService.getUserById(userId);
+    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
 
-    UsersCoursesPK pk = new UsersCoursesPK(userId, course.getId());
-    if (!userCourseRepo.existsById(pk)) {
-      UsersCourses usersCourses = UsersCourses.builder()
-          .id(pk)
-          .completedLessons(0)
-          .user(user)
-          .course(course).build();
-      userCourseRepo.save(usersCourses);
-    }
+    jdbcClient.sql("INSERT INTO users_courses (user_id, course_id, completed_lessons) VALUES (:userId, :courseId, 0)")
+        .param("userId", userId)
+        .param("courseId", course.id())
+        .update();
   }
 
-  @Transactional
   public void cancelUserEnrollmentInCourse(Long userId, String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    userHelper.checkIfUserExistsOrThrow(userId);
+    userReplicaService.getUserById(userId);
+    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
 
-    Optional<UsersCourses> usersCoursesOpt = userCourseRepo.findById(new UsersCoursesPK(userId, course.getId()));
-    if (usersCoursesOpt.isEmpty())
-      return;
-    
-    usersCoursesOpt.get().setCompletedLessons(0);
-    userCourseRepo.save(usersCoursesOpt.get());
+    jdbcClient.sql("DELETE FROM users_courses WHERE user_id = :userId AND course_id = :courseId")
+        .param("userId", userId)
+        .param("courseId", course.id())
+        .update();
   }
 
-  @Transactional
   public void incrementCompletedLessonsForUser(Long userId, String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    User user = userHelper.fetchUserByIdOrThrow(userId);
+    userReplicaService.getUserById(userId);
+    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
 
-    UsersCoursesPK pk = new UsersCoursesPK(userId, course.getId());
-    UsersCourses usersCourses = userCourseRepo.findById(pk)
-        .orElseGet(() -> UsersCourses.builder()
-            .id(pk)
-            .completedLessons(0)
-            .user(user)
-            .course(course).build());
+    int totalNumberOfLessons = getTotalNumberOfLessonsInCourse(course.id());
+    int totalNumberOfCompletedLessons = getTotalNumberOfCompletedLessonsInCourse(userId, course.id());
 
-    int totalNumberOfLessons = lessonRepo.findNumberOfLessonsForCourseWithId(course.getId());
-    if (usersCourses.getCompletedLessons() < totalNumberOfLessons) {
-      usersCourses.setCompletedLessons(usersCourses.getCompletedLessons() + 1);
-      userCourseRepo.save(usersCourses);
+    if (totalNumberOfCompletedLessons < totalNumberOfLessons) {
+      jdbcClient.sql("UPDATE users_courses SET completed_lessons = completed_lessons + 1 WHERE user_id = :userId AND course_id = :courseId")
+          .param("userId", userId)
+          .param("courseId", course.id())
+          .update();
     }
   }
 
-  @Transactional
   public void decrementCompletedLessonsForUser(Long userId, String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    userHelper.checkIfUserExistsOrThrow(userId);
+    userReplicaService.getUserById(userId);
+    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
 
-    UsersCoursesPK pk = new UsersCoursesPK(userId, course.getId());
-    UsersCourses usersCourses = userCourseRepo.findById(pk)
-        .orElseThrow(UserNotEnrolledInCourseException::new);
-
-    if (usersCourses.getCompletedLessons() == 0) {
-      return;
+    int totalNumberOfCompletedLessons = getTotalNumberOfCompletedLessonsInCourse(userId, course.id());
+    if (totalNumberOfCompletedLessons > 0) {
+      jdbcClient.sql("UPDATE users_courses SET completed_lessons = completed_lessons - 1 WHERE user_id = :userId AND course_id = :courseId")
+          .param("userId", userId)
+          .param("courseId", course.id())
+          .update();
     }
-    usersCourses.setCompletedLessons(usersCourses.getCompletedLessons() - 1);
-    userCourseRepo.save(usersCourses);
   }
 
-  @Transactional
   public void markLessonCompleted(Long userId, String lessonName) {
-    UsersLessons userLesson = buildUserLessons(userId, lessonName);
-    userLesson.setIsCompleted(true);
-    userLessonRepository.save(userLesson);
+    userReplicaService.getUserById(userId);
+    Lesson lesson = lessonService.getLessonByName(lessonName);
+
+    jdbcClient.sql("INSERT INTO users_lessons (user_id, lesson_id, is_completed) VALUES (:userId, :lessonId, :isCompleted) ON CONFLICT (user_id, lesson_id) DO UPDATE SET is_completed = EXCLUDED.is_completed;")
+        .param("userId", userId)
+        .param("lessonId", lesson.id())
+        .param("isCompleted", true)
+        .update();
   }
 
-  @Transactional
   public void markLessonNotCompleted(Long userId, String lessonName) {
-    UsersLessons userLesson = buildUserLessons(userId, lessonName);
-    userLesson.setIsCompleted(false);
-    userLessonRepository.save(userLesson);
-  }
+    userReplicaService.getUserById(userId);
+    Lesson lesson = lessonService.getLessonByName(lessonName);
 
-  public List<LessonsWithCompletion> getAllLessonsWithCompletionStatus(Long userId, String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    return lessonRepo.findLessonsWithCompletionStatus(userId, course.getId());
+    jdbcClient.sql("INSERT INTO users_lessons (user_id, lesson_id, is_completed) VALUES (:userId, :lessonId, :isCompleted) ON CONFLICT (user_id, lesson_id) DO UPDATE SET is_completed = EXCLUDED.is_completed;")
+        .param("userId", userId)
+        .param("lessonId", lesson.id())
+        .param("isCompleted", false)
+        .update();
   }
 }

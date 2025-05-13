@@ -1,16 +1,16 @@
 package org.protu.contentservice.progress;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.protu.contentservice.common.enums.SuccessMessage;
 import org.protu.contentservice.common.helpers.JwtHelper;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
 import org.protu.contentservice.progress.dto.UserProgressInCourse;
-import org.protu.contentservice.progress.enums.SuccessMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static org.protu.contentservice.common.response.ApiResponseBuilder.buildApiResponse;
+import static org.protu.contentservice.common.response.ApiResponseBuilder.buildSuccessApiResponse;
 
 @RestController
 @RequestMapping("/api/${app.api.version}/progress")
@@ -39,7 +39,8 @@ public class ProgressController {
 
     Long userId = getUserIdFromBearer(bearerToken);
     UserProgressInCourse userProgressInCourse = progressService.getUserProgressInCourse(userId, courseName);
-    return buildApiResponse(SuccessMessage.GET_USER_PROGRESS_IN_COURSE.message, userProgressInCourse, null, HttpStatus.OK, apiVersion, request);
+    final String message = SuccessMessage.GET_USER_PROGRESS_IN_COURSE.message;
+    return buildSuccessApiResponse(message, userProgressInCourse, HttpStatus.OK, apiVersion, request);
   }
 
   @PostMapping("/courses/{courseName}/enrollments")
@@ -50,7 +51,8 @@ public class ProgressController {
 
     Long userId = getUserIdFromBearer(bearerToken);
     progressService.enrollUserInCourse(userId, courseName);
-    return buildApiResponse(SuccessMessage.USER_ENROLLED_IN_COURSE.message, null, null, HttpStatus.CREATED, apiVersion, request);
+    final String message = SuccessMessage.USER_ENROLLED_IN_COURSE.message;
+    return buildSuccessApiResponse(message, null, HttpStatus.CREATED, apiVersion, request);
   }
 
   @DeleteMapping("/courses/{courseName}/enrollments")
@@ -61,7 +63,8 @@ public class ProgressController {
 
     Long userId = getUserIdFromBearer(bearerToken);
     progressService.cancelUserEnrollmentInCourse(userId, courseName);
-    return buildApiResponse(SuccessMessage.USER_CANCELLED_ENROLLMENT_IN_COURSE.message, null, null, HttpStatus.OK, apiVersion, request);
+    final String message = SuccessMessage.USER_CANCELLED_ENROLLMENT_IN_COURSE.message;
+    return buildSuccessApiResponse(message, null, HttpStatus.OK, apiVersion, request);
   }
 
   @PostMapping("/courses/{courseName}/lessons/{lessonName}/completed")
@@ -74,7 +77,8 @@ public class ProgressController {
     Long userId = getUserIdFromBearer(bearerToken);
     progressService.markLessonCompleted(userId, lessonName);
     progressService.incrementCompletedLessonsForUser(userId, courseName);
-    return buildApiResponse(SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message, null, null, HttpStatus.OK, apiVersion, request);
+    final String message = SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message;
+    return buildSuccessApiResponse(message, null, HttpStatus.OK, apiVersion, request);
   }
 
   @DeleteMapping("/courses/{courseName}/lessons/{lessonName}/completed")
@@ -87,6 +91,7 @@ public class ProgressController {
     Long userId = getUserIdFromBearer(bearerToken);
     progressService.markLessonNotCompleted(userId, lessonName);
     progressService.decrementCompletedLessonsForUser(userId, courseName);
-    return buildApiResponse(SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message, null, null, HttpStatus.OK, apiVersion, request);
+    final String message = SuccessMessage.USER_UNCOMPLETED_A_COURSE_LESSON.message;
+    return buildSuccessApiResponse(message, null, HttpStatus.OK, apiVersion, request);
   }
 }

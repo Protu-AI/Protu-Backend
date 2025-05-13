@@ -1,6 +1,5 @@
 package org.protu.contentservice.common.config;
 
-import lombok.RequiredArgsConstructor;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -10,10 +9,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@RequiredArgsConstructor
 public class RabbitConfig {
 
   private final AppProperties props;
+
+  public RabbitConfig(AppProperties props) {
+    this.props = props;
+  }
 
   @Bean
   public TopicExchange userEventsTopic() {

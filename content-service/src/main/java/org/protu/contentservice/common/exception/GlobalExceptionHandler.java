@@ -6,7 +6,6 @@ import org.protu.contentservice.common.exception.custom.EntityNotFoundException;
 import org.protu.contentservice.common.exception.custom.UserNotFoundException;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
-import org.protu.contentservice.common.response.ApiResponseBuilder;
 import org.protu.contentservice.common.response.ErrorDetails;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.protu.contentservice.common.response.ApiResponseBuilder.buildFailureApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler({EntityAlreadyExistsException.class, EntityNotFoundException.class})
   public ResponseEntity<ApiResponse<Object>> handleEntityExceptions(RuntimeException e, HttpServletRequest request) {
     List<ErrorDetails> errors = List.of(buildErrorDetails(HttpStatus.CONFLICT.value(), e.getMessage()));
-    return ApiResponseBuilder.buildApiResponse("Entity conflict error", null, errors, HttpStatus.CONFLICT, apiVersion, request);
+    return buildFailureApiResponse("Entity conflict error", errors, HttpStatus.CONFLICT, apiVersion, request);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -41,24 +42,24 @@ public class GlobalExceptionHandler {
     List<ErrorDetails> errors = ex.getBindingResult().getAllErrors().stream()
         .map(error -> buildErrorDetails(HttpStatus.BAD_REQUEST.value(), error.getDefaultMessage()))
         .collect(Collectors.toList());
-    return ApiResponseBuilder.buildApiResponse("Validation failed", null, errors, HttpStatus.BAD_REQUEST, apiVersion, request);
+    return buildFailureApiResponse("Validation failed", errors, HttpStatus.BAD_REQUEST, apiVersion, request);
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleDataIntegrityViolationException(HttpServletRequest request) {
     List<ErrorDetails> errors = List.of(buildErrorDetails(HttpStatus.CONFLICT.value(), "An error occurred while processing your request. Please try again later."));
-    return ApiResponseBuilder.buildApiResponse("Data integrity issue", null, errors, HttpStatus.CONFLICT, apiVersion, request);
+    return buildFailureApiResponse("Data integrity issue", errors, HttpStatus.CONFLICT, apiVersion, request);
   }
 
   @ExceptionHandler(UserNotFoundException.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleUserNotFoundException(UserNotFoundException e, HttpServletRequest request) {
     List<ErrorDetails> errors = List.of(buildErrorDetails(HttpStatus.NOT_FOUND.value(), e.getMessage()));
-    return ApiResponseBuilder.buildApiResponse("User Not Found", null, errors, HttpStatus.NOT_FOUND, apiVersion, request);
+    return buildFailureApiResponse("User Not Found", errors, HttpStatus.NOT_FOUND, apiVersion, request);
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse<ErrorDetails>> handleException(Exception e, HttpServletRequest request) {
     List<ErrorDetails> errors = List.of(buildErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
-    return ApiResponseBuilder.buildApiResponse("Internal server error", null, errors, HttpStatus.INTERNAL_SERVER_ERROR, apiVersion, request);
+    return buildFailureApiResponse("Internal server error", errors, HttpStatus.INTERNAL_SERVER_ERROR, apiVersion, request);
   }
 }

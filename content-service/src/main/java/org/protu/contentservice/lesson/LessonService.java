@@ -1,74 +1,50 @@
 package org.protu.contentservice.lesson;
 
-import lombok.RequiredArgsConstructor;
-import org.protu.contentservice.common.exception.custom.EntityAlreadyExistsException;
-import org.protu.contentservice.course.Course;
-import org.protu.contentservice.course.CourseRepository;
-import org.protu.contentservice.course.CourseService;
 import org.protu.contentservice.lesson.dto.LessonRequest;
-import org.protu.contentservice.lesson.dto.LessonResponse;
-import org.protu.contentservice.lesson.dto.LessonSummary;
 import org.protu.contentservice.lesson.dto.LessonUpdateRequest;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class LessonService {
 
-  private final CourseService courseService;
-  private final CourseRepository courseRepo;
-  private final LessonRepository lessonRepo;
-  private final LessonHelper lessonHelper;
-  private final LessonMapper lessonMapper;
+  private final JdbcClient jdbcClient;
 
-  public LessonResponse createLesson(LessonRequest lessonRequest) {
-    lessonRepo.findLessonByName(lessonRequest.name()).ifPresent(lesson -> {
-      throw new EntityAlreadyExistsException("Lesson", lessonRequest.name());
-    });
-
-    Lesson lesson = lessonMapper.toLessonEntity(lessonRequest);
-    lessonRepo.save(lesson);
-    return lessonMapper.toLessonDto(lesson);
+  public LessonService(JdbcClient jdbcClient) {
+    this.jdbcClient = jdbcClient;
   }
 
-  public LessonResponse getLessonByName(String lessonName) {
-    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
-    return lessonMapper.toLessonDto(lesson);
+  public void createLesson(LessonRequest lessonRequest) {
+    jdbcClient.sql("INSERT INTO lessons (name, content, lesson_order) VALUES (:name, :content, :lessonOrder) ON CONFLICT (name) DO NOTHING")
+        .param("name", lessonRequest.name())
+        .param("content", lessonRequest.content())
+        .param("lessonOrder", lessonRequest.lessonOrder())
+        .update();
   }
 
-  public LessonResponse updateLesson(String lessonName, LessonUpdateRequest lessonRequest) {
-    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
-    Optional.ofNullable(lessonRequest.name()).ifPresent(lesson::setName);
-    Optional.ofNullable(lessonRequest.content()).ifPresent(lesson::setContent);
-    Optional.ofNullable(lessonRequest.lessonOrder()).ifPresent(lesson::setLessonOrder);
-    lessonRepo.save(lesson);
-    return lessonMapper.toLessonDto(lesson);
+  public Lesson getLessonByName(String lessonName) {
+    Optional<Lesson> lessonOpt = jdbcClient.sql("SELECT id, name, content, lesson_order AS lessonOrder FROM lessons WHERE name = :name")
+        .param("name", lessonName)
+        .query(Lesson.class)
+        .optional();
+
+    return lessonOpt.orElseThrow(() -> new RuntimeException("Lesson does not exist"));
   }
 
-  public List<LessonSummary> getAllLessonsForCourse(String courseName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    return lessonRepo.findAllLessonsInCourse(course.getId());
+  public void updateLesson(String lessonName, LessonUpdateRequest lessonRequest) {
+    jdbcClient.sql("UPDATE lessons SET name = :newName, content = :content, lesson_order = :lessonOrder WHERE name = :name ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name, content = EXCLUDED.content, lesson_order = EXCLUDED.lesson_order;")
+        .param("newName", lessonRequest.name())
+        .param("content", lessonRequest.content())
+        .param("lessonOrder", lessonRequest.lessonOrder())
+        .param("name", lessonName)
+        .update();
   }
 
-  public void addExistingLessonToCourse(String courseName, String lessonName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
-    lesson.setCourse(course);
-    course.getLessons().add(lesson);
-    courseRepo.save(course);
-  }
-
-  public void deleteLessonFromCourse(String courseName, String lessonName) {
-    Course course = courseService.fetchCourseByNameOrThrow(courseName);
-    Lesson lesson = lessonHelper.fetchLessonByNameOrThrow(lessonName);
-    if (course.getLessons().remove(lesson)) {
-      lesson.setCourse(null);
-    }
-
-    courseRepo.save(course);
-    lessonRepo.save(lesson);
+  public void deleteLesson(String lessonName) {
+    jdbcClient.sql("DELETE FROM lessons WHERE name = :lessonName")
+        .param("lessonName", lessonName)
+        .update();
   }
 }

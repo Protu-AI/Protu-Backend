@@ -1,6 +1,5 @@
 package org.protu.contentservice.common.config;
 
-import lombok.RequiredArgsConstructor;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,10 +17,13 @@ import java.nio.charset.StandardCharsets;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
   private final AppProperties properties;
+
+  public SecurityConfig(AppProperties properties) {
+    this.properties = properties;
+  }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

@@ -1,4 +1,4 @@
-package org.protu.contentservice.progress.user;
+package org.protu.contentservice.progress;
 
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.rabbit.RabbitMessage;
