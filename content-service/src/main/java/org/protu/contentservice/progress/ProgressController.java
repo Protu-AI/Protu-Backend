@@ -5,7 +5,6 @@ import org.protu.contentservice.common.enums.SuccessMessage;
 import org.protu.contentservice.common.helpers.JwtHelper;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
-import org.protu.contentservice.progress.dto.UserProgressInCourse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,15 +31,15 @@ public class ProgressController {
   }
 
   @GetMapping("/courses/{courseName}")
-  public ResponseEntity<ApiResponse<UserProgressInCourse>> getUserProgressInCourse(
+  public ResponseEntity<ApiResponse<UserCourseProgress>> getUserProgressInCourse(
       @PathVariable String courseName,
       @RequestHeader("Authorization") String bearerToken,
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    UserProgressInCourse userProgressInCourse = progressService.getUserProgressInCourse(userId, courseName);
+    UserCourseProgress userCourseProgress = progressService.getUserProgressInCourse(userId, courseName);
     final String message = SuccessMessage.GET_USER_PROGRESS_IN_COURSE.message;
-    return buildSuccessApiResponse(message, userProgressInCourse, HttpStatus.OK, apiVersion, request);
+    return buildSuccessApiResponse(message, userCourseProgress, HttpStatus.OK, apiVersion, request);
   }
 
   @PostMapping("/courses/{courseName}/enrollments")
@@ -75,8 +74,7 @@ public class ProgressController {
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.markLessonCompleted(userId, lessonName);
-    progressService.incrementCompletedLessonsForUser(userId, courseName);
+    progressService.incrementCompletedLessonsByUser(userId, courseName, lessonName);
     final String message = SuccessMessage.USER_COMPLETED_A_COURSE_LESSON.message;
     return buildSuccessApiResponse(message, null, HttpStatus.OK, apiVersion, request);
   }
@@ -89,8 +87,7 @@ public class ProgressController {
       HttpServletRequest request) {
 
     Long userId = getUserIdFromBearer(bearerToken);
-    progressService.markLessonNotCompleted(userId, lessonName);
-    progressService.decrementCompletedLessonsForUser(userId, courseName);
+    progressService.decrementCompletedLessonsByUser(userId, courseName, lessonName);
     final String message = SuccessMessage.USER_UNCOMPLETED_A_COURSE_LESSON.message;
     return buildSuccessApiResponse(message, null, HttpStatus.OK, apiVersion, request);
   }

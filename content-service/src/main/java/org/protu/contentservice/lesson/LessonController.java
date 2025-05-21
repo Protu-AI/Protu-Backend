@@ -7,6 +7,7 @@ import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
 import org.protu.contentservice.lesson.dto.LessonRequest;
 import org.protu.contentservice.lesson.dto.LessonUpdateRequest;
+import org.protu.contentservice.lesson.dto.LessonWithContent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -44,11 +45,11 @@ public class LessonController {
   }
 
   @GetMapping("/{lessonName}")
-  public ResponseEntity<ApiResponse<Lesson>> getSingleLesson(
+  public ResponseEntity<ApiResponse<LessonWithContent>> getSingleLesson(
       @PathVariable String lessonName,
       HttpServletRequest request) {
 
-    Lesson lesson = lessonService.getLessonByName(lessonName);
+    LessonWithContent lesson = lessonService.findByName(lessonName);
     final String message = SuccessMessage.GET_SINGLE_ENTITY.getMessage("Lesson");
     return buildSuccessApiResponse(message, lesson, HttpStatus.OK, apiVersion, request);
   }

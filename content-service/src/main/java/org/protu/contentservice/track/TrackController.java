@@ -5,6 +5,7 @@ import org.protu.contentservice.common.enums.SuccessMessage;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
 import org.protu.contentservice.course.Course;
+import org.protu.contentservice.course.CourseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -71,11 +72,11 @@ public class TrackController {
   }
 
   @GetMapping("/{trackName}/courses")
-  public ResponseEntity<ApiResponse<List<Course>>> getAllCoursesForTrack(
+  public ResponseEntity<ApiResponse<List<CourseDto>>> getAllCoursesForTrack(
       @PathVariable String trackName,
       HttpServletRequest request) {
 
-    List<Course> courses = trackService.getAllCoursesForTrack(trackName);
+    List<CourseDto> courses = trackService.getAllCoursesForTrack(trackName);
     final String message = SuccessMessage.GET_ALL_ENTITIES.getMessage("Courses");
     return buildSuccessApiResponse(message, courses, HttpStatus.OK, apiVersion, request);
   }

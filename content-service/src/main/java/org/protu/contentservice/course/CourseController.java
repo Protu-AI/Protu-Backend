@@ -60,7 +60,7 @@ public class CourseController {
       @PathVariable String courseName,
       HttpServletRequest request) {
 
-    CourseWithLessons course = courseService.getCourseByNameOrThrow(courseName);
+    CourseWithLessons course = courseService.getCourseWithLessonsByName(courseName);
     final String message = SuccessMessage.GET_SINGLE_ENTITY.getMessage("Course");
     return buildSuccessApiResponse(message, course, HttpStatus.OK, apiVersion, request);
   }
