@@ -44,6 +44,11 @@ const createMessage = asyncWrapper(async (req, res) => {
       'model',
       aiResponse.answer
     );
+    // const aiMessage = await messageService.createMessage(
+    //   chatId,
+    //   'model',
+    //   'No response from AI'
+    // );
 
     res.status(201).json(
       buildResponse(

@@ -18,17 +18,7 @@ enum MessageSenderRole {
 model User {
   id              Int      @id @default(autoincrement())
   publicId        String   @unique @db.Char(26) @map("public_id")
-  firstName       String   @map("first_name") @db.VarChar(50)
-  lastName        String   @map("last_name") @db.VarChar(50)
-  username        String   @unique @db.VarChar(50)
-  email           String   @unique @db.VarChar(100)
-  password        String   @db.VarChar(100)
-  phoneNumber     String   @map("phone_number") @db.VarChar(20)
-  authorities     String   @db.Text
-  isActive       Boolean  @default(true) @map("is_active")
-  isEmailVerified Boolean  @default(false) @map("is_email_verified")
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
-  updatedAt      DateTime @default(now()) @map("updated_at") @db.Timestamptz()
+  roles            String  @db.Text @map("roles")
   chats          Chat[]
 
   @@map("users")

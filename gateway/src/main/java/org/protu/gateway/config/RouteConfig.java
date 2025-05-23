@@ -27,6 +27,7 @@ public class RouteConfig {
     boolean chatServiceAvailable = services.contains("CHAT-SERVICE");
     boolean codeExecutionServiceAvailable = services.contains("CODE-EXECUTION-SERVICE");
     boolean contentServiceAvailable = services.contains("CONTENT-SERVICE");
+    boolean quizServiceAvailable = services.contains("QUIZ-SERVICE");
     
     return builder.routes()
         // User Service Routes - use dynamic routing only if service is available
@@ -52,6 +53,12 @@ public class RouteConfig {
             .path("/api/v1/tracks/**", "/api/v1/lessons/**", "/api/v1/courses/**", "/api/v1/progress/**")
             .uri(contentServiceAvailable ? "lb://CONTENT-SERVICE" : 
                  env.getProperty("spring.cloud.gateway.routes[3].uri")))
+
+        // Quiz Service Routes
+        .route("quiz-service-route", r -> r
+            .path("/api/v1/quizzes/**", "/api/v1/attempts/**")
+            .uri(quizServiceAvailable ? "lb://QUIZ-SERVICE" : 
+                 env.getProperty("spring.cloud.gateway.routes[4].uri")))
 
         // Health Check Route
         .route("health-route", r -> r

@@ -32,8 +32,8 @@ const jwtMiddleware = async (req, res, next) => {
     if (!valid) {
       throw new UnauthorizedError('Invalid or expired token');
     }
-
     req.user = { id: userId };
+    console.log('User ID from token:', req.user.id); // Log the user ID for debugging
     next();
   } catch (error) {
     next(error);

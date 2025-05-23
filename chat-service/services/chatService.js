@@ -21,8 +21,7 @@ const createChat = async (userId, name) => {
       },
       select: {
         publicId: true,
-        id: true,
-        username: true
+        id: true
       }
     });
 
@@ -30,20 +29,17 @@ const createChat = async (userId, name) => {
       throw new NotFoundError('User');
     }
 
-    const chat = await prisma.chat
-      .create({
-        data: {
-          id: ulid(),
-          userId: userId,
-          name: name
-        }
-      })
-      .catch(error => {
-        throw error;
-      });
+    const chat = await prisma.chat.create({
+      data: {
+        id: ulid(),
+        userId: userId,
+        name: name
+      }
+    });
 
     return chat;
   } catch (error) {
+    console.error('Error in createChat:', error);
     if (error instanceof ValidationError || error instanceof NotFoundError) {
       throw error;
     }

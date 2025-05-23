@@ -3,6 +3,10 @@ const path = require('path');
 const morgan = require('morgan');
 const { globalErrorHandler } = require('./utils/errorHandler');
 const { NotFoundError } = require('./utils/errorTypes');
+const {
+  connectRabbitMQ,
+  listenForUserEvents
+} = require('./services/rabbitmqService');
 
 const app = express();
 
@@ -33,8 +37,16 @@ app.use((req, res, next) => {
 app.use(globalErrorHandler);
 
 const PORT = 8082;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
+
+  try {
+    const channel = await connectRabbitMQ();
+    await listenForUserEvents(channel);
+    console.log('RabbitMQ listener started successfully');
+  } catch (error) {
+    console.error('Failed to start RabbitMQ listener:', error);
+  }
 });
 
 process.on('unhandledRejection', err => {
