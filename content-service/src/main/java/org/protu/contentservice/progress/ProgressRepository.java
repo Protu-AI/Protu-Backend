@@ -1,5 +1,6 @@
 package org.protu.contentservice.progress;
 
+import org.protu.contentservice.common.exception.custom.CourseHasNoLessonsException;
 import org.protu.contentservice.common.exception.custom.UserNotEnrolledInCourseException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,7 @@ public class ProgressRepository {
         .query(Integer.class)
         .optional();
 
-    return countOpt.orElseThrow(() -> new RuntimeException("No lessons found for this course"));
+    return countOpt.orElseThrow(CourseHasNoLessonsException::new);
   }
 
   public int getTotalNumberOfCompletedLessonsInCourse(Long userId, Integer courseId) {

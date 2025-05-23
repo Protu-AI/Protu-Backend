@@ -128,7 +128,7 @@ public class TrackRepository {
           return new ArrayList<>(map.values());
         });
 
-    return Optional.ofNullable(results.get(0));
+    return results.stream().findFirst();
   }
 
   public void add(TrackRequest trackRequest) {
