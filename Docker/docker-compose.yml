@@ -8,6 +8,7 @@ include:
   - ../code-execution-service/compose.yaml
   - ../gateway/compose.yaml
   - ../service-discovery/compose.yaml
+  - ../quiz-service/compose.yaml
 
 services:
   redis:
@@ -16,11 +17,11 @@ services:
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
       interval: 1s
       timeout: 3s
       retries: 5
-    command: [ "redis-server" ]
+    command: ["redis-server"]
     volumes:
       - redis-data:/data
 
@@ -42,32 +43,25 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq/
 
-  #  model-service:
-  #    container_name: model-service-container
-  #    build:
-  #      context: ../../AI
-  #      dockerfile: Dockerfile
-  #    image: protu-ai/model-service:v1.0.0
-  #    ports:
-  #      - "8000:8000"
-  #    env_file:
-  #      - ../../AI/.env
-  #    depends_on:
-  #      postgres:
-  #        condition: service_healthy
-  #    environment:
-  #      DB_HOST: postgres
-  #      DB_PORT: 5432
-  #      DB_NAME: protu-db
-  #      DB_USER: ${POSTGRES_USER}
-  #      DB_PASSWORD: ${POSTGRES_PASSWORD}
-  #    volumes:
-  #      - model-data:/app/data
-  #      - attachments:/app/uploads
-
+  model-service:
+    container_name: model-service-container
+    build:
+      context: ../../AI
+      dockerfile: Dockerfile
+    image: protu-ai/model-service:v1.0.0
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../../AI/.env
+    depends_on:
+      protu-db:
+        condition: service_healthy
+    volumes:
+      - model-data:/app/data
+      - attachments:/app/uploads
 
 volumes:
   maven-repo:
   redis-data:
   rabbitmq-data:
-#  model-data:
+  model-data:

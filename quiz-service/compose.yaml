@@ -1,0 +1,26 @@
+services:
+  quiz-service:
+    container_name: quiz-service-container
+    build:
+      context: ../quiz-service
+      dockerfile: Dockerfile
+    image: protu-ai/quiz-service:v1.0.0
+    ports:
+      - "8089:8089"
+    env_file:
+      - ./.env
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  mongo:
+    image: mongo:7.0
+    container_name: quiz-service-db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:
