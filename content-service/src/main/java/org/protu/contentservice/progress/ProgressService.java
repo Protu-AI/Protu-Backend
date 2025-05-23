@@ -1,5 +1,7 @@
 package org.protu.contentservice.progress;
 
+import org.protu.contentservice.common.exception.custom.LessonAlreadyCompletedException;
+import org.protu.contentservice.common.exception.custom.LessonAlreadyNotCompletedException;
 import org.protu.contentservice.course.CourseDto;
 import org.protu.contentservice.course.CourseService;
 import org.protu.contentservice.lesson.LessonService;
@@ -62,7 +64,7 @@ public class ProgressService {
     CourseDto course = courseService.getCourseByNameOrThrow(courseName);
 
     if (!markLessonCompleted(userId, lessonName)) {
-      throw new IllegalArgumentException("Lesson is already completed");
+      throw new LessonAlreadyCompletedException();
     }
 
     int lessonsCount = progressRepo.getNumberOfLessonsInCourse(course.id());
@@ -79,7 +81,7 @@ public class ProgressService {
     CourseDto course = courseService.getCourseByNameOrThrow(courseName);
 
     if (!markLessonNotCompleted(userId, lessonName)) {
-      throw new IllegalArgumentException("Lesson is already not completed");
+      throw new LessonAlreadyNotCompletedException();
     }
 
     int completedLessonsCount = progressRepo.getTotalNumberOfCompletedLessonsInCourse(userId, course.id());

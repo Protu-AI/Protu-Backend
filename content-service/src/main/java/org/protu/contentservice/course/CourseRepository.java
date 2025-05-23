@@ -77,11 +77,7 @@ public class CourseRepository {
           return new ArrayList<>(map.values());
         });
 
-    if (results.isEmpty()) {
-      return Optional.empty();
-    }
-
-    return Optional.of(results.get(0));
+    return results.stream().findFirst();
   }
 
   public CourseDto findByNameOrThrow(String courseName) {
