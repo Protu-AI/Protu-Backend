@@ -1,6 +1,32 @@
+app:
+  jwt:
+    secret: <JWT_SECRET_KEY>
+
+  cloudinary:
+    cloud-name: <CLOUD_NAME>
+    api-key: <API_KEY>
+    api-secret: <API_SECRET>
+
+
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/protu-content-db
-    username: YOUR_USERNAME
-    password: YOUR_PASSWORD
+    url: jdbc:postgresql://localhost:5432/<db_name>
+    username: <USER_NAME>
+    password: <PASSWORD>
     driver-class-name: org.postgresql.Driver
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: <USER_NAME>
+    password: <PASSWORD>
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+eureka:
+  client:
+    service-url.defaultZone:
+      http://localhost:8761/eureka/
