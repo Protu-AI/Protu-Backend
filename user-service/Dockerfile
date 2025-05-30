@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine AS build
+FROM eclipse-temurin:23-jdk-alpine AS build
 
 WORKDIR /user-service
 
@@ -11,7 +11,7 @@ COPY src ./src
 
 RUN ./mvnw package -DskipTests -T 1C
 
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:23-jre-alpine
 
 WORKDIR /user-service
 
