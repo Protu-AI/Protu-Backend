@@ -1,6 +1,5 @@
 package org.protu.notificationservice.service;
 
-import lombok.RequiredArgsConstructor;
 import org.protu.notificationservice.config.AppProperties;
 import org.protu.notificationservice.dto.EmailData;
 import org.protu.notificationservice.dto.RabbitMessage;
@@ -17,13 +16,20 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 @Service
-@RequiredArgsConstructor
 public class EmailNotificationConsumer {
   private final EmailService emailService;
   private final AppProperties props;
   private final RabbitTemplate rabbitTemplate;
   private final EmailVerificationTemplateProcessor emailVerificationTemplateProcessor;
   private final PasswordResetTemplateProcessor passwordResetTemplateProcessor;
+
+  public EmailNotificationConsumer(EmailService emailService, AppProperties props, RabbitTemplate rabbitTemplate, EmailVerificationTemplateProcessor emailVerificationTemplateProcessor, PasswordResetTemplateProcessor passwordResetTemplateProcessor) {
+    this.emailService = emailService;
+    this.props = props;
+    this.rabbitTemplate = rabbitTemplate;
+    this.emailVerificationTemplateProcessor = emailVerificationTemplateProcessor;
+    this.passwordResetTemplateProcessor = passwordResetTemplateProcessor;
+  }
 
   @RabbitListener(queues = "${app.rabbit.queue.email.main}")
   public void receiveMessage(RabbitMessage<EmailData> message, Message rabbitmqMessage) {

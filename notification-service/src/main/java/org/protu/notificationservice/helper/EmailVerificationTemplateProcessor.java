@@ -1,6 +1,5 @@
 package org.protu.notificationservice.helper;
 
-import lombok.RequiredArgsConstructor;
 import org.protu.notificationservice.dto.EmailData;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -10,10 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-@RequiredArgsConstructor
 public class EmailVerificationTemplateProcessor implements TemplateProcessor {
 
   private final TemplateEngine templateEngine;
+
+  public EmailVerificationTemplateProcessor(TemplateEngine templateEngine) {
+    this.templateEngine = templateEngine;
+  }
 
   @Override
   public Map<String, Object> getVariables(EmailData emailData) {

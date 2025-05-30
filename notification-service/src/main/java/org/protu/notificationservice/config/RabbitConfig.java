@@ -1,6 +1,5 @@
 package org.protu.notificationservice.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
@@ -12,10 +11,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableRabbit
-@RequiredArgsConstructor
 public class RabbitConfig {
 
   private final AppProperties props;
+
+  public RabbitConfig(AppProperties props) {
+    this.props = props;
+  }
 
   @Bean
   public Queue emailMainQueue() {
