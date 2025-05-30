@@ -29,7 +29,7 @@ public class TrackService {
   }
 
   @Transactional(readOnly = true)
-  @Cacheable(value = CACHE_ALL_TRACK_LIST, unless = "#result == null || #result.isEmpty()")
+  @Cacheable(cacheNames = CACHE_ALL_TRACK_LIST, key = "'all-tracks'")
   public List<TrackWithCourses> getAllTracks() {
     return tracks.findAll().orElse(null);
   }

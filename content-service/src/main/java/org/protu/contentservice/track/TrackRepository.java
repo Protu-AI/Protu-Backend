@@ -13,14 +13,14 @@ import java.util.*;
 @Repository
 public class TrackRepository {
 
-  private static final RowMapper<TrackWithCourses> TRACK_MAPPER = (rs, rowNum) -> {
+  private static final RowMapper<TrackWithCourses> TRACK_MAPPER = (rs, _) -> {
     int trackId = rs.getInt("track_id");
     String trackName = rs.getString("track_name");
     String trackDescription = rs.getString("track_desc");
     return new TrackWithCourses(trackId, trackName, trackDescription, new ArrayList<>());
   };
 
-  private static final RowMapper<CourseDto> COURSE_MAPPER = (rs, rowNum) -> {
+  private static final RowMapper<CourseDto> COURSE_MAPPER = (rs, _) -> {
     int courseId = rs.getInt("course_id");
     String courseName = rs.getString("course_name");
     String courseDescription = rs.getString("course_desc");
@@ -144,16 +144,25 @@ public class TrackRepository {
   }
 
   public void update(String trackName, TrackRequest trackRequest) {
-    jdbcClient.sql("""
-            INSERT INTO tracks (name, description)
-            VALUES (:newName, :description) ON CONFLICT (name) DO
-            UPDATE
-            SET name  = EXCLUDED.name, description = EXCLUDED.description;
-            """)
-        .param("newName", trackRequest.name())
-        .param("description", trackRequest.description())
-        .param("name", trackName)
-        .update();
+    findByName(trackName)
+        .ifPresentOrElse(
+            _ -> jdbcClient.sql("""
+                    UPDATE tracks
+                    SET name = :newName, description = :newDescription
+                    WHERE name = :name
+                    """)
+                .param("newName", trackRequest.name())
+                .param("newDescription", trackRequest.description())
+                .param("name", trackName)
+                .update(),
+            () -> jdbcClient.sql("""
+                    INSERT INTO tracks (name, description)
+                    VALUES (:name, :description)
+                    """)
+                .param("name", trackRequest.name())
+                .param("description", trackRequest.description())
+                .update()
+        );
   }
 
   public void delete(String trackName) {
