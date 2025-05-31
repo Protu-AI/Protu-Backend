@@ -21,12 +21,8 @@ public class PasswordResetTemplateProcessor implements TemplateProcessor {
   public Map<String, Object> getVariables(EmailData emailData) {
     Map<String, Object> variables = new HashMap<>();
     variables.put("username", emailData.username());
+    variables.put("otp", emailData.otp().value());
     variables.put("otpTtl", emailData.otp().ttlInMinutes());
-
-    String otp = emailData.otp().value();
-    for (int i = 0; i < otp.length(); i++) {
-      variables.put("otp_" + (i + 1), otp.charAt(i));
-    }
 
     return variables;
   }
