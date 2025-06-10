@@ -1,4 +1,4 @@
-package org.protu.contentservice;
+package org.protu.contentservice.config;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;

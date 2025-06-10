@@ -1,12 +1,14 @@
-package org.protu.contentservice.exc;
+package org.protu.contentservice;
 
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Set;
 
+@ActiveProfiles("test")
 @Component
 public class RedisCacheHelper {
 

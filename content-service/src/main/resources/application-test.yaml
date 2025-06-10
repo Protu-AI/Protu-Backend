@@ -1,0 +1,27 @@
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+  cloud:
+    discovery:
+      enabled: false
+    loadbalancer:
+      enabled: false
+
+  datasource:
+    url: jdbc:tc:postgresql:latest:///test-db
+
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+eureka:
+  client:
+    enabled: false

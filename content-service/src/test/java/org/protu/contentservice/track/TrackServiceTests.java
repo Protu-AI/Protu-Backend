@@ -7,12 +7,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.protu.contentservice.common.exception.custom.EntityNotFoundException;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @Import(TrackService.class)
 @ExtendWith(MockitoExtension.class)
 public class TrackServiceTests {

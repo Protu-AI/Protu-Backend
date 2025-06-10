@@ -2,16 +2,18 @@ package org.protu.contentservice.track;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.protu.contentservice.PostgresContainerConfig;
+import org.protu.contentservice.config.PostgresContainerConfig;
 import org.protu.contentservice.course.CourseRepository;
 import org.protu.contentservice.course.CourseRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ActiveProfiles("test")
 @JdbcTest
 @Import({CourseRepository.class, TrackRepository.class, PostgresContainerConfig.class})
 public class TrackRepositoryTests {
@@ -94,7 +96,6 @@ public class TrackRepositoryTests {
             TrackWithCourses::description)
         .containsExactly("updated_track1", "updated_desc1");
 
-    System.out.println(tracks.findAll().orElse(null));
     assertThat(tracks.findByName("track1").orElse(null))
         .isNull();
   }

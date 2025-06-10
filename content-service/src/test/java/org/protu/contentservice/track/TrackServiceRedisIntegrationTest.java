@@ -2,12 +2,14 @@ package org.protu.contentservice.track;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.protu.contentservice.RedisContainerConfig;
+import org.protu.contentservice.RedisCacheHelper;
+import org.protu.contentservice.config.RedisContainerConfig;
 import org.protu.contentservice.course.CourseDto;
-import org.protu.contentservice.exc.RedisCacheHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @Import(RedisContainerConfig.class)
 public class TrackServiceRedisIntegrationTest {
@@ -26,10 +29,16 @@ public class TrackServiceRedisIntegrationTest {
   private static final String ALL_TRACKS_KEY = "all-tracks";
   private static final String TRACK1_KEY = "track1";
   private static final String COURSE1_KEY = "course1";
+
   @MockitoBean
   private TrackRepository tracks;
+
+  @MockitoBean
+  private JwtDecoder jwtDecoder;
+
   @Autowired
   private TrackService trackService;
+
   @Autowired
   private RedisCacheHelper redisCacheHelper;
 
