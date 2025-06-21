@@ -16,12 +16,10 @@ app:
       user-deleted: user.deleted
       user-pattern: user.*
 
-
-
 server.port: 8085
 
 logging.level:
-  org.springframework.security: TRACE
+  org.springframework.security: INFO
 
 spring:
   profiles:
