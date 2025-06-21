@@ -35,7 +35,7 @@ public class LessonController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<Lesson>> createLesson(
+  public ResponseEntity<ApiResponse<Void>> createLesson(
       @Validated @RequestBody LessonRequest lessonRequest,
       HttpServletRequest request) {
 
@@ -55,7 +55,7 @@ public class LessonController {
   }
 
   @PatchMapping("/{lessonName}")
-  public ResponseEntity<ApiResponse<Lesson>> updateLesson(
+  public ResponseEntity<ApiResponse<Void>> updateLesson(
       @PathVariable String lessonName,
       @Validated @RequestBody LessonUpdateRequest lessonRequest,
       HttpServletRequest request) {

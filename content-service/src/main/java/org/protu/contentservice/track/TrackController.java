@@ -45,7 +45,7 @@ public class TrackController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<Track>> createTrack(
+  public ResponseEntity<ApiResponse<Void>> createTrack(
       @RequestBody @Validated TrackRequest trackRequest,
       HttpServletRequest request) {
 
@@ -55,7 +55,7 @@ public class TrackController {
   }
 
   @PatchMapping("/{trackName}")
-  public ResponseEntity<ApiResponse<Track>> updateTrack(
+  public ResponseEntity<ApiResponse<Void>> updateTrack(
       @PathVariable String trackName,
       @RequestBody @Validated TrackRequest trackRequest,
       HttpServletRequest request) {

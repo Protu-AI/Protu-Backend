@@ -5,7 +5,6 @@ import org.protu.contentservice.common.enums.SuccessMessage;
 import org.protu.contentservice.common.helpers.JwtHelper;
 import org.protu.contentservice.common.properties.AppProperties;
 import org.protu.contentservice.common.response.ApiResponse;
-import org.protu.contentservice.lesson.Lesson;
 import org.protu.contentservice.lesson.dto.LessonWithoutContent;
 import org.protu.contentservice.lesson.dto.LessonsWithCompletion;
 import org.springframework.http.HttpStatus;
@@ -46,7 +45,7 @@ public class CourseController {
   }
 
   @PostMapping
-  public ResponseEntity<ApiResponse<Course>> createCourse(
+  public ResponseEntity<ApiResponse<Void>> createCourse(
       @Validated @RequestBody CourseRequest courseRequest,
       HttpServletRequest request) {
 
@@ -66,7 +65,7 @@ public class CourseController {
   }
 
   @PatchMapping("/{courseName}")
-  public ResponseEntity<ApiResponse<Course>> updateCourse(
+  public ResponseEntity<ApiResponse<Void>> updateCourse(
       @PathVariable String courseName,
       @Validated @RequestBody CourseRequest courseRequest,
       HttpServletRequest request) {
@@ -84,7 +83,7 @@ public class CourseController {
   }
 
   @PostMapping("/{courseName}")
-  public ResponseEntity<ApiResponse<Course>> uploadCoursePic(
+  public ResponseEntity<ApiResponse<Void>> uploadCoursePic(
       @PathVariable String courseName,
       @RequestParam(name = "file") MultipartFile file,
       HttpServletRequest request) {
@@ -104,7 +103,7 @@ public class CourseController {
   }
 
   @PostMapping("/{courseName}/lessons/{lessonName}")
-  public ResponseEntity<ApiResponse<List<Lesson>>> addExistingLessonToCourse(
+  public ResponseEntity<ApiResponse<Void>> addExistingLessonToCourse(
       @PathVariable String courseName,
       @PathVariable String lessonName,
       HttpServletRequest request) {
