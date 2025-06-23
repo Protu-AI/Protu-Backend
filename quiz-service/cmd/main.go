@@ -62,6 +62,7 @@ func main() {
 		}
 	}
 
+	quizService.SetAttemptRepo(attemptRepo)
 	quizHandler := handlers.NewQuizHandler(quizService, aiService)
 	attemptHandler := handlers.NewAttemptHandler(attemptService, quizService, aiService)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardService)

@@ -6,6 +6,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+const (
+	AttemptStatusInProgress = "in_progress"
+	AttemptStatusCompleted  = "completed"
+	AttemptStatusAbandoned  = "abandoned"
+)
+
 type QuizAttempt struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	QuizID      primitive.ObjectID `bson:"quizId" json:"quizId"`

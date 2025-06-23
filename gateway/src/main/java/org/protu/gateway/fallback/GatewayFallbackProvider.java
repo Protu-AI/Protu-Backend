@@ -23,6 +23,9 @@ public class GatewayFallbackProvider implements HandlerFunction<ServerResponse> 
 
     return ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
         .contentType(MediaType.APPLICATION_JSON)
+        .header("Access-Control-Allow-Origin", "*")
+        .header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        .header("Access-Control-Allow-Headers", "Content-Type,Authorization")
         .body(BodyInserters.fromValue(response));
   }
 }

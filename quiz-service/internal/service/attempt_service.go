@@ -124,7 +124,7 @@ func (s *AttemptService) scoreAttempt(quiz *models.Quiz, attempt *models.QuizAtt
 	attempt.Score = score
 	attempt.Passed = score >= 60
 	attempt.TimeTaken = int(now.Sub(attempt.StartedAt).Seconds())
-	attempt.Status = "completed"
+	attempt.Status = models.AttemptStatusCompleted
 }
 
 func evaluateAnswer(question *models.Question, answer models.Answer) bool {

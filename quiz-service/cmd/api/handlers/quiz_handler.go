@@ -103,7 +103,7 @@ func (h *QuizHandler) CreateQuizStage1(c *gin.Context) {
 		NumberOfQuestions: stage1Req.NumberOfQuestions,
 		QuestionTypes:     stage1Req.QuestionTypes,
 		TimeLimit:         stage1Req.TimeLimit,
-		Status:            "draft_stage1",
+		Status:            models.QuizStatusDraftStage1,
 	}
 
 	createdQuiz, err := h.quizService.CreateQuiz(c, quiz)
@@ -114,7 +114,11 @@ func (h *QuizHandler) CreateQuizStage1(c *gin.Context) {
 
 	questionType := "multiple_choice"
 	if len(createdQuiz.QuestionTypes) > 0 {
-		questionType = createdQuiz.QuestionTypes[0]
+		if len(createdQuiz.QuestionTypes) > 1 {
+			questionType = "mixed"
+		} else {
+			questionType = createdQuiz.QuestionTypes[0]
+		}
 	}
 
 	subtopicSuggestions, err := h.aiService.GetSubtopicSuggestions(
@@ -171,7 +175,7 @@ func (h *QuizHandler) CompleteQuizStage2(c *gin.Context) {
 		return
 	}
 
-	if quiz.Status != "draft_stage1" {
+	if quiz.Status != models.QuizStatusDraftStage1 {
 		apiResponse.Error(c, errors.BadRequestError("Quiz is not in stage 1 draft status", nil))
 		return
 	}
@@ -182,7 +186,11 @@ func (h *QuizHandler) CompleteQuizStage2(c *gin.Context) {
 
 	questionType := "multiple_choice"
 	if len(quiz.QuestionTypes) > 0 {
-		questionType = quiz.QuestionTypes[0]
+		if len(quiz.QuestionTypes) > 1 {
+			questionType = "mixed"
+		} else {
+			questionType = quiz.QuestionTypes[0]
+		}
 	}
 
 	log.Printf("Calling AI service to generate questions for quiz ID: %s", stage2Req.QuizID)
@@ -192,6 +200,7 @@ func (h *QuizHandler) CompleteQuizStage2(c *gin.Context) {
 		quiz.DifficultyLevel,
 		questionType,
 		quiz.TimeLimit,
+		quiz.NumberOfQuestions,
 		quiz.Subtopics,
 		quiz.AdditionalSubtopics,
 		quiz.AdditionalPrefs,
@@ -205,31 +214,12 @@ func (h *QuizHandler) CompleteQuizStage2(c *gin.Context) {
 	quiz.Title = quizResult.Title
 	quiz.Topic = quizResult.Topic
 	quiz.Questions = quizResult.Questions
-	quiz.Status = "draft"
+	quiz.Status = models.QuizStatusDraft
 
 	updatedQuiz, err := h.quizService.UpdateQuiz(c, stage2Req.QuizID, quiz)
 	if err != nil {
 		apiResponse.Error(c, errors.QuizCreationError("Failed to update quiz with generated questions", err.Error()))
 		return
-	}
-
-	var publicQuestions []response.PublicQuestionDetail
-	for _, q := range updatedQuiz.Questions {
-		var publicOptions []response.PublicOption
-		for _, opt := range q.Options {
-			publicOptions = append(publicOptions, response.PublicOption{
-				Text: opt.Text,
-			})
-		}
-
-		publicQuestions = append(publicQuestions, response.PublicQuestionDetail{
-			ID:           q.ID.Hex(),
-			QuestionText: q.QuestionText,
-			QuestionType: q.QuestionType,
-			Options:      publicOptions,
-			CodeSnippet:  "",
-			Order:        q.Order,
-		})
 	}
 
 	stage2Response := response.QuizStage2Response{
@@ -245,10 +235,44 @@ func (h *QuizHandler) CompleteQuizStage2(c *gin.Context) {
 		TimeLimit:           updatedQuiz.TimeLimit,
 		AdditionalPrefs:     updatedQuiz.AdditionalPrefs,
 		Status:              updatedQuiz.Status,
-		Questions:           publicQuestions,
 		CreatedAt:           updatedQuiz.CreatedAt,
 		UpdatedAt:           updatedQuiz.UpdatedAt,
 	}
 
 	apiResponse.QuizStageCompleted(c, 2, stage2Response)
+}
+
+func (h *QuizHandler) DeleteQuiz(c *gin.Context) {
+	quizID := c.Param("quizId")
+	if quizID == "" {
+		apiResponse.Error(c, errors.BadRequestError("Quiz ID is required", nil))
+		return
+	}
+
+	userID, err := middleware.GetUserIDFromContext(c)
+	if err != nil {
+		apiResponse.Error(c, errors.AuthenticationError("Failed to get user ID from token"))
+		return
+	}
+
+	err = h.quizService.DeleteQuiz(c, quizID, userID)
+	if err != nil {
+		switch err.Error() {
+		case "quiz not found":
+			apiResponse.Error(c, errors.NotFoundError("Quiz not found"))
+		case "you are not authorized to delete this quiz":
+			apiResponse.Error(c, errors.AuthorizationError("You are not authorized to delete this quiz"))
+		case "only draft quizzes can be deleted":
+			apiResponse.Error(c, errors.BadRequestError("Only draft quizzes can be deleted", nil))
+		case "cannot delete quiz that has attempts":
+			apiResponse.Error(c, errors.BadRequestError("Cannot delete quiz that has attempts", nil))
+		default:
+			apiResponse.Error(c, errors.InternalError("Failed to delete quiz: "+err.Error()))
+		}
+		return
+	}
+
+	apiResponse.OK(c, "Quiz deleted successfully", gin.H{
+		"quizId": quizID,
+	})
 }

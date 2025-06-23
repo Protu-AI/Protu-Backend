@@ -13,4 +13,10 @@ router.post(
   messageController.createMessage
 );
 
+router.post(
+  '/messages',
+  uploadMiddleware,
+  messageController.createMessageWithAutoChat
+);
+
 module.exports = router;

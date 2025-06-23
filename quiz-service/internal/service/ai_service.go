@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -44,6 +45,7 @@ type QuizGenerationRequest struct {
 	Difficulty            string   `json:"difficulty"`
 	QuestionType          string   `json:"question_type"`
 	Time                  int      `json:"time"`
+	NumberOfQuestions     int      `json:"number_of_questions"`
 	Tags                  []string `json:"tags"`
 	AdditionalTags        []string `json:"additional_tags,omitempty"`
 	AdditionalPreferences string   `json:"additional_preferences,omitempty"`
@@ -179,7 +181,7 @@ func (s *AIService) GetSubtopicSuggestions(ctx context.Context, prompt, difficul
 
 // GenerateQuizQuestions calls the AI service to generate quiz questions along with title and topic
 func (s *AIService) GenerateQuizQuestions(ctx context.Context, prompt, difficulty string, questionType string,
-	timeLimit int, subtopics []string, additionalSubtopics []string, additionalPrefs string) (*QuizGenerationResult, error) {
+	timeLimit int, numberOfQuestions int, subtopics []string, additionalSubtopics []string, additionalPrefs string) (*QuizGenerationResult, error) {
 
 	aiQuestionType := mapQuestionType(questionType)
 	aiDifficulty := mapDifficulty(difficulty)
@@ -189,6 +191,7 @@ func (s *AIService) GenerateQuizQuestions(ctx context.Context, prompt, difficult
 		Difficulty:            aiDifficulty,
 		QuestionType:          aiQuestionType,
 		Time:                  timeLimit,
+		NumberOfQuestions:     numberOfQuestions,
 		Tags:                  subtopics,
 		AdditionalTags:        additionalSubtopics,
 		AdditionalPreferences: additionalPrefs,
@@ -200,7 +203,9 @@ func (s *AIService) GenerateQuizQuestions(ctx context.Context, prompt, difficult
 		return nil, err
 	}
 
-	log.Printf("[AIService] Sending quiz generation request to AI endpoint %s with body: %s", s.quizGenEndpoint, string(jsonBody))
+	log.Printf("[AIService] Sending quiz generation request to AI endpoint %s", s.quizGenEndpoint)
+	log.Printf("[AIService] Request details - numberOfQuestions: %d, questionType: %s, difficulty: %s", numberOfQuestions, aiQuestionType, aiDifficulty)
+	log.Printf("[AIService] Request body: %s", string(jsonBody))
 
 	req, err := http.NewRequestWithContext(ctx, "POST", s.quizGenEndpoint, bytes.NewBuffer(jsonBody))
 	if err != nil {
@@ -229,15 +234,25 @@ func (s *AIService) GenerateQuizQuestions(ctx context.Context, prompt, difficult
 		return nil, err
 	}
 
-	log.Printf("[AIService] Quiz generation successful, received %d questions", len(aiResp.Quiz.Questions))
+	log.Printf("[AIService] Quiz generation successful, received %d questions (requested %d)", len(aiResp.Quiz.Questions), numberOfQuestions)
+
+	// Limit the number of questions to what was requested
+	questionsToProcess := aiResp.Quiz.Questions
+	if len(questionsToProcess) > numberOfQuestions {
+		log.Printf("[AIService] Limiting questions from %d to %d as requested", len(questionsToProcess), numberOfQuestions)
+		questionsToProcess = questionsToProcess[:numberOfQuestions]
+	}
 
 	// Convert AI generated questions to our model
-	questions := make([]models.Question, 0, len(aiResp.Quiz.Questions))
-	for i, q := range aiResp.Quiz.Questions {
+	questions := make([]models.Question, 0, len(questionsToProcess))
+	for i, q := range questionsToProcess {
+		// Detect actual question type based on the question structure
+		detectedType := detectQuestionType(q)
+
 		question := models.Question{
 			ID:           primitive.NewObjectID(),
 			QuestionText: q.Question,
-			QuestionType: aiQuestionTypeToModelType(aiQuestionType),
+			QuestionType: detectedType,
 			Order:        i + 1,
 			Options:      make([]models.Option, 0, len(q.Options)),
 		}
@@ -269,9 +284,9 @@ func mapQuestionType(questionType string) string {
 	case "multiple_choice":
 		return "MCQ"
 	case "true_false":
-		return "true/false"
+		return "True/False"
 	case "mixed":
-		return "combination of MCQ and true/false"
+		return "Combination between both"
 	default:
 		return "MCQ" // Default to MCQ
 	}
@@ -282,9 +297,9 @@ func aiQuestionTypeToModelType(aiType string) string {
 	switch aiType {
 	case "MCQ":
 		return "multiple_choice"
-	case "true/false":
+	case "True/False":
 		return "true_false"
-	case "combination of MCQ and true/false":
+	case "Combination between both":
 		return "mixed"
 	default:
 		return "multiple_choice"
@@ -303,6 +318,28 @@ func mapDifficulty(difficulty string) string {
 	default:
 		return "intermediate" // Default to intermediate
 	}
+}
+
+// detectQuestionType analyzes the question structure to determine its type
+func detectQuestionType(q AIGeneratedQuestion) string {
+	// Check if it's a True/False question
+	if len(q.Options) == 2 {
+		option1 := strings.ToLower(strings.TrimSpace(q.Options[0]))
+		option2 := strings.ToLower(strings.TrimSpace(q.Options[1]))
+
+		// Check for True/False patterns
+		if (option1 == "true" && option2 == "false") || (option1 == "false" && option2 == "true") {
+			return "true_false"
+		}
+
+		// Check for Yes/No patterns
+		if (option1 == "yes" && option2 == "no") || (option1 == "no" && option2 == "yes") {
+			return "true_false"
+		}
+	}
+
+	// Default to multiple choice
+	return "multiple_choice"
 }
 
 // GetQuizFeedback calls the AI service to get personalized feedback on quiz results

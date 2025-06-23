@@ -1,9 +1,6 @@
 package routes
 
 import (
-	"time"
-
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"protu.ai/quiz-service/cmd/api/handlers"
 	"protu.ai/quiz-service/config"
@@ -18,21 +15,12 @@ func SetupRoutes(
 	attemptHandler *handlers.AttemptHandler,
 	dashboardHandler *handlers.DashboardHandler,
 ) {
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
-
-	router.Group("/").
-		GET("/health", func(c *gin.Context) {
-			apiResponse.OK(c, "Service is healthy", gin.H{
-				"status": "ok",
-			})
+	// Health endpoint
+	router.GET("/health", func(c *gin.Context) {
+		apiResponse.OK(c, "Service is healthy", gin.H{
+			"status": "ok",
 		})
+	})
 
 	v1 := router.Group("/api/v1")
 	v1.Use(middleware.JWTMiddleware(cfg))
@@ -50,6 +38,7 @@ func SetupRoutes(
 			quizzes.POST("/stage1", quizHandler.CreateQuizStage1)
 			quizzes.POST("/stage2", quizHandler.CompleteQuizStage2)
 			quizzes.PATCH("/:quizId/title", quizHandler.UpdateQuizTitle)
+			quizzes.DELETE("/:quizId", quizHandler.DeleteQuiz)
 		}
 
 		attempts := v1.Group("/attempts")

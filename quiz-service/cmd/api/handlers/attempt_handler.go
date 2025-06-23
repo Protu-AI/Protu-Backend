@@ -82,13 +82,22 @@ func (h *AttemptHandler) StartQuiz(c *gin.Context) {
 	attempt := &models.QuizAttempt{
 		QuizID: quizObjectID,
 		UserID: userID,
-		Status: "in_progress",
+		Status: models.AttemptStatusInProgress,
 	}
 
 	createdAttempt, err := h.attemptService.CreateAttempt(c, attempt)
 	if err != nil {
 		apiResponse.Error(c, errors.QuizExecutionError("Failed to create attempt", err.Error()))
 		return
+	}
+
+	if quiz.Status == models.QuizStatusDraft || quiz.Status == models.QuizStatusDraftStage1 {
+		_, err := h.quizService.PublishQuiz(c, quizID)
+		if err != nil {
+		}
+	}
+
+	if err := h.quizService.IncrementAttemptCount(c, quizID); err != nil {
 	}
 
 	questions := make([]response.QuestionDetail, 0, len(quiz.Questions))
@@ -143,6 +152,11 @@ func (h *AttemptHandler) SubmitAttempt(c *gin.Context) {
 	attempt, err := h.attemptService.GetAttemptByID(c, attemptID)
 	if err != nil {
 		apiResponse.Error(c, errors.NotFoundError("Attempt not found"))
+		return
+	}
+
+	if attempt.Status == models.AttemptStatusCompleted {
+		apiResponse.Error(c, errors.BadRequestError("Attempt has already been submitted", nil))
 		return
 	}
 

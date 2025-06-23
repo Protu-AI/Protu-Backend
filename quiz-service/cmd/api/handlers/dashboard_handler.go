@@ -12,15 +12,11 @@ import (
 
 type DashboardHandler struct {
 	dashboardService *service.DashboardService
-	defaultPageSize  int
-	maxPageSize      int
 }
 
 func NewDashboardHandler(dashboardService *service.DashboardService) *DashboardHandler {
 	return &DashboardHandler{
 		dashboardService: dashboardService,
-		defaultPageSize:  10,
-		maxPageSize:      100,
 	}
 }
 
@@ -37,16 +33,16 @@ func (h *DashboardHandler) GetDashboardSummary(c *gin.Context) {
 		return
 	}
 
-	dashboardSummary, err := h.dashboardService.GetDashboardSummary(c, userIDStr)
+	summary, err := h.dashboardService.GetDashboardSummary(c, userIDStr)
 	if err != nil {
 		apiResponse.Error(c, errors.InternalError("Failed to retrieve dashboard summary: "+err.Error()))
 		return
 	}
 
 	summaryResponse := response.DashboardSummaryResponse{
-		TotalQuizzes: dashboardSummary.TotalQuizzes,
-		AverageScore: dashboardSummary.AverageScore,
-		SuccessRate:  dashboardSummary.SuccessRate,
+		TotalQuizzes: summary.TotalQuizzes,
+		AverageScore: summary.AverageScore,
+		SuccessRate:  summary.SuccessRate,
 	}
 
 	apiResponse.OK(c, "Dashboard summary retrieved successfully", summaryResponse)
@@ -75,7 +71,13 @@ func (h *DashboardHandler) GetPassedQuizzes(c *gin.Context) {
 
 	quizResponses := make([]response.QuizSummaryResponse, 0, len(quizzesList.Quizzes))
 	for _, quiz := range quizzesList.Quizzes {
-		quizResponses = append(quizResponses, mapQuizToSummaryResponse(quiz))
+		quizResponses = append(quizResponses, response.QuizSummaryResponse{
+			ID:        quiz.ID,
+			Title:     quiz.Title,
+			Topic:     quiz.Topic,
+			Score:     quiz.Score,
+			TimeTaken: quiz.TimeTaken,
+		})
 	}
 
 	pagination := response.PaginationMetadata{
@@ -116,7 +118,13 @@ func (h *DashboardHandler) GetFailedQuizzes(c *gin.Context) {
 
 	quizResponses := make([]response.QuizSummaryResponse, 0, len(quizzesList.Quizzes))
 	for _, quiz := range quizzesList.Quizzes {
-		quizResponses = append(quizResponses, mapQuizToSummaryResponse(quiz))
+		quizResponses = append(quizResponses, response.QuizSummaryResponse{
+			ID:        quiz.ID,
+			Title:     quiz.Title,
+			Topic:     quiz.Topic,
+			Score:     quiz.Score,
+			TimeTaken: quiz.TimeTaken,
+		})
 	}
 
 	pagination := response.PaginationMetadata{
@@ -157,7 +165,13 @@ func (h *DashboardHandler) GetDraftQuizzes(c *gin.Context) {
 
 	quizResponses := make([]response.QuizSummaryResponse, 0, len(quizzesList.Quizzes))
 	for _, quiz := range quizzesList.Quizzes {
-		quizResponses = append(quizResponses, mapQuizToSummaryResponse(quiz))
+		quizResponses = append(quizResponses, response.QuizSummaryResponse{
+			ID:        quiz.ID,
+			Title:     quiz.Title,
+			Topic:     quiz.Topic,
+			Score:     quiz.Score,
+			TimeTaken: quiz.TimeTaken,
+		})
 	}
 
 	pagination := response.PaginationMetadata{
@@ -176,34 +190,26 @@ func (h *DashboardHandler) GetDraftQuizzes(c *gin.Context) {
 }
 
 func (h *DashboardHandler) getFilterOptions(c *gin.Context) service.FilterOptions {
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil || page < 1 {
+	page, _ := strconv.Atoi(c.Query("page"))
+	if page < 1 {
 		page = 1
 	}
 
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", strconv.Itoa(h.defaultPageSize)))
-	if err != nil || pageSize < 1 {
-		pageSize = h.defaultPageSize
-	} else if pageSize > h.maxPageSize {
-		pageSize = h.maxPageSize
+	pageSize, _ := strconv.Atoi(c.Query("pageSize"))
+	if pageSize < 1 {
+		pageSize = 10
+	} else if pageSize > 100 {
+		pageSize = 100
 	}
 
-	sortBy := c.DefaultQuery("sortBy", "dateTaken")
-	sortOrder := c.DefaultQuery("sortOrder", "desc")
+	sortBy := c.Query("sortBy")
+	if sortBy == "" {
+		sortBy = "dateTaken"
+	}
 
+	sortOrder := c.Query("sortOrder")
 	if sortOrder != "asc" && sortOrder != "desc" {
 		sortOrder = "desc"
-	}
-
-	validSortFields := map[string]bool{
-		"dateTaken": true,
-		"score":     true,
-		"title":     true,
-		"topic":     true,
-	}
-
-	if !validSortFields[sortBy] {
-		sortBy = "dateTaken"
 	}
 
 	topic := c.Query("topic")
@@ -214,16 +220,5 @@ func (h *DashboardHandler) getFilterOptions(c *gin.Context) service.FilterOption
 		SortBy:    sortBy,
 		SortOrder: sortOrder,
 		Topic:     topic,
-	}
-}
-
-func mapQuizToSummaryResponse(quiz service.QuizCard) response.QuizSummaryResponse {
-	return response.QuizSummaryResponse{
-		ID:        quiz.ID,
-		Title:     quiz.Title,
-		Score:     quiz.Score,
-		DateTaken: quiz.DateTaken,
-		Topic:     quiz.Topic,
-		TimeTaken: quiz.TimeTaken,
 	}
 }

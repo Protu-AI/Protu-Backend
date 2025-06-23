@@ -56,19 +56,18 @@ type SubtopicSuggestion struct {
 }
 
 type QuizStage2Response struct {
-	ID                  string                 `json:"id"`
-	Title               string                 `json:"title"`
-	Topic               string                 `json:"topic"`
-	Prompt              string                 `json:"prompt"`
-	Subtopics           []string               `json:"subtopics"`
-	AdditionalSubtopics []string               `json:"additional_subtopics"`
-	DifficultyLevel     string                 `json:"difficultyLevel"`
-	NumberOfQuestions   int                    `json:"numberOfQuestions"`
-	QuestionTypes       []string               `json:"questionTypes"`
-	TimeLimit           int                    `json:"timeLimit"`
-	AdditionalPrefs     string                 `json:"additionalPrefs"`
-	Status              string                 `json:"status"`
-	Questions           []PublicQuestionDetail `json:"questions"`
-	CreatedAt           time.Time              `json:"createdAt"`
-	UpdatedAt           time.Time              `json:"updatedAt"`
+	ID                  string    `json:"id"`
+	Title               string    `json:"title"`
+	Topic               string    `json:"topic"`
+	Prompt              string    `json:"prompt"`
+	Subtopics           []string  `json:"subtopics"`
+	AdditionalSubtopics []string  `json:"additional_subtopics"`
+	DifficultyLevel     string    `json:"difficultyLevel"`
+	NumberOfQuestions   int       `json:"numberOfQuestions"`
+	QuestionTypes       []string  `json:"questionTypes"`
+	TimeLimit           int       `json:"timeLimit"`
+	AdditionalPrefs     string    `json:"additionalPrefs"`
+	Status              string    `json:"status"`
+	CreatedAt           time.Time `json:"createdAt"`
+	UpdatedAt           time.Time `json:"updatedAt"`
 }

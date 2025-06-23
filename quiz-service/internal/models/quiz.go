@@ -6,6 +6,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Quiz status constants
+const (
+	QuizStatusDraftStage1 = "draft_stage1"
+	QuizStatusDraft       = "draft"
+	QuizStatusPublished   = "published"
+	QuizStatusActive      = "active"
+	QuizStatusCompleted   = "completed"
+	QuizStatusArchived    = "archived"
+)
+
 type Quiz struct {
 	ID                  primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	UserID              string             `bson:"userId" json:"userId"`
@@ -21,8 +31,10 @@ type Quiz struct {
 	Questions           []Question         `bson:"questions" json:"questions"`
 	Topic               string             `bson:"topic" json:"topic"`
 	Status              string             `bson:"status" json:"status"`
+	AttemptCount        int                `bson:"attemptCount" json:"attemptCount"`
 	CreatedAt           time.Time          `bson:"createdAt" json:"createdAt"`
 	UpdatedAt           time.Time          `bson:"updatedAt" json:"updatedAt"`
+	PublishedAt         *time.Time         `bson:"publishedAt,omitempty" json:"publishedAt,omitempty"`
 }
 
 type Question struct {

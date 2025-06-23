@@ -59,9 +59,27 @@ const deleteChat = asyncWrapper(async (req, res) => {
     .json(buildResponse(req, 'OK', result, 'Chat deleted successfully'));
 });
 
+const updateChatName = asyncWrapper(async (req, res) => {
+  const userId = req.user.id;
+  const { chatId } = req.params;
+  const { name } = req.body;
+
+  if (!name) {
+    throw new ValidationError('Chat name is required');
+  }
+
+  const updatedChat = await chatService.updateChatName(chatId, userId, name);
+  res
+    .status(200)
+    .json(
+      buildResponse(req, 'OK', updatedChat, 'Chat name updated successfully')
+    );
+});
+
 module.exports = {
   createChat,
   getUserChats,
   deleteChat,
-  getSingleChat
+  getSingleChat,
+  updateChatName
 };
