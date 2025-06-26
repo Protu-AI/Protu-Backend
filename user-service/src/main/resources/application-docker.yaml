@@ -16,6 +16,9 @@ app:
     api-key: ${CLOUDINARY_API_KEY}
     api-secret: ${CLOUDINARY_API_SECRET}
 
+  admin:
+    password: ${ADMIN_PASSWORD}
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
